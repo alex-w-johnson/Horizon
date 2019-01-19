@@ -1,0 +1,25 @@
+<TARGETDECK>
+	<TARGET
+		TargetName = "groundstation1"
+		TargetType = "FacilityTarget"
+		TaskType = "COMM"
+		MaxTimes = "10"
+		Value = "-1">
+		<DynamicState
+			DynamicStateType = "STATIC_LLA"
+			ICs = "[-33.47; -70.65; 0]">
+		</DynamicState>
+	</TARGET>
+	<TARGET
+		TargetName = "imagetarget1"
+		TargetType = "LocationTarget"
+		TaskType = "IMAGING"
+		MaxTimes = "10"
+		Value = "3">
+		<DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[39.2945; -71.1559; 0]">
+		</DynamicState>
+	</TARGET>
+	
+</TARGETDECK>
