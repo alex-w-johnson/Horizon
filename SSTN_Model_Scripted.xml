@@ -1,0 +1,92 @@
+<MODEL>
+  <ASSET assetName="Asset1">
+    <DynamicState
+			DynamicStateType="PREDETERMINED_ECI"
+			ICs="[7378.137; 0.0; 0.0; 0.0; 6.02088; 4.215866]">
+      <EOMS
+				EOMSType="orbital_EOMS">
+      </EOMS>
+    </DynamicState>
+    <SUBSYSTEM
+			Type="Access"
+			subsystemName = "Access">
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Adcs"
+      src="..\..\..\Adcs.py"
+      className ="adcs">
+      <IC type="Matrix" key="ECI_Pointing_Vector(XYZ)" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="ECI_Body_Rates(XYZ)" value="[0.0;0.0;0.0]"></IC>
+      <IC type="Matrix" key="ReactWheelRates(XYZ)" value="[0.0;0.0;0.0]"></IC>
+      <DEPENDENCY subsystemName="Access"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Payload"
+			src="..\..\..\payload.py"
+			className="payload">
+      <IC type="Double" key="numPixels" value="0.0"></IC>
+      <IC type="Bool" key="PayloadOn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "MDH"
+			src="..\..\..\mdh.py"
+			className="mdh">
+      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Payload" fcnName="Asset1.MDHfromPayload"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "CDH"
+			src="..\..\..\cdh.py"
+			className="cdh">
+      <IC type="Double" key="TelemBufferFillRatio" value="0.0"></IC>
+      <DEPENDENCY subsystemName="MDH" fcnName="Asset1.CDHfromMDH"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Comm"
+			src="..\..\..\comm.py"
+			className="comm">
+      <IC type="Double" key="DataRate(MB/s)" value="0.0"></IC>
+      <DEPENDENCY subsystemName="CDH" fcnName="Asset1.CommfromCDH"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Power"
+			src="..\..\..\power.py"
+			className="power"
+			batterySize="1000000"
+			fullSolarPower="60"
+			penumbraSolarPower="30">
+      <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
+      <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs" fcnName="Asset1.PowerfromADCS"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Payload" fcnName="Asset1.PowerfromPayload"></DEPENDENCY>
+      <DEPENDENCY subsystemName="MDH" fcnName="Asset1.PowerfromMDH"></DEPENDENCY>
+      <DEPENDENCY subsystemName="CDH" fcnName="Asset1.PowerfromCDH"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Comm" fcnName="Asset1.PowerfromComm"></DEPENDENCY>
+    </SUBSYSTEM>
+    <CONSTRAINT
+			value="0.25"
+			subsystemName = "Power"
+			type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DepthofDischarge"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+			value="0.7"
+			subsystemName="MDH"
+			type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="0.7"
+      subsystemName="CDH"
+      type="FAIL_IF_HIGHER">
+      <STATEVAR type ="Double" key="TelemBufferFillRatio"></STATEVAR>
+    </CONSTRAINT>
+  </ASSET>
+</MODEL>
