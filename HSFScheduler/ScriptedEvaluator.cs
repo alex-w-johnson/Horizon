@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2016 California Polytechnic State University
 // Authors: Morgan Yost (morgan.yost125@gmail.com) Eric A. Mehiel (emehiel@calpoly.edu)
 
-
 using IronPython.Hosting;
 using HSFSystem;
 using System.Xml;
