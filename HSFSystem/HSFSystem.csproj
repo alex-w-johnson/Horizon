@@ -39,41 +39,33 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IronPython, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\IronPython.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="IronPython">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\IronPython.dll</HintPath>
     </Reference>
-    <Reference Include="IronPython.Modules, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\IronPython.Modules.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="IronPython.Modules">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\IronPython.Modules.dll</HintPath>
     </Reference>
-    <Reference Include="IronPython.SQLite, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\IronPython.SQLite.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="IronPython.SQLite">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\DLLs\IronPython.SQLite.dll</HintPath>
     </Reference>
-    <Reference Include="IronPython.Wpf, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\IronPython.Wpf.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="IronPython.Wpf">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\DLLs\IronPython.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Dynamic, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\Microsoft.Dynamic.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Dynamic">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\Microsoft.Dynamic.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Scripting, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\Microsoft.Scripting.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Scripting">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\Microsoft.Scripting.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Scripting.AspNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\Microsoft.Scripting.AspNet.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Scripting.AspNet">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\Microsoft.Scripting.AspNet.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Scripting.Metadata, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\packages\IronPython.2.7.4\lib\Net45\Microsoft.Scripting.Metadata.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Scripting.Metadata">
+      <HintPath>..\..\..\..\..\Downloads\IronPython-2.7.7-win\IronPython-2.7.7\Microsoft.Scripting.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.6.0\lib\net45\nunit.framework.dll</HintPath>
