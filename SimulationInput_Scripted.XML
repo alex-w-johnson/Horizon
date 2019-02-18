@@ -1,8 +1,8 @@
 <SCENARIO scenarioName="testScenario">
 	<SIMULATION_PARAMETERS
-		SimStartJD="2458930.5"
+		SimStartJD="2454680.0"
 		SimStartSeconds="0.0"
-		SimEndSeconds="86400">
+		SimEndSeconds="6307.0">
 	</SIMULATION_PARAMETERS>
 
 	<SCHEDULER_PARAMETERS
