@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingUnitTest", "LoggingU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSFMainUnitTest", "HSFMainUnitTest\HSFMainUnitTest.csproj", "{20099F21-A99C-4F8A-9C10-AE3C3102F320}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "CANPythonModels", "CANPythonModels\CANPythonModels.pyproj", "{04F8AC2F-8C8F-444C-BA5B-A44345020335}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -237,6 +239,12 @@ Global
 		{20099F21-A99C-4F8A-9C10-AE3C3102F320}.Release|Any CPU.Build.0 = Release|Any CPU
 		{20099F21-A99C-4F8A-9C10-AE3C3102F320}.Release|x86.ActiveCfg = Release|Any CPU
 		{20099F21-A99C-4F8A-9C10-AE3C3102F320}.Release|x86.Build.0 = Release|Any CPU
+		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Realease Fast|Any CPU.ActiveCfg = Release|Any CPU
+		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Realease Fast|x86.ActiveCfg = Release|Any CPU
+		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
