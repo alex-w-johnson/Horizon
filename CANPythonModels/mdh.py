@@ -69,7 +69,7 @@ class mdh(HSFSubsystem.Subsystem):
                 return True
           #  Logger.Report("SSDR")
             return False
-        if(self/_task.Type == TaskType.COMPRESS):
+        if(self/_task.Type == TaskType.COMM):
              ts = event.GetTaskStart(self.Asset)
              event.SetTaskEnd(self.Asset, ts + 60.0)
              te = event.GetTaskEnd(self.Asset)
@@ -93,7 +93,7 @@ class mdh(HSFSubsystem.Subsystem):
         prof1[event.GetEventStart(self.Asset)] = 15
         return prof1
 
-    def CDHSUB_DataRateProfile_MDHSUB(self, event):
+    def COMMSUB_DataRateProfile_MDHSUB(self, event):
         datarate = 5000 * (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset))
         prof1 = HSFProfile[System.Double]()
         if (datarate != 0):
@@ -101,7 +101,7 @@ class mdh(HSFSubsystem.Subsystem):
             prof1[event.GetTaskEnd(self.Asset)] = 0
         return prof1
 
-    def EVAL_DataRateProfile_SSDRSUB(self, event):
+    def EVAL_DataRateProfile_MDHSUB(self, event):
         return (event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value - event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) * 50
 
     def DependencyCollector(self, currentEvent):

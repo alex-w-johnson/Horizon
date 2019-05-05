@@ -18,28 +18,32 @@ import UserModel
 from UserModel import XmlParser
 from MissionElements import Asset
 #per Maclean's rocketEOMS.py
-from Utilities import *
+
 from HSFUniverse import *
 from System.Collections.Generic import Dictionary
 from IronPython.Compiler import CallTarget0
 from System import Array
 from System import Xml
+import datetime #For using WMM
+from System import DateTime #For using WMM
+
 
 class eomSSTN(Utilities.EOMS):
     def __init__(self):
-        self.Cd = float(scriptedNode["Geometry"].Attributes["Cd"].Value)
-        self.CxArea = float(scriptedNode["Geometry"].Attributes["CxArea"].Value)
-        self.CoP = float(scriptedNode["Geometry"].Attributes["CoP"].Value)
+        self.Cd = float(scriptedNode["EOMS"].Attributes["cd"].Value)
+        self.CxArea = float(scriptedNode["EOMS"].Attributes["cxareaavg"].Value)
+        self.CoP = Vector(scriptedNode["EOMS"].Attributes["cop"].Value)
         
         # Mass Properties for Dynamics
-        self.Ixx = float(scriptedNode["MassProp"].Attributes["Ixx"].Value)
-        self.Iyy = float(scriptedNode["MassProp"].Attributes["Iyy"].Value)
-        self.Izz = float(scriptedNode["MassProp"].Attributes["Izz"].Value)
-        self.Mass = float(scriptedNode["MassProp"].Attributes["Mass"].Value)
+        self.Ivec = Vector(scriptedNode["EOMS"].Attrbutes["moi"].Value)
+        self.Ixx = self.Ivec[1]
+        self.Iyy = self.Ivec[2]
+        self.Izz = self.Ivec[3]
+        self.Mass = float(scriptedNode["EOMS"].Attributes["mass"].Value)
         self.Imat = CalcInertiaMatrix(self)
-        self.CoM = float(scriptedNode["MassProp"].Attributes["CoM"].Value)
-        
-    def PythonAccessor(self, t, y):
+        self.CoM = Vector(scriptedNode["EOMS"].Attributes["com"].Value)
+
+    def PythonAccessor(self, t, y, param):
         xeci = y[1]
         yeci = y[2]
         zeci = y[3]
@@ -89,26 +93,37 @@ class eomSSTN(Utilities.EOMS):
         epscross[3,3] = qb3
         epsbecidot = 0.5*epscross*wbeci
         
-        
+        # Current Julian Date
+        jdCurrent = SimParameters.SimStartJD
+
         # State transition matrix equations
+        dy = Matrix[System.Double](16,1)
         dy[1] = vxeci
         dy[2] = vyeci
         dy[3] = vzeci
-        #dy[4] = accelerations
-        
-        d[7] = epsbecidot[1]
-        d[8] = epsbecidot[2]
-        d[9] = epsbecidot[3]
+        acceleration = CalcForces(self)
+        dy[4] = acceleration[1]
+        dy[5] = acceleration[2]
+        dy[6] = acceleration[3]
+        dy[7] = epsbecidot[1]
+        dy[8] = epsbecidot[2]
+        dy[9] = epsbecidot[3]
         dy[10] = -0.5*Utilities.Vector.Dot(epsbeci,wbeci)
-
-
         return super(eomSSTN, self).PythonAccessor(t, y)
 
     def CalcForces(self):
-        pass
+        a_grav = CalcGravityForce(self,self.Reci)
+        a_J2 = CalcJ2Force(self,self.Reci)
+        a_drag = CalcDragForce(self,self.Reci,self.Veci)/self.Mass
+        a_total = a_grav + a_J2 + a_drag
+        return a_total
 
-    def CalcMoments(self,r_eci,v_eci):
-        pass
+    def CalcMoments(self,r_eci,v_eci,T_control,M_dipole):
+        T_drag = CalcDragMoment(self,self.Reci,self.Veci)
+        T_mag = CalcMagMoment(self,self.Reci,self.jdCurrent,M_dipole)
+        #T_gravgrad = CalcGravGradMoment()
+        T_total = T_drag + T_mag
+        return T_total
 
     def CalcGravityForce(self,r):
         mu = 398600.4418
@@ -133,14 +148,18 @@ class eomSSTN(Utilities.EOMS):
     def CalcDragForce(self,r_eci,v_eci):
         rho = CalcAtmosDens(self,r_eci)
         vnorm = Matrix[System.Double].Norm(v_eci)
-        F_d = -1*rho*v_eci*vnorm*self.Cd*self.CxArea
+        F_d = -1*rho*1000.0*v_eci*vnorm*self.Cd*self.CxArea
         return F_d
 
     def CalcDragMoment(self,r_eci,v_eci):
-        pass
+        fdrag = CalcDragForce(self,r_eci,v_eci)
+        T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
+        return T_d
 
-    def CalcMagMoment(self,r_eci):
-        pass
+    def CalcMagMoment(self,r_eci,JD,M_dipole):
+        bField = CalcCurrentMagField(r_eci,JD)
+        magMoment = Vector.Cross(M_dipole,bField)
+        return magMoment
 
     def CalcGravGradMoment(self,r_eci,Qb_eci):
         mu = 398600.4418
@@ -184,7 +203,7 @@ class eomSSTN(Utilities.EOMS):
         atmMatrix[28] = [ 1000, 3.019E-15, 268.00]
         for r in atmMatrix:
             if h > atmMatrix[r][0] and h < atmMatrix[r+1][0]:
-                rho = atmMatrix[r][1] * math.exp(-1*(h-atmMatrix[r][1])/atmMatrix[r][2])
+                rho = atmMatrix[r][1] * math.exp(-1*(h-atmMatrix[r][0])/atmMatrix[r][2])
             else:
                 print('Invalid altitude input to exponential atmosphere calculation')
                 break
@@ -204,3 +223,70 @@ class eomSSTN(Utilities.EOMS):
         InerMat[2,2] = self.Iyy
         InerMat[3,3] = self.Izz
         return InerMat
+
+    def CalcCurrentJD(JD):
+        # TODO: find way to get current time Julian Date to propagate with sim time
+        return JD
+
+    def CalcCurrentYMDhms(JD):
+        # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado "Inverse Julian Date" algorithm
+        J2000 = 2451545.0 #JD for Jan. 1 2000
+        Y2000 = 2000.0 
+        T2000 = (JD - J2000)/365.25 # Number of Julian centuries (*100) from Jan. 1, 2000
+        Y = Y2000 + math.floor(T2000)
+        lyrs = math.floor(0.25*(Y-Y2000-1))
+        days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
+        if days < 1.0:
+            Y = Y-1
+            lyrs = math.floor(0.25*(Y-Y2000-1))
+            days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
+        dayofyr = math.floor(days)
+
+        # determine month
+        lmonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        if Y % 4.0 == 0:
+            lmonth[2] = 29
+
+        # for loop to determine calendar month
+        idx = 1
+        tempint = 0
+        while (dayofyr > tempint + lmonth[idx]) and (idx < 12):
+            tempint += lmonth[idx]
+            idx += 1
+        M = idx
+        D = dayofyr - tempint
+
+        # find hours, minutes, seconds
+        temp = (days - dayofyr) * 24.0
+        h = math.floor(temp)
+        temp = (temp-h) * 60.0
+        m = math.floor(temp)
+        s = (temp - m) * 60.0
+        out[0] = Y
+        out[1] = M
+        out[2] = D
+        out[3] = h
+        out[4] = m
+        out[5] = s
+        return out # return Y M D h m s as list
+
+    def CalcCurrentUTCDateTime(Y,M,D,h,m,s):
+        currDateTime = System.Datetime(Y,M,D,h,m,s,kind=DateTimeKind.Utc)
+        return currDateTime
+
+    def CalcCurrentMagField(r_eci,JD):
+        assetLLA = GeometryUtilities.ECI2LLA(r_eci,JD)
+        assetLat = assetLLA[1]
+        assetLong = assetLLA[2]
+        assetAlt = assetLLA[3]
+        YMDhms = CalcCurrentYMDhms(JD)
+        Y = YMDhms[0]
+        M = YMDhms[1]
+        D = YMDhms[2]
+        h = YMDhms[3]
+        m = YMDhms[4]
+        s = YMDhms[5]
+        cDT = CalcCurrentUTCDateTime(Y,M,D,h,m,s)
+        bvec = WMM.CalcBvec(assetLat,assetLong,assetAlt,cDT)
+        bvecECI = GeometryUtilities.NED2ECIRotate(bvec,assetLLA,JD)
+        return bvecECI

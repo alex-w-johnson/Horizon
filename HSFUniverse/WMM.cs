@@ -290,5 +290,15 @@ namespace HSFUniverse
             olon = glon;
 
         }
+
+        public Vector CalcBvec(double dlat, double dlon, double alt, DateTime date)
+        {
+            GeoMag(dlat, dlon, alt, date);
+            Vector bvec = new Vector(3);
+            bvec[1] = bx;
+            bvec[2] = by;
+            bvec[3] = bz;
+            return bvec;
+        }
     }
 }

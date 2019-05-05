@@ -165,6 +165,16 @@ namespace HSFUniverse
         {
             return _stateData[simTime][new MatrixIndex(11, 13)];
         }
+
+        /// <summary>
+        /// Returns reaction wheel speeds in rad/s
+        /// </summary>
+        /// <param name="simtime"></param>
+        /// <returns></returns>
+        public Matrix<double> WheelRates(double simTime)
+        {
+            return _stateData[simTime][new MatrixIndex(14, 16)];
+        }
         #endregion
 
         /// <summary>

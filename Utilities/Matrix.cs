@@ -308,6 +308,31 @@ namespace Utilities
         }
 
         /// <summary>
+        /// Returns the cross matrix of a 3x1 (or 1x3) vector.
+        /// Return type is a 3x3 matrix.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static Matrix<T> CrossMatrix(Matrix<T> a)
+        {
+            if (!a.IsVector())
+                throw new ArgumentException("Argument of the cross matrix must be a vector.");
+            if (a.NumElements != 3)
+                throw new ArgumentException("Argument of the cross matrix must be a 3-element vector.");
+            Matrix<T> B = new Matrix<T>(3,3);
+            B[1, 1] = (dynamic)0;
+            B[1, 2] = -1 * (dynamic)a[3];
+            B[1, 3] = (dynamic)a[2];
+            B[2, 1] = (dynamic)a[3];
+            B[2, 2] = (dynamic)0;
+            B[2, 3] = -1 * (dynamic)a[1];
+            B[3, 1] = -1 * (dynamic)a[2];
+            B[3, 2] = (dynamic)a[1];
+            B[3, 3] = (dynamic)0;
+            return B;
+        }
+
+        /// <summary>
         /// Returns the cross product of two 3x1 (or 1x3) vectors.
         /// The shape of the return vector is determined by the shape of a.
         /// </summary>

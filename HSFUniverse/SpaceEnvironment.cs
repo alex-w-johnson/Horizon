@@ -15,6 +15,7 @@ namespace HSFUniverse
         #region Attributes
         public Sun Sun { get; private set; }
         public StandardAtmosphere Atmos { get; private set; }
+        public WMM wmm { get; private set; }
         #endregion
 
         #region Constructors
@@ -38,6 +39,7 @@ namespace HSFUniverse
         {
             Sun = new Sun(false);
             Atmos = new StandardAtmosphere();
+            wmm = new WMM();
         }
 
         protected override void CreateUniverse(XmlNode environmentNode)
@@ -62,7 +64,7 @@ namespace HSFUniverse
             {
                 Sun = new Sun();
             }
-            
+            wmm = new WMM();
         }
 
         /// <summary>
@@ -79,6 +81,8 @@ namespace HSFUniverse
                     return (T)(object)(Sun);
                 case "atmos":
                     return (T)(object)(Atmos);
+                case "wmm":
+                    return (T)(object)(wmm);
             }
             return (T)(object)-1;
         }

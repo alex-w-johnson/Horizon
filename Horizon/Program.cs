@@ -102,9 +102,9 @@ namespace Horizon
         public void InitInput(string[] args)
         {
             // Set Defaults
-            simulationInputFilePath = @"..\..\..\SimulationInput.XML";
-            targetDeckFilePath = @"..\..\..\v2.2-300targets.xml";
-            modelInputFilePath = @"..\..\..\DSAC_Static.xml";
+            simulationInputFilePath = @"..\..\..\SimulationInput_CAN.XML";
+            targetDeckFilePath = @"..\..\..\SSTN_Targets_Null.xml";
+            modelInputFilePath = @"..\..\..\CAN_Model_Scripted.xml";
             bool simulationSet = false, targetSet = false, modelSet = false;
 
             // Get the input filenames

@@ -4,15 +4,17 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>04f8ac2f-8c8f-444c-ba5b-a44345020335</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>CANPythonModels.py</StartupFile>
+    <StartupFile>eomSSTN.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
-    <InterpreterId>IronPython|2.7-32</InterpreterId>
+    <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
     <LaunchProvider>IronPython (.NET) launcher</LaunchProvider>
     <OutputPath>.</OutputPath>
     <Name>CANPythonModels</Name>
     <RootNamespace>CANPythonModels</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <DebugStdLib>True</DebugStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,7 +27,12 @@
   <ItemGroup>
     <None Include="CANPythonModels.py" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|2.7" />
+    <InterpreterReference Include="Global|PythonCore|2.7-32" />
+    <InterpreterReference Include="Global|PythonCore|3.6" />
+    <InterpreterReference Include="Global|PythonCore|3.6-32" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Horizon\Horizon.csproj">
       <Name>Horizon</Name>
@@ -65,9 +72,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adcs.py" />
+    <Compile Include="comm.py" />
     <Compile Include="eomSSTN.py" />
+    <Compile Include="eval.py" />
     <Compile Include="mdh.py" />
     <Compile Include="payload.py" />
+    <Compile Include="power.py" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">

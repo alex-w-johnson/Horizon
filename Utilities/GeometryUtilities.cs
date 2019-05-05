@@ -60,7 +60,24 @@ namespace Utilities
             return pos;
         }
 
-        public static Vector ECI2LLA( Vector ECI, double JD )
+        public static Vector NED2ECIRotate(Vector vIn, Vector LLA, double JD)
+        {
+            
+            double lat = LLA[1]; //deg
+            double lon = LLA[2]; //deg
+
+            double gst = CT2LST(lon, JD); //deg
+            double theta = gst * System.Math.PI / 180.0; //(lon + gst) * M_PI/180.0; //rad
+
+            // Per https://nescacademy.nasa.gov/review/downloadfile.php?file=FundamentalsofGeodeticKinematicsPart2of2.pptx&id=52&distr=Public
+            Quat q1 = new Quat(System.Math.Cos(theta / 2.0), 0.0, 0.0, System.Math.Sin(theta / 2.0));
+            Quat q2 = new Quat(System.Math.Cos((-0.5 * System.Math.PI - lat) / 2.0), 0.0, System.Math.Sin((-0.5 * System.Math.PI - lat) / 2.0), 0.0);
+            Quat q_ECI2NED = q1 * q2;
+            Quat q_NED2ECI = Quat.Conjugate(q_ECI2NED);
+            Vector vOut = Quat.Rotate(q_NED2ECI, vIn);
+            return vOut;
+        }
+            public static Vector ECI2LLA( Vector ECI, double JD )
         {
             Vector pos = new Vector(3);
             double x = ECI[1];

@@ -2,24 +2,17 @@
   <ASSET assetName="Asset1">
     <DynamicState
 			DynamicStateType="PREDETERMINED_ECI"
-			ICs="[7378.137; 0.0; 0.0; 0.0; 6.02088; 4.215866; 1.0; 0.0; 0.0; 0.0]">
+			ICs="[0.0; 6992.86; 0.0; 1.0516; 0; 7.4953; 0.533605910691400; 0.463966304892071; 0.463966304892071; 0.533605910691400; 0.0; 0.0; -0.001082354252268; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
-        src="...\eomSSTN.py"
-        className="eomSSTN">
-        <GEOMETRY
-          Cd="2.2"
-          
-        ></GEOMETRY>
-        <MassProp
-          Ixx="0.26481"
-          Iyy="0.26481"
-          Izz="0.256349"
-          Mass="13.879"
-          CoMx="0"
-          CoMy="0"
-          CoMz="0.122115"
-        ></MassProp>
+        src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\CANPythonModels\eomSSTN.py"
+        className="eomSSTN"
+        mass="13.879"
+        com="[-0.00425; 0.0; 0.13872]"
+        cop="[-0.0282; 0.0; -0.1042]"
+        cxareaavg="0.1584"
+        cd="2.2"
+        moi="[0.2745; 0.2667; 0.3034]">
       </EOMS>
     </DynamicState>
     <SUBSYSTEM
@@ -31,7 +24,39 @@
 			subsystemName = "Adcs"
       src="..\..\..\Adcs.py"
       className ="adcs">
+      <Wheels
+        numwheels="3"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        iswheels="[0.000028665; 0.000028665; 0.000028665]"
+        itwheels="[1.82433E-05; 1.82433E-05; 1.82433E-05]"
+        poswheel1="[0.095;-0.05;0.03]"
+        poswheel2="[0.05; -0.095; 0.03]"
+        poswheel3="[0.05; -0.05; 0.015]"
+        idlepowwheels="[0.5; 0.5; 0.5]"
+        maxpowwheels="[5.5; 5.5; 5.5]"
+        peaktorque="[0.004; 0.004; 0.004]">
+      </Wheels>
+      <Magtorquers
+        nummagtorx="3"
+        axmagtorx1="[1.0; 0.0; 0.0]"
+        axmagtorx2="[0.0; 1.0; 0.0]"
+        axmagtorx3="[0.0; 0.0; 1.0]"
+        peakB="[0.2; 0.2; 0.2]"
+        maxpowmagtorx="[0.6; 0.6; 0.6]">
+      </Magtorquers>
+      <Guidance
+        antisolaraxis ="[0.0; 0.0; 1.0]">
+      </Guidance>
+      <Control
+        kpslew="[0.00018; 0.000175; 0.000199]"
+        kdslew="[0.00821; 0.007976; 0.009073]">
+      </Control>
       <IC type="Matrix" key="ECI_Pointing_Vector(XYZ)" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Double" key="SolarBoreElongation" value="180.0"></IC>
+      <IC type="Double" key="EarthBoreAngle" value="90"></IC>
+      <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
+      <IC type="Matrix" key="WheelTorque" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
       <DEPENDENCY subsystemName="Access"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
@@ -53,18 +78,10 @@
 			subsystemName = "MDH"
 			src="..\..\..\mdh.py"
 			className="mdh"
+      compressionRatio ="1.5"
       bufferSize="252000000">
       <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="Asset1.MDHfromPayload"></DEPENDENCY>
-    </SUBSYSTEM>
-    <SUBSYSTEM
-			Type="scripted"
-			subsystemName = "CDH"
-			src="..\..\..\cdh.py"
-			className="cdh"
-      bufferSize="125000000">
-      <IC type="Double" key="TelemBufferFillRatio" value="0.0"></IC>
-      <DEPENDENCY subsystemName="MDH" fcnName="Asset1.CDHfromMDH"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
 			Type="scripted"
@@ -72,7 +89,7 @@
 			src="..\..\..\comm.py"
 			className="comm">
       <IC type="Double" key="DataRate(MB/s)" value="0.0"></IC>
-      <DEPENDENCY subsystemName="CDH" fcnName="Asset1.CommfromCDH"></DEPENDENCY>
+      <DEPENDENCY subsystemName="CDH" fcnName="Asset1.CommfromMDH"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
 			Type="scripted"
@@ -80,14 +97,14 @@
 			src="..\..\..\power.py"
 			className="power"
 			batterySize="100000"
-			fullSolarPower="60"
-			penumbraSolarPower="30">
+      panelefficiency=""
+			panelarea=""
+      panelaxis="[0.0;0.0;-1.0]">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="Asset1.PowerfromADCS"></DEPENDENCY>
       <DEPENDENCY subsystemName="Payload" fcnName="Asset1.PowerfromPayload"></DEPENDENCY>
       <DEPENDENCY subsystemName="MDH" fcnName="Asset1.PowerfromMDH"></DEPENDENCY>
-      <DEPENDENCY subsystemName="CDH" fcnName="Asset1.PowerfromCDH"></DEPENDENCY>
       <DEPENDENCY subsystemName="Comm" fcnName="Asset1.PowerfromComm"></DEPENDENCY>
     </SUBSYSTEM>
     <CONSTRAINT
@@ -103,10 +120,22 @@
       <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
     </CONSTRAINT>
     <CONSTRAINT
-      value="0.7"
-      subsystemName="CDH"
+      value="45.0"
+      subsystemName="ADCS"
       type="FAIL_IF_HIGHER">
-      <STATEVAR type ="Double" key="TelemBufferFillRatio"></STATEVAR>
+      <STATEVAR type ="Double" key="SolarBoreElongation"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="EarthBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="70.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="RamDirectionBoreAngle"></STATEVAR>
     </CONSTRAINT>
   </ASSET>
 </MODEL>

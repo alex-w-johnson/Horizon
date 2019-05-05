@@ -34,6 +34,42 @@ namespace Utilities
             _eps[3] = eps3;
         }
 
+        public static Quat Conjugate(Quat q)
+        {
+            Quat p = new Quat();
+            {
+                p._eta = q._eta;
+                p._eps = -1 * q._eps;
+            }
+            return p;
+        }
+
+        public static Vector Rotate(Quat q, Vector a)
+        {
+            Matrix<double> c1 = new Matrix<double>(3, 1);
+            Matrix<double> c2 = new Matrix<double>(3, 1);
+            Matrix<double> c3 = new Matrix<double>(3, 1);
+            Vector b = new Vector(3);
+            c1 = (2 * q._eta - 1.0) * Matrix<double>.Eye(3);
+            c2 = 2 * q._eps * Matrix<double>.Transpose(q._eps);
+            c3 = 2 * q._eta * Matrix<double>.CrossMatrix(q._eps);
+            b = (c1 + c2 + c3) * a;
+            return b;
+        }
+
+        public static Quat Mat2Quat(Matrix<double> A)
+        {
+            if (!(A.IsSquare()) || !(A.Length == 3))
+            {
+                throw new ArgumentException("Matrix must be square 3x3 matrix.");
+            }
+            double eta = 0.5 * Math.Sqrt(1.0 + Matrix<double>.Trace(A));
+            double eps1 = (A[2, 3] - A[3, 2]) / (4.0 * eta);
+            double eps2 = (A[3, 1] - A[1, 3]) / (4.0 * eta);
+            double eps3 = (A[1, 2] - A[2, 1]) / (4.0 * eta);
+            return new Quat(eta, eps1, eps2, eps3);
+        }
+
         public static Quat operator *(Quat q, Quat p)
         {
             double a = q._eta;

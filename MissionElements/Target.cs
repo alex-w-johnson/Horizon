@@ -56,5 +56,5 @@ namespace MissionElements
     }
 
     // Types of targets that HSF supports
-    public enum TargetType { FacilityTarget, LocationTarget, FlyingAlong, Recovery }
+    public enum TargetType { FacilityTarget, LocationTarget, FlyingAlong, Recovery, Desaturate, Compression }
 }
