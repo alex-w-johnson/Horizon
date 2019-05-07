@@ -97,9 +97,8 @@
 			src="..\..\..\power.py"
 			className="power"
 			batterySize="100000"
-      panelefficiency=""
-			panelarea=""
-      panelaxis="[0.0;0.0;-1.0]">
+      panelEfficiency="0.25"
+			panelArea="0.22">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="Asset1.PowerfromADCS"></DEPENDENCY>

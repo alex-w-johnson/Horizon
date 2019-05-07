@@ -25,9 +25,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="CANPythonModels.py" />
-  </ItemGroup>
-  <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|2.7" />
     <InterpreterReference Include="Global|PythonCore|2.7-32" />
     <InterpreterReference Include="Global|PythonCore|3.6" />

@@ -49,7 +49,7 @@ class adcs(HSFSubsystem.Subsystem):
         instance.kpvec = Vector(scriptedNode["Control"].Attributes["kpslew"])
         instance.kdvec = Vector(scriptedNode["Control"].Attributes["kdslew"])
         instance.antisolaraxis = Vector(scriptedNode["Guidance"].Attributes["antisolaraxis"])
-        instance.numwheels = System.Integer(scriptedNode["Wheels"].Attributes["numwheels"])
+        instance.numwheels = int(scriptedNode["Wheels"].Attributes["numwheels"])
         instance.masswheels = Vector(scriptedNode["Wheels"].Attributes["wheelsmass"])
         instance.iswheels = Vector(scriptedNode["Wheels"].Attributes["iswheels"])
         instance.itwheels = Vector(scriptedNode["Wheels"].Attributes["itwheels"])
@@ -59,12 +59,13 @@ class adcs(HSFSubsystem.Subsystem):
         instance.idlepowerwheels = Vector(scriptedNode["Wheels"].Attributes["idlepowwheels"])
         instance.maxpowerwheels = Vector(scriptedNode["Wheels"].Attributes["maxpowwheels"])
         instance.peaktorqwheels = Vector(scriptedNode["Wheels"].Attributes["peaktorque"])
-        instance.nummagtorx = System.Integer(scriptedNode["Magtorquers"].Attributes["nummagtorx"])
+        instance.nummagtorx = int(scriptedNode["Magtorquers"].Attributes["nummagtorx"])
         instance.axmagtorx1 = Vector(scriptedNode["Magtorquers"].Attributes["axmagtorx1"])
         instance.axmagtorx2 = Vector(scriptedNode["Magtorquers"].Attributes["axmagtorx2"])
         instance.axmagtorx3 = Vector(scriptedNode["Magtorquers"].Attributes["axmagtorx3"])
         instance.peakbmagtorx = Vector(scriptedNode["Magtorquers"].Attributes["peakB"])
         instance.peakpowermagtorx = Vector(scriptedNode["Magtorquers"].Attributes["maxpowmagtorx"])
+        instance.wmm = WMM()
         return instance
 
     def GetDependencyDictionary(self):
@@ -89,6 +90,7 @@ class adcs(HSFSubsystem.Subsystem):
         pos = state.PositionECI(ts)
         controlState = state[MatrixIndex(7,13),1] # Control variables are body-eci quaternions and body rates
         if self._task.Type == TaskType.IMAGING:
+            # Implement roll-constrained slew maneuver here
             pass
         if self._task.Type == TaskType.COMM:
             pass
@@ -106,10 +108,6 @@ class adcs(HSFSubsystem.Subsystem):
         # Get state information from dynamic state
         r_oa = state[MatrixIndex(1,3),1]
         v_oa = state[MatrixIndex(4,6),1]
-        qb_eci = state[MatrixIndex(7,10),1]
-        
-        xbeci = Quat.Rotate(qb_eci,xAx)
-        zbeci = Quat.Rotate(qb_eci,zAx)
         
         # Determine LVLH Frame (+Z direction = nadir, +Y direction = -1* R cross V
         
@@ -172,3 +170,8 @@ class adcs(HSFSubsystem.Subsystem):
         C_lam0 = Matrix.Horzcat(temp,z_lam0)
         q_lam0 = Quat.Mat2Quat(C_lam0)
         return q_lam0
+
+    def CalcRho0(self, event, time):
+        r_oa = self.Asset.AssetDynamicState.PositionECI(time)
+        r_ot = self._taks.Target.DynamicState.PositionECI(time)
+        return r_ot - r_oa

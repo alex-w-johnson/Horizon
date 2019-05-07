@@ -28,8 +28,8 @@ import datetime #For using WMM
 from System import DateTime #For using WMM
 
 
-class eomSSTN(Utilities.EOMS):
-    def __init__(self):
+class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH XML INPUT
+    def __init__(self,scriptedNode):
         self.Cd = float(scriptedNode["EOMS"].Attributes["cd"].Value)
         self.CxArea = float(scriptedNode["EOMS"].Attributes["cxareaavg"].Value)
         self.CoP = Vector(scriptedNode["EOMS"].Attributes["cop"].Value)
@@ -40,7 +40,7 @@ class eomSSTN(Utilities.EOMS):
         self.Iyy = self.Ivec[2]
         self.Izz = self.Ivec[3]
         self.Mass = float(scriptedNode["EOMS"].Attributes["mass"].Value)
-        self.Imat = CalcInertiaMatrix(self)
+        self.Imat = self.CalcInertiaMatrix(self)
         self.CoM = Vector(scriptedNode["EOMS"].Attributes["com"].Value)
 
     def PythonAccessor(self, t, y, param):
@@ -101,7 +101,7 @@ class eomSSTN(Utilities.EOMS):
         dy[1] = vxeci
         dy[2] = vyeci
         dy[3] = vzeci
-        acceleration = CalcForces(self)
+        acceleration = self.CalcForces(self)
         dy[4] = acceleration[1]
         dy[5] = acceleration[2]
         dy[6] = acceleration[3]
@@ -109,18 +109,20 @@ class eomSSTN(Utilities.EOMS):
         dy[8] = epsbecidot[2]
         dy[9] = epsbecidot[3]
         dy[10] = -0.5*Utilities.Vector.Dot(epsbeci,wbeci)
-        return super(eomSSTN, self).PythonAccessor(t, y)
+
+        # HOW TO GET INTEGRATOR PARAMETERS FROM ADCS SYSTEM? ASK MEHIEL
+        return dy
 
     def CalcForces(self):
-        a_grav = CalcGravityForce(self,self.Reci)
-        a_J2 = CalcJ2Force(self,self.Reci)
-        a_drag = CalcDragForce(self,self.Reci,self.Veci)/self.Mass
+        a_grav = self.CalcGravityForce(self,self.Reci)
+        a_J2 = self.CalcJ2Force(self,self.Reci)
+        a_drag = self.CalcDragForce(self,self.Reci,self.Veci)/self.Mass
         a_total = a_grav + a_J2 + a_drag
         return a_total
 
     def CalcMoments(self,r_eci,v_eci,T_control,M_dipole):
-        T_drag = CalcDragMoment(self,self.Reci,self.Veci)
-        T_mag = CalcMagMoment(self,self.Reci,self.jdCurrent,M_dipole)
+        T_drag = self.CalcDragMoment(self,self.Reci,self.Veci)
+        T_mag = self.CalcMagMoment(self,self.Reci,self.jdCurrent,M_dipole)
         #T_gravgrad = CalcGravGradMoment()
         T_total = T_drag + T_mag
         return T_total
@@ -146,13 +148,13 @@ class eomSSTN(Utilities.EOMS):
         return aJ2
 
     def CalcDragForce(self,r_eci,v_eci):
-        rho = CalcAtmosDens(self,r_eci)
+        rho = self.CalcAtmosDens(self,r_eci)
         vnorm = Matrix[System.Double].Norm(v_eci)
         F_d = -1*rho*1000.0*v_eci*vnorm*self.Cd*self.CxArea
         return F_d
 
     def CalcDragMoment(self,r_eci,v_eci):
-        fdrag = CalcDragForce(self,r_eci,v_eci)
+        fdrag = self.CalcDragForce(self,r_eci,v_eci)
         T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
         return T_d
 
@@ -229,7 +231,7 @@ class eomSSTN(Utilities.EOMS):
         return JD
 
     def CalcCurrentYMDhms(JD):
-        # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado "Inverse Julian Date" algorithm
+        # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date" algorithm
         J2000 = 2451545.0 #JD for Jan. 1 2000
         Y2000 = 2000.0 
         T2000 = (JD - J2000)/365.25 # Number of Julian centuries (*100) from Jan. 1, 2000
@@ -279,14 +281,14 @@ class eomSSTN(Utilities.EOMS):
         assetLat = assetLLA[1]
         assetLong = assetLLA[2]
         assetAlt = assetLLA[3]
-        YMDhms = CalcCurrentYMDhms(JD)
+        YMDhms = self.CalcCurrentYMDhms(JD)
         Y = YMDhms[0]
         M = YMDhms[1]
         D = YMDhms[2]
         h = YMDhms[3]
         m = YMDhms[4]
         s = YMDhms[5]
-        cDT = CalcCurrentUTCDateTime(Y,M,D,h,m,s)
+        cDT = self.CalcCurrentUTCDateTime(Y,M,D,h,m,s)
         bvec = WMM.CalcBvec(assetLat,assetLong,assetAlt,cDT)
         bvecECI = GeometryUtilities.NED2ECIRotate(bvec,assetLLA,JD)
         return bvecECI

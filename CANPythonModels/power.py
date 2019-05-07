@@ -41,16 +41,16 @@ class power(HSFSubsystem.Subsystem):
 
         # default values if variables not defined in xml file
         instance._batterySize = 1000000
-        instance._fullSolarPanelPower = 150
-        instance._penumbraSolarPanelPower = 75
+        instance._panelEfficiency = 0.25
+        instance._panelArea = 0.22
 
         # values read from the xml file		
         if (node.Attributes['batterySize'] != None):
             instance._batterySize = float(node.Attributes['batterySize'].Value)
-        if (node.Attributes['fullSolarPower'] != None):
-            instance._fullSolarPanelPower = float(node.Attributes['fullSolarPower'].Value)
-        if (node.Attributes['penumbraSolarPower'] != None):
-            instance._penumbraSolarPanelPower = float(node.Attributes['penumbraSolarPower'].Value)
+        if (node.Attributes['panelEfficiency'] != None):
+            instance._panelEfficiency = float(node.Attributes['panelEfficiency'].Value)
+        if (node.Attributes['panelArea'] != None):
+            instance._panelArea = float(node.Attributes['panelArea'].Value)
 
         return instance
 
@@ -128,19 +128,19 @@ class power(HSFSubsystem.Subsystem):
         event.State.AddValue(self.DOD_KEY, dodProf)
         return True
       
-    def GetSolarPanelPower(self, shadow):
+    def GetSolarPanelPower(self, shadow, attitude, area, efficiency, time):
         if (str(shadow) == 'UMBRA'):
             return 0
         elif (str(shadow) == 'PENUMBRA'):
-            return self._penumbraSolarPanelPower
+            return 0.5*self.CalcPowerInCosineArea(attitude,area,efficiency,time)
         else:
-            return self._fullSolarPanelPower
+            return self.CalcPowerInCosineArea(attitude,area,efficiency,time)
 
     def CalcSolarPanelPowerProfile(self, start, end, state, position, universe):
         # create solar panel profile for this event
         freq = 5
         lastShadow = universe.Sun.castShadowOnPos(position, start)
-        solarPanelSolarProfile = Utilities.HSFProfile[System.Double](start, self.GetSolarPanelPower(lastShadow))
+        solarPanelSolarProfile = Utilities.HSFProfile[System.Double](start, self.GetSolarPanelPower(lastShadow,attitude,self._panelArea,self._panelEfficiency,start))
 
         time = start
         while time <= end:
@@ -156,3 +156,13 @@ class power(HSFSubsystem.Subsystem):
     def DependencyCollector(self, currentEvent):
         return super(power, self).DependencyCollector(currentEvent)
 
+    def CalcPowerInCosineArea(attitude,area,efficiency,time):
+        panelAxis = Matrix[System.Double](3,1)
+        panelAxis[1,1] = 0.0
+        panelAxis[2,1] = 0.0
+        panelAxis[3,1] = -1.0
+        panAxisECI = Quat.Rotate(attitude,panelAxis)
+        r_solar = Sun.getEarSunVec(time)
+        r_solarNorm = Matrix[System.Double].Norm(r_solar)
+        dotProd = Matrix[Systenumerate.Double].Dot(r_solarNorm,panAxisECI)
+        return 1367.0*area*efficiency*dotProd

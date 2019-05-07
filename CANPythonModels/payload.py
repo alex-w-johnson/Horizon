@@ -41,7 +41,7 @@ class payload(HSFSubsystem.Subsystem):
         instance.addKey(instance.PAYLOADON_KEY)
         instance._subFieldNumPixels = 5000
         instance._fullFieldNumPixels = 1050000
-        instance._subFieldCaptureTime = 100
+        instance._subFieldCaptureTime = 90
         instance._fullFieldCaptureTime = 100
         instance._pixelDepth
         if (node.Attributes['subFieldNumPixels'] != None):
@@ -101,18 +101,18 @@ class payload(HSFSubsystem.Subsystem):
              return True
 
     def CanExtend(self, event, universe, extendTo):
-        return super(payload, self).CanExtend(event, universe, extendTo)
+        return super(payload, self).CanExtend(event, universe, extendTo) # What does this extend method do?
 
     def POWERSUB_PowerProfile_PAYLOADSUB(self, event):
         prof1 = HSFProfile[System.Double]()
-        prof1[event.GetEventStart(self.Asset)] = 10
+        prof1[event.GetEventStart(self.Asset)] = 2 # per camera datasheet at http://www.3d-plus.com/data/doc/products/references/shortform_space_camera_2018.pdf
         if (event.State.GetValueAtTime(self.PAYLOADON_KEY, event.GetTaskStart(self.Asset)).Value):
-            prof1[event.GetTaskStart(self.Asset)] = 60
-            prof1[event.GetTaskEnd(self.Asset)] = 10	
+            prof1[event.GetTaskStart(self.Asset)] = 4
+            prof1[event.GetTaskEnd(self.Asset)] = 2	
         return prof1
 
     def CDHSUB_NewDataProfile_PAYLOADSUB(self, event):
-        return event.State.GetProfile(self.PIXELS_KEY) / 500
+        return event.State.GetProfile(self.PIXELS_KEY) / 500 # Where did this 500 come from? Ask Mehiel
 
     def DependencyCollector(self, currentEvent):
-        return super(eosensor, self).DependencyCollector(currentEvent)
+        return super(eosensor, self).DependencyCollector(currentEvent) #What does this super method do? Need to find out
