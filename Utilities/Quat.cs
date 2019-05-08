@@ -57,6 +57,19 @@ namespace Utilities
             return b;
         }
 
+        public static Matrix<double> Rotate(Quat q, Matrix<double> a)
+        {
+            Matrix<double> c1 = new Matrix<double>(3, 1);
+            Matrix<double> c2 = new Matrix<double>(3, 1);
+            Matrix<double> c3 = new Matrix<double>(3, 1);
+            Matrix<double> b = new Matrix<double>(3, 1);
+            c1 = (2 * q._eta - 1.0) * Matrix<double>.Eye(3);
+            c2 = 2 * q._eps * Matrix<double>.Transpose(q._eps);
+            c3 = 2 * q._eta * Matrix<double>.CrossMatrix(q._eps);
+            b = (c1 + c2 + c3) * a;
+            return b;
+        }
+
         public static Quat Mat2Quat(Matrix<double> A)
         {
             if (!(A.IsSquare()) || !(A.Length == 3))

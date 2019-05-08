@@ -19,7 +19,6 @@ from UserModel import XmlParser
 from MissionElements import Asset
 #per Maclean's rocketEOMS.py
 
-from HSFUniverse import *
 from System.Collections.Generic import Dictionary
 from IronPython.Compiler import CallTarget0
 from System import Array
@@ -28,22 +27,22 @@ import datetime #For using WMM
 from System import DateTime #For using WMM
 
 
-class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH XML INPUT
+class eomSSTN(HSFUniverse.ScriptedEOMS):
     def __init__(self,scriptedNode):
         self.Cd = float(scriptedNode["EOMS"].Attributes["cd"].Value)
         self.CxArea = float(scriptedNode["EOMS"].Attributes["cxareaavg"].Value)
-        self.CoP = Vector(scriptedNode["EOMS"].Attributes["cop"].Value)
+        self.CoP = Utilities.Vector(scriptedNode["EOMS"].Attributes["cop"].Value)
         
         # Mass Properties for Dynamics
-        self.Ivec = Vector(scriptedNode["EOMS"].Attrbutes["moi"].Value)
+        self.Ivec = Utilities.Vector(scriptedNode["EOMS"].Attrbutes["moi"].Value)
         self.Ixx = self.Ivec[1]
         self.Iyy = self.Ivec[2]
         self.Izz = self.Ivec[3]
         self.Mass = float(scriptedNode["EOMS"].Attributes["mass"].Value)
         self.Imat = self.CalcInertiaMatrix(self)
-        self.CoM = Vector(scriptedNode["EOMS"].Attributes["com"].Value)
+        self.CoM = Utilities.Vector(scriptedNode["EOMS"].Attributes["com"].Value)
 
-    def PythonAccessor(self, t, y, param):
+    def PythonAccessor(self, t, y, param, environment):
         xeci = y[1]
         yeci = y[2]
         zeci = y[3]
@@ -69,10 +68,10 @@ class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH X
         Veci[2] = vyeci
         Veci[3] = vzeci
         epsbeci = Matrix[System.Double](3,1)
-        epsbeci[1] = qb0
-        epsbeci[2] = qb1
-        epsbeci[3] = qb2
-        qbeci = Quat[System.Double](qb3,epsbeci)
+        epsbeci[1] = qb1
+        epsbeci[2] = qb2
+        epsbeci[3] = qb3
+        qbeci = Quat[System.Double](qb0,epsbeci)
         wbeci = Matrix[System.Double](3,1)
         wbeci[1] = wxbeci
         wbeci[2] = wybeci
@@ -81,18 +80,13 @@ class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH X
         wwb[1] = wwxb
         wwb[2] = wwyb
         wwb[3] = wwzb
-        epscross = Matrix[System.Double](3,3)
-        epscross[1,1] = qb3
-        epscross[1,2] = -1*qb2
-        epscross[1,3] = qb1
-        epscross[2,1] = qb2
-        epscross[2,2] = qb3
-        epscross[2,3] = -1*qb0
-        epscross[3,1] = -1*qb1
-        epscross[3,2] = qb0
-        epscross[3,3] = qb3
-        epsbecidot = 0.5*epscross*wbeci
-        
+        epscross = Matrix[System.Double].CrossMatrix(epsbeci)
+        etaI = CalcInertiaMatrix[System.Double](3,3)
+        etaI[1,1] = qb0
+        etaI[2,2] = qb0
+        etaI[3,3] = qb0
+        epsbecidot = 0.5*epscross*wbeci + 0.5*etaI*wbeci
+
         # Current Julian Date
         jdCurrent = SimParameters.SimStartJD
 
@@ -108,7 +102,7 @@ class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH X
         dy[7] = epsbecidot[1]
         dy[8] = epsbecidot[2]
         dy[9] = epsbecidot[3]
-        dy[10] = -0.5*Utilities.Vector.Dot(epsbeci,wbeci)
+        dy[10] = -0.5*Matrix[System.Double].Dot(epsbeci,wbeci)
 
         # HOW TO GET INTEGRATOR PARAMETERS FROM ADCS SYSTEM? ASK MEHIEL
         return dy
@@ -120,11 +114,11 @@ class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH X
         a_total = a_grav + a_J2 + a_drag
         return a_total
 
-    def CalcMoments(self,r_eci,v_eci,T_control,M_dipole):
+    def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole):
         T_drag = self.CalcDragMoment(self,self.Reci,self.Veci)
-        T_mag = self.CalcMagMoment(self,self.Reci,self.jdCurrent,M_dipole)
-        #T_gravgrad = CalcGravGradMoment()
-        T_total = T_drag + T_mag
+        T_mag = self.CalcMagMoment(self,self.Reci,self.jdCurrent,M_dipole,qb_eci)
+        T_gravgrad = self.CalcGravGradMoment(self,r_eci,qb_eci)
+        T_total = T_drag + T_mag + T_gravgrad + T_control
         return T_total
 
     def CalcGravityForce(self,r):
@@ -158,16 +152,18 @@ class eom(Utilities.EOMS): # NEED TO FIGURE OUT HOW TO INSTANTIATE MODELS WITH X
         T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
         return T_d
 
-    def CalcMagMoment(self,r_eci,JD,M_dipole):
-        bField = CalcCurrentMagField(r_eci,JD)
-        magMoment = Vector.Cross(M_dipole,bField)
+    def CalcMagMoment(self,r_eci,JD,M_dipole,qb_eci):
+        bField = self.CalcCurrentMagField(r_eci,JD)
+        bFieldBody = Quat.Rotate(qb_eci,bField)
+        magMoment = Matrix[System.Double].Cross(M_dipole,bFieldBody)
         return magMoment
 
-    def CalcGravGradMoment(self,r_eci,Qb_eci):
+    def CalcGravGradMoment(self,r_eci,qb_eci):
         mu = 398600.4418
         rnorm = Matrix[System.Double].Norm(r)
-        rb = Matrix[System.Double].Transpose(Qb_eci)*r_eci
-        T_g = 3*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)
+        r5 = rnorm*rnorm*rnorm*rnorm*rnorm
+        rb = Quat.Rotate(qb_eci,r_eci)
+        T_g = 3.0*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/rnorm
         return T_g
 
     def CalcAtmosDens(self,r_eci):

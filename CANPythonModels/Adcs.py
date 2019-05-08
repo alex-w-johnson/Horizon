@@ -131,7 +131,7 @@ class adcs(HSFSubsystem.Subsystem):
         return q_Command
 
     def CalcBodyAttitudeLVLH(self,state):
-        q_lam0 = self.CalcLVLHECIState
+        q_lam0 = self.CalcLVLHECIState(state)
         qb_eci = state[MatrixIndex(7,10),1]
         q_bodLam = Quat.Conjugate(q_lam0)*qb_eci
         return q_bodLam
@@ -175,3 +175,15 @@ class adcs(HSFSubsystem.Subsystem):
         r_oa = self.Asset.AssetDynamicState.PositionECI(time)
         r_ot = self._taks.Target.DynamicState.PositionECI(time)
         return r_ot - r_oa
+
+    def CalcDesatCommandDipole(bBody, kpDesat, wWheel, wRef):
+        # Cross-product dipole control law for desaturating reaction wheels
+        # All vectors in BODY frame
+        # Per Eq. 16 of "Reaction Wheels Desaturation Using Magnetorquers and Static Input Allocation" - 2015
+        desatError = kpDesat*(wWheel-wRef)
+        bBody2 = Vector.Norm(bBody) * Vector.Norm(bBody)
+        tauM = -1.0*Vector.Cross(bBody,desatError)/bBody2
+        return tauM
+
+    def CalcDesatCommandWheelTorque(wWheel,IsWheel,omega_body):
+        pass

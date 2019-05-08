@@ -1,7 +1,7 @@
 <MODEL>
   <ASSET assetName="Asset1">
     <DynamicState
-			DynamicStateType="PREDETERMINED_ECI"
+			DynamicStateType="DYNAMIC_ECI"
 			ICs="[0.0; 6992.86; 0.0; 1.0516; 0; 7.4953; 0.533605910691400; 0.463966304892071; 0.463966304892071; 0.533605910691400; 0.0; 0.0; -0.001082354252268; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
