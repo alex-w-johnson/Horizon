@@ -95,6 +95,7 @@ class adcs(HSFSubsystem.Subsystem):
         if self._task.Type == TaskType.COMM:
             pass
         if self._task.Type == TaskType.DESATURATE:
+            # Implement roll-constrained slew maneuver here
             pass
         return True
 
@@ -110,7 +111,6 @@ class adcs(HSFSubsystem.Subsystem):
         v_oa = state[MatrixIndex(4,6),1]
         
         # Determine LVLH Frame (+Z direction = nadir, +Y direction = -1* R cross V
-        
         q_lam0 = self.CalcLVLHECIState(state)
 
         # Determine Command Frame

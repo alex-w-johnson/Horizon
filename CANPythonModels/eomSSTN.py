@@ -41,6 +41,8 @@ class eomSSTN(HSFUniverse.ScriptedEOMS):
         self.Mass = float(scriptedNode["EOMS"].Attributes["mass"].Value)
         self.Imat = self.CalcInertiaMatrix(self)
         self.CoM = Utilities.Vector(scriptedNode["EOMS"].Attributes["com"].Value)
+        self.WHEELTORQUE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'rxwheel_torque')
+        self.MAGTORQDIPOLE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'magtorq_dipole')
 
     def PythonAccessor(self, t, y, param, environment):
         xeci = y[1]
