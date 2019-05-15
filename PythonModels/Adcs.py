@@ -87,16 +87,24 @@ class adcs(HSFSubsystem.Subsystem):
     def CanPerform(self, event, universe):
         # Event information
         es = event.GetEventStart(self.Asset)
-        ts = event.GetTaskStart(self.Asset)
         dt = SimParameters.SimStepSeconds
         
         # Load asset dynamic state
         dynamicStateEs = self.Asset.AssetDynamicState(es)
         posEs = dynamicStateEs.PositionECI(es)
+        velEs = dynamicStateEs.VelocityECI(es)
         controlQuatsEs = dynamicStateEs.Quaternions(es)
         controlRatesEs = dynamicStateEs.EulerRates(es)
         wheelSpeedsEs = dynamicStateEs.WheelSpeeds(es)
         
+        assetOrbState = Matrix[System.Double](6,1)
+        assetOrbState[1] = posEs[1]
+        assetOrbState[2] = posEs[2]
+        assetOrbState[3] = posEs[3]
+        assetOrbState[4] = velEs[1]
+        assetOrbState[5] = velEs[2]
+        assetOrbState[6] = velEs[3]
+
         # Load task parameters
         task = event.GetAssetTask(self.Asset)
         taskType = task.Type
@@ -104,11 +112,17 @@ class adcs(HSFSubsystem.Subsystem):
         # Load target parameters
         target = task.Target
         targetDynStateEs = target.DynamicState(es)
+        targetR_ot = targetDynStateEs.PositionECI
 
         if (taskType == TaskType.IMAGING):
             if not(self.Asset.DynamicState.hasLOSTo(posEs,es)):
                 return False
             # Implement roll-constrained slew maneuver here
+            qComLam = CalcRollConstrainedQCommand(self,assetOrbState,targetR_ot)
+            qBodLam = CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
+            qBodCom = Quat.Conjugate(qComLam)*qBodLam
+            propError = qBodCom._eps
+            deriError = controlRatesEs
             pass
         elif (taskType == TaskType.COMM):
             if not(self.Asset.DynamicState.hasLOSTo(posEs,es)):
@@ -120,7 +134,15 @@ class adcs(HSFSubsystem.Subsystem):
             # Implement roll-constrained slew maneuver here
             pass
         else:
-            
+            qCom0 = CalcNadirCommandFrame(self,assetOrbState)
+            qLam0 = CalcLVLHECIState(self,assetOrbState)
+            qComLam = Quat.Conjugate(qLam0)*qCom0
+            qBodLam  = CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
+            qBodCom = Quat.Conjugate(qComLam)*qBodLam
+            propError = qBodCom._eps
+            rEs = Matrix[System.Double].Norm(posEs)
+            lvlhRate = Matrix[System.Double].Cross(posEs,velEs)/(rEs*rEs)
+            deriError
             return True
         return True
 
@@ -146,36 +168,36 @@ class adcs(HSFSubsystem.Subsystem):
         nadirProj = z_lam0 - Matrix[System.Double].Dot(z_com0,z_lam0)*z_com0
         x_com0 = -1.0*nadirProj
         y_com0 = Matrix[System.Double].Cross(z_com0,x_com0)
-        C_com0 = MatrixIndex[System.Double].SetColumn(1,x_com0)
-        C_com0 = MatrixIndex[System.Double].SetColumn(2,y_com0)
-        C_com0 = MatrixIndex[System.Double].SetColumn(3,z_com0)
+        C_com0 = Matrix[System.Double].SetColumn(C_com0,1,x_com0)
+        C_com0 = Matrix[System.Double].SetColumn(C_com0,2,y_com0)
+        C_com0 = Matrix[System.Double].SetColumn(C_com0,3,z_com0)
         q_com0 = Quat.Mat2Quat(C_com0)
 
         # Determine Command Quaternion w.r.t. LVLH Frame
         q_Command = Quat.Conjugate(q_lam0)*q_com0
         return q_Command
 
-    def CalcBodyAttitudeLVLH(self,state):
+    # Calculates orientation of body frame with respect to lvlh frame
+    def CalcBodyAttitudeLVLH(self,state,qb_eci):
         q_lam0 = self.CalcLVLHECIState(state)
-        qb_eci = state[MatrixIndex(7,10),1]
         q_bodLam = Quat.Conjugate(q_lam0)*qb_eci
         return q_bodLam
         
-    def PropErrorCalc(kp_vec,pStateError):
+    def PropErrorCalc(self,kp_vec,pStateError):
         kp_mat = Matrix[System.Double](3,3)
         kp_mat[1,1] = kp_vec[1]
         kp_mat[2,2] = kp_vec[2]
         kp_mat[3,3] = kp_vec[3]
         return kp_mat * pStateError
 
-    def DeriErrorCalc(kd_vec,dStateError):
+    def DeriErrorCalc(self,kd_vec,dStateError):
         kd_mat = Matrix[System.Double](3,3)
         kd_mat[1,1] = kd_vec[1]
         kd_mat[2,2] = kd_vec[2]
         kd_mat[3,3] = kd_vec[3]
         return kd_mat * dStateError
 
-    def CalcLVLHECIState(state):
+    def CalcLVLHECIState(self,state):
         r_oa = state[MatrixIndex(1,3),1]
         v_oa = state[MatrixIndex(4,6),1]
         x_lam0 = Matrix[System.Double](3,1)
@@ -196,7 +218,7 @@ class adcs(HSFSubsystem.Subsystem):
         q_lam0 = Quat.Mat2Quat(C_lam0)
         return q_lam0
 
-    def CalcNadirCommandFrame(state):
+    def CalcNadirCommandFrame(self,state):
         r_oa = state[MatrixIndex(1,3),1]
         v_oa = state[MatrixIndex(4,6),1]
         x_lam0 = Matrix[System.Double](3,1)
@@ -215,9 +237,29 @@ class adcs(HSFSubsystem.Subsystem):
         temp = Matrix.Horzcat(-1.0*z_lam0,-1.0*x_lam0)
         C_com0 = Matrix.Horzcat(temp,y_lam0)
         q_com0 = Quat.Mat2Quat(C_com0)
+        return q_com0
+
+    def CalcCommsCommandFrame(self,state,r_ot):
+        r_oa = state[MatrixIndex(1,3),1]
+        v_oa = state[MatrixIndex(4,6),1]
+        rho = r_ot - r_oa
+        rhoHat = rho / Matrix[System.Double].Norm(rho)
+        C_com0 = Matrix[System.Double](3,3)
+        x_com0 = Matrix[System.Double](3,1)
+        y_com0 = Matrix[System.Double](3,1)
+        z_com0 = Matrix[System.Double](3,1)
+        x_com0 = -1.0*rhoNorm
+        hOrbVec = Matrix[System.Double].Cross(r_oa,v_oa)
+        y_lvlh0 = hOrbVec/Matrix[System.Double].Norm(hOrbVec)
+        y_lvlhProj = y_lvlh0 - Matrix[System.Double].Dot(rhoHat,y_lvlh0)*rhoHat
+        z_com0 = y_lvlhProj
+        y_com0 = Matrix[System.Double].Cross(z_com0,x_com0)
+        C_com0 = Matrix[System.Double].SetColumn(C_com0,1,x_com0)
+        C_com0 = Matrix[System.Double].SetColumn(C_com0,2,y_com0)
+        C_com0 = Matrix[System.Double].SetColumn(C_com0,3,z_com0)
         pass
 
-    def CalcDesatCommandDipole(bBody, kpDesat, wWheel, wRef):
+    def CalcDesatCommandDipole(self, bBody, kpDesat, wWheel, wRef):
         # Cross-product dipole control law for desaturating reaction wheels
         # All vectors in BODY frame
         # Per Eq. 16 of "Reaction Wheels Desaturation Using Magnetorquers and Static Input Allocation" - 2015
@@ -226,5 +268,5 @@ class adcs(HSFSubsystem.Subsystem):
         tauM = -1.0*Vector.Cross(bBody,desatError)/bBody2
         return tauM
 
-    def CalcDesatCommandWheelTorque(wWheel,IsWheel,omega_body):
+    def CalcDesatCommandWheelTorque(self, wWheel, IsWheel, omega_body):
         pass

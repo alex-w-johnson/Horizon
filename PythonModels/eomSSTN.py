@@ -59,22 +59,6 @@ class eomSSTN(Utilities.EOMS):
         instance.IsWheels[3,3] = instance.IsWheelsVec[3]
         return instance
     
-    '''def __init__(self,scriptedNode):
-        self.Cd = float(scriptedNode["EOMS"].Attributes["cd"].Value)
-        self.CxArea = float(scriptedNode["EOMS"].Attributes["cxareaavg"].Value)
-        self.CoP = Utilities.Vector(scriptedNode["EOMS"].Attributes["cop"].Value)
-        
-        # Mass Properties for Dynamics
-        self.Ivec = Utilities.Vector(scriptedNode["EOMS"].Attrbutes["moi"].Value)
-        self.Ixx = self.Ivec[1]
-        self.Iyy = self.Ivec[2]
-        self.Izz = self.Ivec[3]
-        self.Mass = float(scriptedNode["EOMS"].Attributes["mass"].Value)
-        self.Imat = self.CalcInertiaMatrix(self)
-        self.CoM = Utilities.Vector(scriptedNode["EOMS"].Attributes["com"].Value)
-        self.WHEELTORQUE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'rxwheel_torque')
-        self.MAGTORQDIPOLE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'magtorq_dipole')'''
-    
     def PythonAccessor(self, t, y, param, environment):
         xeci = y[1]
         yeci = y[2]

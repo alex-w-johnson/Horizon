@@ -91,7 +91,7 @@
 			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\comm.py"
 			className="comm">
       <IC type="Double" key="DataRate(MB/s)" value="0.0"></IC>
-      <DEPENDENCY subsystemName="CDH" fcnName="Asset1.CommfromMDH"></DEPENDENCY>
+      <DEPENDENCY subsystemName="MDH" fcnName="Asset1.CommfromMDH"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
 			Type="scripted"

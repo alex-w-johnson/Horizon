@@ -164,5 +164,5 @@ class power(HSFSubsystem.Subsystem):
         panAxisECI = Quat.Rotate(attitude,panelAxis)
         r_solar = Sun.getEarSunVec(time)
         r_solarNorm = Matrix[System.Double].Norm(r_solar)
-        dotProd = Matrix[Systenumerate.Double].Dot(r_solarNorm,panAxisECI)
+        dotProd = Matrix[System.Double].Dot(r_solarNorm,panAxisECI)
         return 1367.0*area*efficiency*dotProd
