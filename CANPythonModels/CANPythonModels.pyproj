@@ -8,7 +8,7 @@
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
-    <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
+    <InterpreterId>IronPython|2.7-64</InterpreterId>
     <LaunchProvider>IronPython (.NET) launcher</LaunchProvider>
     <OutputPath>.</OutputPath>
     <Name>CANPythonModels</Name>
@@ -29,6 +29,8 @@
     <InterpreterReference Include="Global|PythonCore|2.7-32" />
     <InterpreterReference Include="Global|PythonCore|3.6" />
     <InterpreterReference Include="Global|PythonCore|3.6-32" />
+    <InterpreterReference Include="IronPython|2.7-32" />
+    <InterpreterReference Include="IronPython|2.7-64" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Horizon\Horizon.csproj">

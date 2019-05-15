@@ -27,8 +27,27 @@ import datetime #For using WMM
 from System import DateTime #For using WMM
 
 
-class eomSSTN(HSFUniverse.ScriptedEOMS):
-    def __init__(self,scriptedNode):
+class eomSSTN(Utilities.EOMS):
+    # Base class is Utilities.EOMS b/c it is typecast to type DynamicEOMS in the EOMFactory, per Adam's suggestion - A
+    def __new__(cls, node):
+        instance = Utilities.EOMS.__new__(cls)
+        instance.Cd = float(node["EOMS"].Attributes["cd"].Value)
+        instance.CxArea = float(node["EOMS"].Attributes["cxareaavg"].Value)
+        instance.CoP = Utilities.Vector(node["EOMS"].Attributes["cop"].Value)
+        
+        # Mass Properties for Dynamics
+        instance.Ivec = Utilities.Vector(node["EOMS"].Attrbutes["moi"].Value)
+        instance.Ixx = instance.Ivec[1]
+        instance.Iyy = instance.Ivec[2]
+        instance.Izz = instance.Ivec[3]
+        instance.Mass = float(node["EOMS"].Attributes["mass"].Value)
+        instance.Imat = instance.CalcInertiaMatrix(instance)
+        instance.CoM = Utilities.Vector(node["EOMS"].Attributes["com"].Value)
+        instance.WHEELTORQUE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](instance.Asset.Name + '.' + 'rxwheel_torque')
+        instance.MAGTORQDIPOLE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](instance.Asset.Name + '.' + 'magtorq_dipole')
+        return instance
+
+    '''def __init__(self,scriptedNode):
         self.Cd = float(scriptedNode["EOMS"].Attributes["cd"].Value)
         self.CxArea = float(scriptedNode["EOMS"].Attributes["cxareaavg"].Value)
         self.CoP = Utilities.Vector(scriptedNode["EOMS"].Attributes["cop"].Value)
@@ -42,8 +61,8 @@ class eomSSTN(HSFUniverse.ScriptedEOMS):
         self.Imat = self.CalcInertiaMatrix(self)
         self.CoM = Utilities.Vector(scriptedNode["EOMS"].Attributes["com"].Value)
         self.WHEELTORQUE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'rxwheel_torque')
-        self.MAGTORQDIPOLE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'magtorq_dipole')
-
+        self.MAGTORQDIPOLE_KEY = Utilities.StateVarKey[Utilities.Matrix[System.Double]](self.Asset.Name + '.' + 'magtorq_dipole')'''
+    
     def PythonAccessor(self, t, y, param, environment):
         xeci = y[1]
         yeci = y[2]

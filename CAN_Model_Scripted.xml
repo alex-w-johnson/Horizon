@@ -5,14 +5,16 @@
 			ICs="[0.0; 6992.86; 0.0; 1.0516; 0; 7.4953; 0.533605910691400; 0.463966304892071; 0.463966304892071; 0.533605910691400; 0.0; 0.0; -0.001082354252268; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
-        src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\CANPythonModels\eomSSTN.py"
+        src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eomSSTN.py"
         className="eomSSTN"
         mass="13.879"
         com="[-0.00425; 0.0; 0.13872]"
         cop="[-0.0282; 0.0; -0.1042]"
         cxareaavg="0.1584"
         cd="2.2"
-        moi="[0.2745; 0.2667; 0.3034]">
+        moi="[0.2745; 0.2667; 0.3034]"
+        iswheels="[0.000028665; 0.000028665; 0.000028665]"
+        Name ="Asset1">
       </EOMS>
     </DynamicState>
     <SUBSYSTEM
@@ -62,7 +64,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Payload"
-			src="..\..\..\payload.py"
+			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\payload.py"
 			className="payload"
       fullFieldNumPixels="1050000"
       subFieldNumPixels="5000"
@@ -76,7 +78,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "MDH"
-			src="..\..\..\mdh.py"
+			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\mdh.py"
 			className="mdh"
       compressionRatio ="1.5"
       bufferSize="252000000">
@@ -86,7 +88,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Comm"
-			src="..\..\..\comm.py"
+			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\comm.py"
 			className="comm">
       <IC type="Double" key="DataRate(MB/s)" value="0.0"></IC>
       <DEPENDENCY subsystemName="CDH" fcnName="Asset1.CommfromMDH"></DEPENDENCY>
@@ -94,7 +96,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Power"
-			src="..\..\..\power.py"
+			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\power.py"
 			className="power"
 			batterySize="100000"
       panelEfficiency="0.25"

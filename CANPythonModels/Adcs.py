@@ -85,10 +85,16 @@ class adcs(HSFSubsystem.Subsystem):
         return prof1
 
     def CanPerform(self, event, universe):
-        ts = event.GetEventStart(self.Asset)
-        state = self.Asset.AssetDynamicState
-        pos = state.PositionECI(ts)
-        controlState = state[MatrixIndex(7,13),1] # Control variables are body-eci quaternions and body rates
+        es = event.GetEventStart(self.Asset)
+        ts = event.GetTaskStart(self.Asset)
+        
+        dynamicState = self.Asset.AssetDynamicState
+        pos = dynamicState.PositionECI(ts)
+        controlQuats = dynamicState.Quaternions
+        controlRates = dynamicState.EulerRates
+        wheelSpeeds = dynamicState.WheelSpeeds 
+        target = self._task.Target # Control variables are body-eci quaternions and body rates
+        targDynState = target.DynamicState
         if self._task.Type == TaskType.IMAGING:
             # Implement roll-constrained slew maneuver here
             pass
