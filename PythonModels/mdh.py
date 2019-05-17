@@ -45,8 +45,10 @@ class mdh(HSFSubsystem.Subsystem):
         dep = Dictionary[str, Delegate]()
         depFunc1 = Func[Event,  Utilities.HSFProfile[System.Double]](self.POWERSUB_PowerProfile_MDHSUB)
         dep.Add("PowerfromMDH" + "." + self.Asset.Name, depFunc1)
-        depFunc2 = Func[Event,  System.Double](self.EVAL_DataRateProfile_MDHSUB)
-        dep.Add("EvalfromMDH" + "." + self.Asset.Name, depFunc2)
+        depFunc2 = Func[Event,  Utilities.HSFProfile[System.Double]](self.COMMSUB_DataRateProfile_MDHSUB)
+        dep.Add("CommfromMDH" + "." + self.Asset.Name, depFunc2)
+        depFunc3 = Func[Event,  System.Double](self.EVAL_DataRateProfile_MDHSUB)
+        dep.Add("EvalfromMDH" + "." + self.Asset.Name, depFunc3)
         return dep
 
     def GetDependencyCollector(self):
@@ -69,10 +71,10 @@ class mdh(HSFSubsystem.Subsystem):
             return False
         if(self/_task.Type == TaskType.COMM):
              ts = event.GetTaskStart(self.Asset)
-             event.SetTaskEnd(self.Asset, ts + 60.0) #Why only one minute downlinks? Find out
+             event.SetTaskEnd(self.Asset, ts + 60.0)
              te = event.GetTaskEnd(self.Asset)
              data = self._bufferSize * self._newState.GetLastValue(self.Dkeys[0]).Value
-             if( data / 2 > 50): # Why if data / 2? Why greater than 50? Where did 50 come from? This condition doesn't make sense
+             if( data / 2 > 50):
                  dataqueout = data/2
              else:
                  dataqueout = data
@@ -88,11 +90,11 @@ class mdh(HSFSubsystem.Subsystem):
 
     def POWERSUB_PowerProfile_MDHSUB(self, event):
         prof1 = HSFProfile[System.Double]()
-        prof1[event.GetEventStart(self.Asset)] = 15 #This is power value? why not specified in XML file?
+        prof1[event.GetEventStart(self.Asset)] = 15
         return prof1
 
     def COMMSUB_DataRateProfile_MDHSUB(self, event):
-        datarate = 5000 * (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset)) # What does this mean? Find Out
+        datarate = 5000 * (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset)) 
         prof1 = HSFProfile[System.Double]()
         if (datarate != 0):
             prof1[event.GetTaskStart(self.Asset)] = datarate
@@ -100,7 +102,7 @@ class mdh(HSFSubsystem.Subsystem):
         return prof1
 
     def EVAL_DataRateProfile_MDHSUB(self, event):
-        return (event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value - event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) * 50 #What does this mean? Find out
+        return (event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value - event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) * 50
 
     def DependencyCollector(self, currentEvent):
-        return super(ssdr, self).DependencyCollector(currentEvent)
+        return super(mdh, self).DependencyCollector(currentEvent)

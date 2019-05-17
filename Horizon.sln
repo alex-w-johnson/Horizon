@@ -35,8 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingUnitTest", "LoggingU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSFMainUnitTest", "HSFMainUnitTest\HSFMainUnitTest.csproj", "{20099F21-A99C-4F8A-9C10-AE3C3102F320}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "CANPythonModels", "CANPythonModels\CANPythonModels.pyproj", "{04F8AC2F-8C8F-444C-BA5B-A44345020335}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{63B508F7-1C69-41C7-8ED9-28E791788817}"
 	ProjectSection(SolutionItems) = preProject
 		CAN_Model_Scripted.xml = CAN_Model_Scripted.xml
@@ -248,12 +246,6 @@ Global
 		{20099F21-A99C-4F8A-9C10-AE3C3102F320}.Release|Any CPU.Build.0 = Release|Any CPU
 		{20099F21-A99C-4F8A-9C10-AE3C3102F320}.Release|x86.ActiveCfg = Release|Any CPU
 		{20099F21-A99C-4F8A-9C10-AE3C3102F320}.Release|x86.Build.0 = Release|Any CPU
-		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Realease Fast|Any CPU.ActiveCfg = Release|Any CPU
-		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Realease Fast|x86.ActiveCfg = Release|Any CPU
-		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04F8AC2F-8C8F-444C-BA5B-A44345020335}.Release|x86.ActiveCfg = Release|Any CPU
 		{212CB1B3-7627-4E33-9C66-F8456AF75A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{212CB1B3-7627-4E33-9C66-F8456AF75A55}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{212CB1B3-7627-4E33-9C66-F8456AF75A55}.Realease Fast|Any CPU.ActiveCfg = Release|Any CPU

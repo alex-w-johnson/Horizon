@@ -112,7 +112,7 @@ class payload(HSFSubsystem.Subsystem):
         return prof1
 
     def MDHSUB_NewDataProfile_PAYLOADSUB(self, event):
-        return event.State.GetProfile(self.PIXELS_KEY) / 500 # Where did this 500 come from? Ask Mehiel
+        return event.State.GetProfile(self.PIXELS_KEY)
 
     def DependencyCollector(self, currentEvent):
         return super(payload, self).DependencyCollector(currentEvent) #What does this super method do? Need to find out

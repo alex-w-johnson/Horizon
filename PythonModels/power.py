@@ -42,7 +42,8 @@ class power(HSFSubsystem.Subsystem):
         # default values if variables not defined in xml file
         instance._batterySize = 1000000
         instance._panelEfficiency = 0.25
-        instance._panelArea = 0.22
+        instance._panelArea = 0.18
+        instance._panelDensity = 0.75
 
         # values read from the xml file		
         if (node.Attributes['batterySize'] != None):
@@ -51,6 +52,8 @@ class power(HSFSubsystem.Subsystem):
             instance._panelEfficiency = float(node.Attributes['panelEfficiency'].Value)
         if (node.Attributes['panelArea'] != None):
             instance._panelArea = float(node.Attributes['panelArea'].Value)
+        if (node.Attributes['panelDensity'] != None):
+            instance._panelDensity = float(node.Attributes['panelDensity'].Value)
 
         return instance
 

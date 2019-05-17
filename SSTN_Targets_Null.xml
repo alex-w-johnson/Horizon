@@ -3,7 +3,7 @@
 		TargetName = "groundstation1"
 		TargetType = "FacilityTarget"
 		TaskType = "COMM"
-		MaxTimes = "1000"
+		MaxTimes = "10"
 		Value = "-1">
 		<DynamicState
 			DynamicStateType = "STATIC_LLA"
@@ -14,7 +14,7 @@
 		TargetName = "imagetarget1"
 		TargetType = "LocationTarget"
 		TaskType = "IMAGING"
-		MaxTimes = "1000"
+		MaxTimes = "16"
 		Value = "3">
 		<DynamicState
 			DynamicStateType = "STATIC_ECI"
@@ -25,7 +25,7 @@
 		TargetName = "desaturate1"
 		TargetType = "Desaturate"
 		TaskType = "DESATURATE"
-		MaxTimes = "1000"
+		MaxTimes = "10"
 		Value = "-1">
     <DynamicState
 			DynamicStateType = "STATIC_ECI"

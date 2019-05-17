@@ -59,6 +59,7 @@ class adcs(HSFSubsystem.Subsystem):
         instance.idlepowerwheels = Vector(scriptedNode["Wheels"].Attributes["idlepowwheels"])
         instance.maxpowerwheels = Vector(scriptedNode["Wheels"].Attributes["maxpowwheels"])
         instance.peaktorqwheels = Vector(scriptedNode["Wheels"].Attributes["peaktorque"])
+        instance.maxspeedwheels = Vector(scriptedNode["Wheels"].Attributes["maxspeed"])
         instance.nummagtorx = int(scriptedNode["Magtorquers"].Attributes["nummagtorx"])
         instance.axmagtorx1 = Vector(scriptedNode["Magtorquers"].Attributes["axmagtorx1"])
         instance.axmagtorx2 = Vector(scriptedNode["Magtorquers"].Attributes["axmagtorx2"])
@@ -115,34 +116,54 @@ class adcs(HSFSubsystem.Subsystem):
         targetR_ot = targetDynStateEs.PositionECI
 
         if (taskType == TaskType.IMAGING):
-            if not(self.Asset.DynamicState.hasLOSTo(posEs,es)):
-                return False
-            # Implement roll-constrained slew maneuver here
-            qComLam = CalcRollConstrainedQCommand(self,assetOrbState,targetR_ot)
-            qBodLam = CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
+            # Implement roll-constrained slew maneuver here THEN HOLD INERTIAL POINTING AFTER TASK START
+            qComLam = self.CalcRollConstrainedQCommand(self,assetOrbState,targetR_ot)
+            qBodLam = self.CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
             qBodCom = Quat.Conjugate(qComLam)*qBodLam
-            propError = qBodCom._eps
-            deriError = controlRatesEs
+            propError = self.PropErrorCalc(self,self.kpvec,qBodCom._eps)
+            deriError = self.DeriErrorCalc(self,self.kdvec,controlRatesEs)
+            T_control = - propError - deriError
             pass
         elif (taskType == TaskType.COMM):
-            if not(self.Asset.DynamicState.hasLOSTo(posEs,es)):
-                return False
+            # Point -X-axis towards target, point +Z-axis towards projection of Y_LVLH onto target pointing vector plane
+            qCom0 = self.CalcCommsCommandFrame(self,assetOrbState,targetR_ot)
+            qLam0 = self.CalcLVLHECIState(self,assetOrbState)
+            qComLam = Quat.Conjugate(qLam0)*qCom0
+            qBodLam  = self.CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
+            qBodCom = Quat.Conjugate(qComLam)*qBodLam
+            propError = self.PropErrorCalc(self,self.kpvec,qBodCom._eps)
+            deriError = self.DeriErrorCalc(self,self.kdvec,controlRatesEs)
+            T_control = - propError - deriError
             pass
         elif (taskType== TaskType.DESATURATE):
-            if not(self.Asset.DynamicState.hasLOSTo(posEs,es)):
-                return False
-            # Implement roll-constrained slew maneuver here
+            for wheelIdx in range(1,self.numWheels):
+                if wheelSpeedsEs[wheelIdx] > self.maxspeedwheels[wheelIdx]:
+                    event.SetTaskStart(self.Asset, te)
+            # Implement desaturation maneuver here
+            # Point -X-axis to nadir, point +z-axis towards Y_LVLH
+            qCom0 = self.CalcNadirCommandFrame(self,assetOrbState)
+            qLam0 = self.CalcLVLHECIState(self,assetOrbState)
+            qComLam = Quat.Conjugate(qLam0)*qCom0
+            qBodLam  = self.CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
+            qBodCom = Quat.Conjugate(qComLam)*qBodLam
+            propError = self.PropErrorCalc(self,self.kpvec,qBodCom._eps)
+            rEs = Vector.Norm(posEs)
+            lvlhRate = Vector.Cross(posEs,velEs)/(rEs*rEs)
+            deriError = self.DeriErrorCalc(self,self.kdvec,controlRatesEs - lvlhRate)
+            T_control = - propError - deriError
             pass
         else:
+            # Point -X-axis to nadir, point +z-axis towards Y_LVLH
             qCom0 = CalcNadirCommandFrame(self,assetOrbState)
             qLam0 = CalcLVLHECIState(self,assetOrbState)
             qComLam = Quat.Conjugate(qLam0)*qCom0
             qBodLam  = CalcBodyAttitudeLVLH(self,assetOrbState,controlQuatsEs)
             qBodCom = Quat.Conjugate(qComLam)*qBodLam
-            propError = qBodCom._eps
-            rEs = Matrix[System.Double].Norm(posEs)
-            lvlhRate = Matrix[System.Double].Cross(posEs,velEs)/(rEs*rEs)
-            deriError
+            propError = PropErrorCalc(self,self.kpvec,qBodCom._eps)
+            rEs = Vector.Norm(posEs)
+            lvlhRate = Vector.Cross(posEs,velEs)/(rEs*rEs)
+            deriError = DeriErrorCalc(self,self.kdvec,controlRatesEs - lvlhRate)
+            T_control = - propError - deriError
             return True
         return True
 

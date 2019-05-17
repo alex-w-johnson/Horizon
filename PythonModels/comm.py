@@ -33,10 +33,8 @@ class comm(HSFSubsystem.Subsystem):
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
-
         instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(mb/s)')
         instance.addKey(instance.DATARATE_KEY)
-
         return instance
 		
     def GetDependencyDictionary(self):
@@ -59,7 +57,7 @@ class comm(HSFSubsystem.Subsystem):
         return super(comm, self).CanExtend(event, universe, extendTo)
 
     def POWERSUB_PowerProfile_COMMSUB(self, event):
-        return event.State.GetProfile(self.DATARATE_KEY) * 20
+        return event.State.GetProfile(self.DATARATE_KEY)
 
     def DependencyCollector(self, currentEvent):
         return super(comm, self).DependencyCollector(currentEvent)
