@@ -101,7 +101,7 @@ class payload(HSFSubsystem.Subsystem):
              return True
 
     def CanExtend(self, event, universe, extendTo):
-        return super(payload, self).CanExtend(event, universe, extendTo) # What does this extend method do?
+        return super(payload, self).CanExtend(event, universe, extendTo)
 
     def POWERSUB_PowerProfile_PAYLOADSUB(self, event):
         prof1 = HSFProfile[System.Double]()
@@ -115,4 +115,4 @@ class payload(HSFSubsystem.Subsystem):
         return event.State.GetProfile(self.PIXELS_KEY)
 
     def DependencyCollector(self, currentEvent):
-        return super(payload, self).DependencyCollector(currentEvent) #What does this super method do? Need to find out
+        return super(payload, self).DependencyCollector(currentEvent)

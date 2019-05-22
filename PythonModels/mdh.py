@@ -58,7 +58,7 @@ class mdh(HSFSubsystem.Subsystem):
         if (self._task.Type == TaskType.IMAGING):
             ts = event.GetTaskStart(self.Asset)
             te = event.GetTaskEnd(self.Asset)
-            oldbufferratio = self._newState.GetLastValue(self.Dkeys[0]).Value # Why Dkeys?
+            oldbufferratio = self._newState.GetLastValue(self.Dkeys[0]).Value
             newdataratein = HSFProfile[System.Double]()
             newdataratein = self.DependencyCollector(event) / self._bufferSize
             exceeded = False

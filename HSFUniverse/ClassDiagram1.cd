@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="HSFUniverse.Atmosphere" Collapsed="true">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAgggQAAAACAAAAABAQACDAQAAAAAAAA=</HashCode>
+      <FileName>Atmosphere.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.HorizontalWindModel14" Collapsed="true">
+    <Position X="10.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Atmosphere.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.CloudCover" Collapsed="true">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAABAAAAAABAAAAAQAgABEAAAAE=</HashCode>
+      <FileName>CloudCover.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.Domain" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAgAAAAAAAAAACAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Domain.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.DynamicEOMS" Collapsed="true">
+    <Position X="1.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAACAAAAAAAIAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>DynamicEOMS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.DynamicState" Collapsed="true">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCIkAAAAAEAwAIAMDAQACAQAAQAAABAAAQAIACAAAAg=</HashCode>
+      <FileName>DynamicState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.EOMFactory" Collapsed="true">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EOMFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.OrbitalEOMS" Collapsed="true">
+    <Position X="2.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEQAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OrbitalEOMS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.RealTimeAtmosphere" Collapsed="true">
+    <Position X="5.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAEQBAAKAAAAgAABIQCAAAACCAAAUAiDAQABAAAEAA=</HashCode>
+      <FileName>RealTimeAtmosphere.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.ScriptedEOMS" Collapsed="true">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ScriptedEOMS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.ScriptedUniverse" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAIAAAAgAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ScriptedUniverse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.SpaceEnvironment" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAICAAAAAAAAAAAAAAAAAAAAEAAAAAAAQ=</HashCode>
+      <FileName>SpaceEnvironment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.StandardAtmosphere" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAQAAAAAAAAACAAQACDgQAAAAAAAA=</HashCode>
+      <FileName>StandardAtmosphere.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.WorldMagneticModel" Collapsed="true">
+    <Position X="12" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StandardModels.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.Sun" Collapsed="true">
+    <Position X="12" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAARAAAAAAIAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Sun.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.UniverseFactory" Collapsed="true">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>UniverseFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFUniverse.WMM" Collapsed="true">
+    <Position X="10.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>sBACAEAAACAAoCACACIAgAAAAADAAwCghcQAwIAYMIE=</HashCode>
+      <FileName>WMM.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="HSFUniverse.DynamicStateType" Collapsed="true">
+    <Position X="10.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAICAAAAAAAAAQAAAAAIQAAAAAAAAA=</HashCode>
+      <FileName>DynamicState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HSFUniverse.PropagationType" Collapsed="true">
+    <Position X="12" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAIAAAAAAAAAAAAAAAAAAAAAAAAAAEAIAAAAAA=</HashCode>
+      <FileName>DynamicState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="HSFUniverse.ShadowState" Collapsed="true">
+    <Position X="13.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAIAAAAAIAAAAAA=</HashCode>
+      <FileName>Sun.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

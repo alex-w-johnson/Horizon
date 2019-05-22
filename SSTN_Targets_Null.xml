@@ -18,7 +18,7 @@
 		Value = "3">
 		<DynamicState
 			DynamicStateType = "STATIC_ECI"
-			ICs = "[39.2945; -71.1559; 0]">
+			ICs = "[-2.26E+15; -8.80E+14; -4.78E+14]">
 		</DynamicState>
 	</TARGET>
   <TARGET

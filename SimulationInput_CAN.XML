@@ -6,8 +6,8 @@
 	</SIMULATION_PARAMETERS>
 
 	<SCHEDULER_PARAMETERS
-		maxNumSchedules="20"
-		numSchedCropTo="2"
+		maxNumSchedules="40"
+		numSchedCropTo="20"
 		simStepSeconds="1">
 		<SCRIPTED_EVALUATOR
 			src="..\..\..\eval.py"

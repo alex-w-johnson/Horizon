@@ -102,7 +102,7 @@
 			className="power"
 			batterySize="100000"
       panelEfficiency="0.25"
-			panelArea="0.22">
+			panelArea="0.18">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset1"></DEPENDENCY>

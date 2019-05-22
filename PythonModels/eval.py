@@ -33,7 +33,4 @@ class eval(HSFScheduler.TargetValueEvaluator):
                     callKey = "EvalfromMDH" + "." + assetTask.Key.Name
                     foo = self.Dependencies.GetDependencyFunc(callKey)
                     sum += System.Double(foo(eit))
-                # TODO: add value from imaging 
-                # TODO: add value from desaturation
-
         return sum

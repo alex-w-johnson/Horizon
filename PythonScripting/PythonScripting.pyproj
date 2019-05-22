@@ -2,17 +2,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>4c51b371-0513-4202-a182-8b9b5d496d7d</ProjectGuid>
+    <ProjectGuid>f4556f42-98a5-4423-b39a-2bf134713036</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>IronPythonApplication1.py</StartupFile>
+    <StartupFile>PythonScripting.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <InterpreterId>IronPython|2.7-32</InterpreterId>
     <LaunchProvider>IronPython (.NET) launcher</LaunchProvider>
     <OutputPath>.</OutputPath>
-    <Name>IronPythonApplication1</Name>
-    <RootNamespace>IronPythonApplication1</RootNamespace>
+    <Name>PythonScripting</Name>
+    <RootNamespace>PythonScripting</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +23,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="IronPythonApplication1.py" />
+    <None Include="PythonScripting.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="IronPython|2.7-32" />
