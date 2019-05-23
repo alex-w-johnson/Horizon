@@ -46,8 +46,7 @@ namespace HSFUniverse
         {
             get
             {
-                dynamic prop = _pythonInstance.PythonAccessor(t, y, param, environment); // EOMSSTN KEEPS RETURNING EXCEPTION "EXPECTED VECTOR, RECEIVED MATRIX[FLOAT]"
-                // IS THE EOMS ACCESSOR ACTUALLY BEING OVERRIDEN? UNIT TEST, PERHAPS? I MAY BE BEYOND MADNESS NOW, I WONDER WHAT AWAITS BEYOND? MY THESIS DEFENSE? YEARS OF TOIL?
+                dynamic prop = _pythonInstance.PythonAccessor(t, y, param, environment); 
                 return (Matrix<double>)prop;
             }
         }

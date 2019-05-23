@@ -3,6 +3,7 @@ import clr
 import System.Collections.Generic
 import System
 clr.AddReference('System.Core')
+clr.AddReference('mscorlib')
 clr.AddReference('IronPython')
 clr.AddReference('System.Xml')
 clr.AddReferenceByName('Utilities')
@@ -23,8 +24,8 @@ from System.Collections.Generic import Dictionary
 from IronPython.Compiler import CallTarget0
 from System import Array
 from System import Xml
-import datetime #For using WMM
-from System import DateTime #For using WMM
+from HSFUniverse import WMM
+#from System import Datetime #For using WMM
 
 
 class eomSSTN(EOMS):
@@ -56,9 +57,10 @@ class eomSSTN(EOMS):
         instance.IsWheels[1,1] = instance.IsWheelsVec[1]
         instance.IsWheels[2,2] = instance.IsWheelsVec[2]
         instance.IsWheels[3,3] = instance.IsWheelsVec[3]
+        instance.wmm = WMM()
         return instance
     
-    def PythonAccessor(self, t, y, param):
+    def PythonAccessor(self, t, y, param,environment):
         xeci = y[1,1]
         yeci = y[2,1]
         zeci = y[3,1]
@@ -83,7 +85,7 @@ class eomSSTN(EOMS):
         Veci[1] = vxeci
         Veci[2] = vyeci
         Veci[3] = vzeci
-        epsbeci = Matrix[System.Double](3,1)
+        epsbeci = Vector(3)
         epsbeci[1] = qb1
         epsbeci[2] = qb2
         epsbeci[3] = qb3
@@ -96,62 +98,77 @@ class eomSSTN(EOMS):
         wwb[1] = wwxb
         wwb[2] = wwyb
         wwb[3] = wwzb
-        etaI = Matrix[System.Double](3,3)
-        etaI[1,1] = qb0
-        etaI[2,2] = qb0
-        etaI[3,3] = qb0
-        epsbecidot = 0.5*Matrix[System.Double].Cross(epsbeci,wbeci) + 0.5*etaI*wbeci
+        etaI = qb0*Matrix[System.Double].Eye(3)
+        
+        epsbecidot = 0.5*Matrix[System.Double].CrossMatrix(epsbeci)*wbeci + 0.5*etaI*wbeci
 
         # Current Julian Date
-        jdCurrent = SimParameters.SimStartJD
+        jdCurrent = UserModel.SimParameters.SimStartJD
 
         # ADCS control inputs
-        T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
-        M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)
-
+        # T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
+        # M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)
+        T_control = Matrix[System.Double]('[0;0;0]')
+        M_dipole = Matrix[System.Double]('[0;0;0]')
         # State transition matrix equations
         dy = Matrix[System.Double](16,1)
         dy[1,1] = vxeci
         dy[2,1] = vyeci
         dy[3,1] = vzeci
-        acceleration = self.CalcForces(self)
+        #print('Calc Accels')
+        acceleration = self.CalcForces(Reci,Veci)
+        #print('Done')
         dy[4,1] = acceleration[1]
         dy[5,1] = acceleration[2]
         dy[6,1] = acceleration[3]
-        dy[7,1] = -0.5*Matrix[System.Double].Dot(epsbeci,wbeci)
+        #print('Calc QuatDot')
+        dy[7,1] = -0.5*Matrix[System.Double].Dot(Matrix[System.Double](epsbeci.ToString()),wbeci)
         dy[8,1] = epsbecidot[1]
         dy[9,1] = epsbecidot[2]
         dy[10,1] = epsbecidot[3]
-        T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole)
+        #print('done')
+        #print('Calc Disturbs')
+        T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent)    
+        #print('done')
         Imat = self.Imat
-        omegaDot = Matrix[System.Double].Inverse(Imat)*(T_dist-Matrix[System.Double].Cross(wbeci,Imat*wbeci)) # Correct formula for body rate integration? Or need wheel momentum? -AJ
+        #print('Calc Ang Accels')
+        omegaDot = Matrix[System.Double].Inverse(Imat)*(T_dist-Matrix[System.Double].Cross(wbeci,Imat*wbeci)) # Correct formula for body rate integration? Or need wheel momentum? -AJ        
         dy[11,1] = omegaDot[1]
         dy[12,1] = omegaDot[2]
         dy[13,1] = omegaDot[3]
+        #print('done')
         IsWheels = self.IsWheels
+        #print('Calc Wheel Dots')
         omegaWDot = Matrix[System.Double].Inverse(IsWheels)*(-T_control-Matrix[System.Double].Cross(wbeci,IsWheels*wwb)) # Fairly confident, ask Mehiel anyways - AJ
+        #print('done')
         dy[14,1] = omegaWDot[1]
         dy[15,1] = omegaWDot[2]
         dy[16,1] = omegaWDot[3]
         return dy
     
-    def CalcForces(self):
-        a_grav = self.CalcGravityForce(self,self.Reci)
-        a_J2 = self.CalcJ2Force(self,self.Reci)
-        a_drag = self.CalcDragForce(self,self.Reci,self.Veci)/self.Mass
+    def CalcForces(self,r_eci,v_eci):
+        a_grav = self.CalcGravityForce(r_eci)
+        a_J2 = self.CalcJ2Force(r_eci)
+        a_drag = self.CalcDragForce(r_eci,v_eci)/self.Mass
         a_total = a_grav + a_J2 + a_drag
         return a_total
 
-    def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole):
-        T_drag = self.CalcDragMoment(self,self.Reci,self.Veci)
-        T_mag = self.CalcMagMoment(self,self.Reci,self.jdCurrent,M_dipole,qb_eci)
-        T_gravgrad = self.CalcGravGradMoment(self,r_eci,qb_eci)
+    def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole,jdCurrent):
+        T_drag = self.CalcDragMoment(r_eci,v_eci)
+        #print('drag')
+        #print(T_drag)
+        T_mag = self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
+        #print('mag')
+        #print(T_mag)
+        T_gravgrad = self.CalcGravGradMoment(r_eci,qb_eci)
+        #print('grad')
+        #print(T_gravgrad)
         T_total = T_drag + T_mag + T_gravgrad + T_control
         return T_total
 
     def CalcGravityForce(self,r):
         mu = 398600.4418
-        r3 = Matrix[System.Double].Norm(r)^3
+        r3 = Matrix[System.Double].Norm(r)**3
         agrav = Matrix[System.Double](3,1)
         agrav[1] = -mu*r[1]/r3
         agrav[2] = -mu*r[2]/r3
@@ -164,87 +181,98 @@ class eomSSTN(EOMS):
         rE = 6378.137
         rnorm = Matrix[System.Double].Norm(r)
         aJ2 = Matrix[System.Double](3,1)
-        aJ2[1] = -((3*J2*mu*(rE^2)*r[1])/(2*(rnorm^5)))*(1-((5*(r[3]^2))/(rnorm^2)))
-        aJ2[2] = -((3*J2*mu*(rE^2)*r[2])/(2*(rnorm^5)))*(1-((5*(r[3]^2))/(rnorm^2)))
-        aJ2[3] = -((3*J2*mu*(rE^2)*r[3])/(2*(rnorm^5)))*(3-((5*(r[3]^2))/(rnorm^2)))
+        aJ2[1] = -((3*J2*mu*(rE**2)*r[1])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
+        aJ2[2] = -((3*J2*mu*(rE**2)*r[2])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
+        aJ2[3] = -((3*J2*mu*(rE**2)*r[3])/(2*(rnorm**5)))*(3-((5*(r[3]**2))/(rnorm**2)))
         return aJ2
 
     def CalcDragForce(self,r_eci,v_eci):
-        rho = self.CalcAtmosDens(self,r_eci)
+        rho = self.CalcAtmosDens(r_eci)
+        #print(rho)
         vnorm = Matrix[System.Double].Norm(v_eci)
         F_d = -1*rho*1000.0*v_eci*vnorm*self.Cd*self.CxArea
+        #print(F_d)
         return F_d
 
     def CalcDragMoment(self,r_eci,v_eci):
-        fdrag = self.CalcDragForce(self,r_eci,v_eci)
+        fdrag = self.CalcDragForce(r_eci,v_eci)
+        #print('Drag')
         T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
+        #print('Tdrag')
         return T_d
 
     def CalcMagMoment(self,r_eci,JD,M_dipole,qb_eci):
         bField = self.CalcCurrentMagField(r_eci,JD)
+        #print('bfield')
+        #print(type(bField))
         bFieldBody = Quat.Rotate(qb_eci,bField)
+        #print('bfieldBody')
+        #print(type(bFieldBody))
         magMoment = Matrix[System.Double].Cross(M_dipole,bFieldBody)
         return magMoment
 
     def CalcGravGradMoment(self,r_eci,qb_eci):
         mu = 398600.4418
-        rnorm = Matrix[System.Double].Norm(r)
-        r5 = rnorm*rnorm*rnorm*rnorm*rnorm
+        rnorm = Matrix[System.Double].Norm(r_eci)
+        r5 = rnorm**5
         rb = Quat.Rotate(qb_eci,r_eci)
+        #print(rb)
         T_g = 3.0*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/rnorm
         return T_g
 
     def CalcAtmosDens(self,r_eci):
         rE = 6378.137
         h = Matrix[System.Double].Norm(r_eci) - rE
+        #print(h)
         # Based on exp. atmosphere model from Vallado Table 8-4
         atmMatrix = Matrix[System.Double](28,3)
-        atmMatrix.SetRow(1,Matrix[System.Double]([ 0, 1.225, 7.249]))
-        atmMatrix.SetRow(2,Matrix[System.Double]([ 25, 3.899E-2, 6.349]))
-        atmMatrix.SetRow(3,Matrix[System.Double]([ 30, 1.774E-2, 6.682]))
-        atmMatrix.SetRow(4,Matrix[System.Double]([ 40, 3.972E-3, 7.554]))
-        atmMatrix.SetRow(5,Matrix[System.Double]([ 50, 1.057E-3, 8.382]))
-        atmMatrix.SetRow(6,Matrix[System.Double]([ 60, 3.206E-4, 7.714]))
-        atmMatrix.SetRow(7,Matrix[System.Double]([ 70, 8.770E-5, 6.549]))
-        atmMatrix.SetRow(8,Matrix[System.Double]([ 80, 1.905E-5, 5.799]))
-        atmMatrix.SetRow(9,Matrix[System.Double]([ 90, 3.396E-6, 5.382]))
-        atmMatrix.SetRow(10,Matrix[System.Double]([ 100, 5.297E-7, 5.877]))
-        atmMatrix.SetRow(11,Matrix[System.Double]([ 110, 9.661E-8, 7.263]))
-        atmMatrix.SetRow(12,Matrix[System.Double]([ 120, 2.438E-8, 9.473]))
-        atmMatrix.SetRow(13,Matrix[System.Double]([ 130, 8.484E-9, 12.636]))
-        atmMatrix.SetRow(14,Matrix[System.Double]([ 140, 3.845E-9, 16.149]))
-        atmMatrix.SetRow(15,Matrix[System.Double]([ 150, 2.070E-9, 22.523]))
-        atmMatrix.SetRow(16,Matrix[System.Double]([ 180, 5.464E-10, 29.740]))
-        atmMatrix.SetRow(17,Matrix[System.Double]([ 200, 2.789E-10, 37.105]))
-        atmMatrix.SetRow(18,Matrix[System.Double]([ 250, 7.248E-11, 45.546]))
-        atmMatrix.SetRow(19,Matrix[System.Double]([ 300, 2.418E-11, 53.628]))
-        atmMatrix.SetRow(20,Matrix[System.Double]([ 350, 9.518E-12, 53.298]))
-        atmMatrix.SetRow(21,Matrix[System.Double]([ 400, 3.725E-12, 58.515]))
-        atmMatrix.SetRow(22,Matrix[System.Double]([ 450, 1.585E-12, 60.828]))
-        atmMatrix.SetRow(23,Matrix[System.Double]([ 500, 6.967E-13, 63.822]))
-        atmMatrix.SetRow(24,Matrix[System.Double]([ 600, 1.454E-13, 71.835]))
-        atmMatrix.SetRow(25,Matrix[System.Double]([ 700, 3.614E-14, 88.667]))
-        atmMatrix.SetRow(26,Matrix[System.Double]([ 800, 1.170E-14, 124.64]))
-        atmMatrix.SetRow(27,Matrix[System.Double]([ 900, 5.245E-15, 181.05]))
-        atmMatrix.SetRow(28,Matrix[System.Double]([ 1000, 3.019E-15, 268.00]))
-        for r in range(1,28+1):
-            if h == atmMatrix[28,1]:
-                rho = atmMatrix[28,2] * math.exp(-1*(h-atmMatrix[28,1])/atmMatrix[28,3])
+        atmMatrix.SetRow(1,Matrix[System.Double]('[0, 1.225, 7.249]'))
+        atmMatrix.SetRow(2,Matrix[System.Double]('[25, 3.899E-2, 6.349]'))
+        atmMatrix.SetRow(3,Matrix[System.Double]('[30, 1.774E-2, 6.682]'))
+        atmMatrix.SetRow(4,Matrix[System.Double]('[40, 3.972E-3, 7.554]'))
+        atmMatrix.SetRow(5,Matrix[System.Double]('[50, 1.057E-3, 8.382]'))
+        atmMatrix.SetRow(6,Matrix[System.Double]('[60, 3.206E-4, 7.714]'))
+        atmMatrix.SetRow(7,Matrix[System.Double]('[70, 8.770E-5, 6.549]'))
+        atmMatrix.SetRow(8,Matrix[System.Double]('[80, 1.905E-5, 5.799]'))
+        atmMatrix.SetRow(9,Matrix[System.Double]('[90, 3.396E-6, 5.382]'))
+        atmMatrix.SetRow(10,Matrix[System.Double]('[100, 5.297E-7, 5.877]'))
+        atmMatrix.SetRow(11,Matrix[System.Double]('[110, 9.661E-8, 7.263]'))
+        atmMatrix.SetRow(12,Matrix[System.Double]('[120, 2.438E-8, 9.473]'))
+        atmMatrix.SetRow(13,Matrix[System.Double]('[130, 8.484E-9, 12.636]'))
+        atmMatrix.SetRow(14,Matrix[System.Double]('[140, 3.845E-9, 16.149]'))
+        atmMatrix.SetRow(15,Matrix[System.Double]('[150, 2.070E-9, 22.523]'))
+        atmMatrix.SetRow(16,Matrix[System.Double]('[180, 5.464E-10, 29.740]'))
+        atmMatrix.SetRow(17,Matrix[System.Double]('[200, 2.789E-10, 37.105]'))
+        atmMatrix.SetRow(18,Matrix[System.Double]('[250, 7.248E-11, 45.546]'))
+        atmMatrix.SetRow(19,Matrix[System.Double]('[300, 2.418E-11, 53.628]'))
+        atmMatrix.SetRow(20,Matrix[System.Double]('[350, 9.518E-12, 53.298]'))
+        atmMatrix.SetRow(21,Matrix[System.Double]('[400, 3.725E-12, 58.515]'))
+        atmMatrix.SetRow(22,Matrix[System.Double]('[450, 1.585E-12, 60.828]'))
+        atmMatrix.SetRow(23,Matrix[System.Double]('[500, 6.967E-13, 63.822]'))
+        atmMatrix.SetRow(24,Matrix[System.Double]('[600, 1.454E-13, 71.835]'))
+        atmMatrix.SetRow(25,Matrix[System.Double]('[700, 3.614E-14, 88.667]'))
+        atmMatrix.SetRow(26,Matrix[System.Double]('[800, 1.170E-14, 124.64]'))
+        atmMatrix.SetRow(27,Matrix[System.Double]('[900, 5.245E-15, 181.05]'))
+        atmMatrix.SetRow(28,Matrix[System.Double]('[1000, 3.019E-15, 268.00]'))
+        #print(atmMatrix)
+        for r in range(28+1,1):
+            if h > atmMatrix[28,1]:
+                rho0 = atmMatrix[28,2]
+                h0 = atmMatrix[28,1]
+                H = atmMatrix[28,3]
+                rho = rho0 * System.Math.Exp(-1*(h-h0)/H)
+                return rho
             if h > atmMatrix[r,1] and h < atmMatrix[r+1,1]:
-                rho = atmMatrix[r,2] * math.exp(-1*(h-atmMatrix[r,1])/atmMatrix[r,3])
+                rho0 = atmMatrix[r,2]
+                h0 = atmMatrix[r,1]
+                H = atmMatrix[r,3]
+                rho = rho0 * System.Math.Exp(-1*(h-h0)/H)
+                return rho
             else:
-                print('Invalid altitude input to exponential atmosphere calculation')
-                break
-        return rho
+                raise ValueError
+        return 0.0
 
-    def CalcWheelInertiaMatrix(self):
-        IswMat = Matrix[System.Double](3,3)
-        IswMat[1,1] = self.IsWheelsVec[1]
-        IswMat[2,2] = self.IsWheelsVec[2]
-        IswMat[3,3] = self.IsWheelsVec[3]
-        return IswMat
-
-    def CalcCurrentYMDhms(JD):
+    def CalcCurrentYMDhms(self,JD):
         # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date" algorithm
         J2000 = 2451545.0 #JD for Jan. 1 2000
         Y2000 = 2000.0 
@@ -278,20 +306,20 @@ class eomSSTN(EOMS):
         temp = (temp-h) * 60.0
         m = math.floor(temp)
         s = (temp - m) * 60.0
-        out[0] = Y
-        out[1] = M
-        out[2] = D
-        out[3] = h
-        out[4] = m
-        out[5] = s
+        out = [Y,M,D,h,m,s]
         return out # return Y M D h m s as list
 
     def CalcCurrentUTCDateTime(self,Y,M,D,h,m,s):
-        currDateTime = System.Datetime(Y,M,D,h,m,s,kind=DateTimeKind.Utc)
+        kind = System.DateTimeKind.Utc
+        currDateTime = System.DateTime(Y,M,D,h,m,s,kind)
         return currDateTime
 
-    def CalcCurrentMagField(self,r_eci,JD):
-        assetLLA = GeometryUtilities.ECI2LLA(r_eci,JD)
+    def CalcCurrentMagField(self,r_eci,JD): # PROBLEM IS HERE
+        r_eciVec = Vector(3)
+        r_eciVec[1] = r_eci[1]
+        r_eciVec[2] = r_eci[2]
+        r_eciVec[3] = r_eci[3]
+        assetLLA = GeometryUtilities.ECI2LLA(r_eciVec,JD)
         assetLat = assetLLA[1]
         assetLong = assetLLA[2]
         assetAlt = assetLLA[3]
@@ -303,7 +331,14 @@ class eomSSTN(EOMS):
         m = YMDhms[4]
         s = YMDhms[5]
         cDT = self.CalcCurrentUTCDateTime(Y,M,D,h,m,s)
-        bvec = WMM.CalcBvec(assetLat,assetLong,assetAlt,cDT)
-        bvecECI = GeometryUtilities.NED2ECIRotate(bvec,assetLLA,JD)
-        bvecECIMat = Matrix(bvecECI);
+        bvec = self.wmm.CalcBvec(assetLat,assetLong,assetAlt,cDT)
+        bVec = Vector(3)
+        bVec[1] = bvec[1]
+        bVec[2] = bvec[2]
+        bVec[3] = bvec[3]
+        bvecECI = GeometryUtilities.NED2ECIRotate(bVec,assetLLA,JD)
+        bvecECIMat = Matrix[System.Double](3,1)
+        bvecECIMat[1] = bvecECI[1]
+        bvecECIMat[2] = bvecECI[2]
+        bvecECIMat[3] = bvecECI[3]
         return bvecECIMat

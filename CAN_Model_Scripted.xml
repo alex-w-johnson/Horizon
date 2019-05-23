@@ -13,7 +13,9 @@
         cxareaavg="0.1584"
         cd="2.2"
         moi="[0.15; 0.15; 0.15]"
-        iswheels="[0.000028665; 0.000028665; 0.000028665]"
+        iswheels="[0.00003; 0.00003; 0.00003]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelsmass="[0.13; 0.13; 0.13]"
         Name ="Asset1">
       </EOMS>
     </DynamicState>
