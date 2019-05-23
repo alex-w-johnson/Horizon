@@ -63,6 +63,8 @@ class payload(HSFSubsystem.Subsystem):
         dep.Add("PowerfromPayload" + "." + self.Asset.Name, depFunc1)
         depFunc2 = Func[Event,  Utilities.HSFProfile[System.Double]](self.MDHSUB_NewDataProfile_PAYLOADSUB)
         dep.Add("MDHfromPayload" + "." + self.Asset.Name, depFunc2)
+        depFunc3 = Func[Event, System.Double](self.EVAL_targetvalue_PAYLOADSUB)
+        dep.Add("EvalfromPayload" + "." + self.Asset.Name, depFunc3)
         return dep
 
     def GetDependencyCollector(self):
@@ -113,6 +115,9 @@ class payload(HSFSubsystem.Subsystem):
 
     def MDHSUB_NewDataProfile_PAYLOADSUB(self, event):
         return event.State.GetProfile(self.PIXELS_KEY)
+
+    def EVAL_targetvalue_PALOADSUB(self, event):
+        return event.Task.Target.Value
 
     def DependencyCollector(self, currentEvent):
         return super(payload, self).DependencyCollector(currentEvent)

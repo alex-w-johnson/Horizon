@@ -102,7 +102,7 @@ class mdh(HSFSubsystem.Subsystem):
         return prof1
 
     def EVAL_DataRateProfile_MDHSUB(self, event):
-        return (event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value - event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) * 50
+        return (event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value - event.State.GetValueAtTime(DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value)
 
     def DependencyCollector(self, currentEvent):
         return super(mdh, self).DependencyCollector(currentEvent)

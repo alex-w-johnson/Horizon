@@ -85,6 +85,7 @@
     <Compile Include="DynamicEOMS.cs" />
     <Compile Include="DynamicState.cs" />
     <Compile Include="EOMFactory.cs" />
+    <Compile Include="ExponentialAtmosphere.cs" />
     <Compile Include="OrbitalEOMS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealTimeAtmosphere.cs" />
@@ -114,6 +115,9 @@
     <None Include="app.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="oldExpAtmos.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

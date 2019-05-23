@@ -7,15 +7,16 @@
 				EOMSType="scripted"
         src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eomSSTN.py"
         className="eomSSTN"
-        mass="13.879"
-        com="[-0.00425; 0.0; 0.13872]"
-        cop="[-0.0282; 0.0; -0.1042]"
+        mass="8.5"
+        com="[0.0; 0.0; 0.133]"
+        cop="[0.0; 0.0; -0.1042]"
         cxareaavg="0.1584"
         cd="2.2"
         moi="[0.15; 0.15; 0.15]"
         iswheels="[0.00003; 0.00003; 0.00003]"
         itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
         wheelsmass="[0.13; 0.13; 0.13]"
+        residualdipole ="[0.0; 0.0; 0.1]"
         Name ="Asset1">
       </EOMS>
     </DynamicState>
@@ -47,7 +48,8 @@
         axmagtorx2="[0.0; 1.0; 0.0]"
         axmagtorx3="[0.0; 0.0; 1.0]"
         peakB="[0.2; 0.2; 0.2]"
-        maxpowmagtorx="[0.6; 0.6; 0.6]">
+        maxpowmagtorx="[0.6; 0.6; 0.6]"
+        residualdipole="[0.0; 0.0; 0.1]">
       </Magtorquers>
       <Guidance
         antisolaraxis ="[0.0; 0.0; 1.0]">

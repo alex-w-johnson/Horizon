@@ -25,6 +25,7 @@ from IronPython.Compiler import CallTarget0
 from System import Array
 from System import Xml
 from HSFUniverse import WMM
+from HSFUniverse import ExponentialAtmosphere
 #from System import Datetime #For using WMM
 
 
@@ -58,9 +59,13 @@ class eomSSTN(EOMS):
         instance.IsWheels[2,2] = instance.IsWheelsVec[2]
         instance.IsWheels[3,3] = instance.IsWheelsVec[3]
         instance.wmm = WMM()
+        instance.atmos = ExponentialAtmosphere()
+        
+        # Residual dipole property
+        instance.ResDipole = Matrix[System.Double](instance.AssetName + '.' + 'residualdipole')
         return instance
     
-    def PythonAccessor(self, t, y, param,environment):
+    def PythonAccessor(self, t, y, param, environment):
         xeci = y[1,1]
         yeci = y[2,1]
         zeci = y[3,1]
@@ -109,7 +114,7 @@ class eomSSTN(EOMS):
         # T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
         # M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)
         T_control = Matrix[System.Double]('[0;0;0]')
-        M_dipole = Matrix[System.Double]('[0;0;0]')
+        M_dipole = Matrix[System.Double]('[0;0;0]') +  self.ResDipole
         # State transition matrix equations
         dy = Matrix[System.Double](16,1)
         dy[1,1] = vxeci
@@ -225,52 +230,8 @@ class eomSSTN(EOMS):
         h = Matrix[System.Double].Norm(r_eci) - rE
         #print(h)
         # Based on exp. atmosphere model from Vallado Table 8-4
-        atmMatrix = Matrix[System.Double](28,3)
-        atmMatrix.SetRow(1,Matrix[System.Double]('[0, 1.225, 7.249]'))
-        atmMatrix.SetRow(2,Matrix[System.Double]('[25, 3.899E-2, 6.349]'))
-        atmMatrix.SetRow(3,Matrix[System.Double]('[30, 1.774E-2, 6.682]'))
-        atmMatrix.SetRow(4,Matrix[System.Double]('[40, 3.972E-3, 7.554]'))
-        atmMatrix.SetRow(5,Matrix[System.Double]('[50, 1.057E-3, 8.382]'))
-        atmMatrix.SetRow(6,Matrix[System.Double]('[60, 3.206E-4, 7.714]'))
-        atmMatrix.SetRow(7,Matrix[System.Double]('[70, 8.770E-5, 6.549]'))
-        atmMatrix.SetRow(8,Matrix[System.Double]('[80, 1.905E-5, 5.799]'))
-        atmMatrix.SetRow(9,Matrix[System.Double]('[90, 3.396E-6, 5.382]'))
-        atmMatrix.SetRow(10,Matrix[System.Double]('[100, 5.297E-7, 5.877]'))
-        atmMatrix.SetRow(11,Matrix[System.Double]('[110, 9.661E-8, 7.263]'))
-        atmMatrix.SetRow(12,Matrix[System.Double]('[120, 2.438E-8, 9.473]'))
-        atmMatrix.SetRow(13,Matrix[System.Double]('[130, 8.484E-9, 12.636]'))
-        atmMatrix.SetRow(14,Matrix[System.Double]('[140, 3.845E-9, 16.149]'))
-        atmMatrix.SetRow(15,Matrix[System.Double]('[150, 2.070E-9, 22.523]'))
-        atmMatrix.SetRow(16,Matrix[System.Double]('[180, 5.464E-10, 29.740]'))
-        atmMatrix.SetRow(17,Matrix[System.Double]('[200, 2.789E-10, 37.105]'))
-        atmMatrix.SetRow(18,Matrix[System.Double]('[250, 7.248E-11, 45.546]'))
-        atmMatrix.SetRow(19,Matrix[System.Double]('[300, 2.418E-11, 53.628]'))
-        atmMatrix.SetRow(20,Matrix[System.Double]('[350, 9.518E-12, 53.298]'))
-        atmMatrix.SetRow(21,Matrix[System.Double]('[400, 3.725E-12, 58.515]'))
-        atmMatrix.SetRow(22,Matrix[System.Double]('[450, 1.585E-12, 60.828]'))
-        atmMatrix.SetRow(23,Matrix[System.Double]('[500, 6.967E-13, 63.822]'))
-        atmMatrix.SetRow(24,Matrix[System.Double]('[600, 1.454E-13, 71.835]'))
-        atmMatrix.SetRow(25,Matrix[System.Double]('[700, 3.614E-14, 88.667]'))
-        atmMatrix.SetRow(26,Matrix[System.Double]('[800, 1.170E-14, 124.64]'))
-        atmMatrix.SetRow(27,Matrix[System.Double]('[900, 5.245E-15, 181.05]'))
-        atmMatrix.SetRow(28,Matrix[System.Double]('[1000, 3.019E-15, 268.00]'))
-        #print(atmMatrix)
-        for r in range(28+1,1):
-            if h > atmMatrix[28,1]:
-                rho0 = atmMatrix[28,2]
-                h0 = atmMatrix[28,1]
-                H = atmMatrix[28,3]
-                rho = rho0 * System.Math.Exp(-1*(h-h0)/H)
-                return rho
-            if h > atmMatrix[r,1] and h < atmMatrix[r+1,1]:
-                rho0 = atmMatrix[r,2]
-                h0 = atmMatrix[r,1]
-                H = atmMatrix[r,3]
-                rho = rho0 * System.Math.Exp(-1*(h-h0)/H)
-                return rho
-            else:
-                raise ValueError
-        return 0.0
+        rho = self.atmos.density(h)
+        return rho
 
     def CalcCurrentYMDhms(self,JD):
         # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date" algorithm

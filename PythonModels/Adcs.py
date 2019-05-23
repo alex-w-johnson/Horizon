@@ -68,13 +68,14 @@ class adcs(HSFSubsystem.Subsystem):
         instance.axmagtorx3 = Matrix[System.Double](scriptedNode["Magtorquers"].Attributes["axmagtorx3"])
         instance.peakbmagtorx = Matrix[System.Double](scriptedNode["Magtorquers"].Attributes["peakB"])
         instance.peakpowermagtorx = Matrix[System.Double](scriptedNode["Magtorquers"].Attributes["maxpowmagtorx"])
-        instance.wmm = WMM()
         return instance
 
     def GetDependencyDictionary(self):
         dep = Dictionary[str, Delegate]()
         depFunc1 = Func[Event,  HSFProfile[System.Double]](self.POWERSUB_PowerProfile_ADCSSUB)
         dep.Add("PowerfromADCS" + "." + self.Asset.Name, depFunc1)
+        depFunc2 = Func[Event, HSFProfile[System.Double]](self.EVAL_desaturation_ADCSSUB)
+        dep.Add("EvalfromADCS" + "." + self.Asset.Name, depFunc2)
         return dep
 
     def GetDependencyCollector(self):
@@ -87,21 +88,30 @@ class adcs(HSFSubsystem.Subsystem):
         prof1[event.GetTaskEnd(self.Asset)] = 30
         return prof1
 
+    def EVAL_desaturation_ADCSSUB(self, event):
+        task = event.GetAssetTask
+        if task.Type is DESATURATE:
+            return -1.0 * (event.GetTaskEnd - event.GetTaskStart)
+
     def CanPerform(self, event, universe):
         # Event information
-        es = event.GetEventStart(self.Asset)
-        ts = event.GetTaskStart(self.Asset)
-        te = event.GetTaskEnd(self.Asset)
+        asset = self.Asset
+        es = event.GetEventStart(asset)
+        ts = event.GetTaskStart(asset)
+        te = event.GetTaskEnd(asset)
         dt = SimParameters.SimStepSeconds
         
+        # Task information
+        task = event.GetAssetTask(asset)
+        taskType = task.Type
+
+        # Target information
+        target = task.Target
+        targetDynState = target.DynamicState
+
         # Load asset dynamic state
-        dynamicStateEs = self.Asset.AssetDynamicState(es)
-        posEs = dynamicStateEs.PositionECI(es)
-        velEs = dynamicStateEs.VelocityECI(es)
-        controlQuatsEs = dynamicStateEs.Quaternions(es)
-        controlRatesEs = dynamicStateEs.EulerRates(es)
-        wheelSpeedsEs = dynamicStateEs.WheelSpeeds(es)
-        
+        assetDynState = asset.AssetDynamicState
+
         assetOrbState = Matrix[System.Double](6,1)
         assetOrbState[1] = posEs[1]
         assetOrbState[2] = posEs[2]
@@ -109,15 +119,6 @@ class adcs(HSFSubsystem.Subsystem):
         assetOrbState[4] = velEs[1]
         assetOrbState[5] = velEs[2]
         assetOrbState[6] = velEs[3]
-
-        # Load task parameters
-        task = event.GetAssetTask(self.Asset)
-        taskType = task.Type
-        
-        # Load target parameters
-        target = task.Target
-        targetDynStateEs = target.DynamicState(es)
-        targetR_ot = targetDynStateEs.PositionECI
 
         if (taskType == TaskType.IMAGING):
             # Implement roll-constrained slew maneuver here THEN HOLD INERTIAL POINTING AFTER TASK START

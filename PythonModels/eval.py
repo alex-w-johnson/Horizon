@@ -33,4 +33,12 @@ class eval(HSFScheduler.TargetValueEvaluator):
                     callKey = "EvalfromMDH" + "." + assetTask.Key.Name
                     foo = self.Dependencies.GetDependencyFunc(callKey)
                     sum += System.Double(foo(eit))
+                if(task.Type == TaskType.DESATURATE):
+                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
+                    foo = self.Dependecies.GetDependencyFunc(callKey)
+                    sum += System.Double(foo(eit))
+                if(task.Type == TaskType.IMAGING):
+                    callKey = "EvalfromPayload" + "." + assetTask.Key.Name
+                    foo = self.Dependencies.GetDependecyFunc(callKey)
+                    sum += System.Double(foo(eit))
         return sum
