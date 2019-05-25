@@ -29,16 +29,16 @@ class eval(HSFScheduler.TargetValueEvaluator):
             for assetTask in eit.Tasks:
                 task = assetTask.Value
                 sum += task.Target.Value
-                if(task.Type == TaskType.COMM):
-                    callKey = "EvalfromMDH" + "." + assetTask.Key.Name
-                    foo = self.Dependencies.GetDependencyFunc(callKey)
-                    sum += System.Double(foo(eit))
-                if(task.Type == TaskType.DESATURATE):
-                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
-                    foo = self.Dependecies.GetDependencyFunc(callKey)
-                    sum += System.Double(foo(eit))
-                if(task.Type == TaskType.IMAGING):
-                    callKey = "EvalfromPayload" + "." + assetTask.Key.Name
-                    foo = self.Dependencies.GetDependecyFunc(callKey)
-                    sum += System.Double(foo(eit))
-        return sum
+                #if(task.Type == TaskType.COMM):
+                    #callKey = "EvalfromMDH" + "." + assetTask.Key.Name
+                    #foo = self.Dependencies.GetDependencyFunc(callKey)
+                    #sum += System.Double(foo(eit))
+                #if(task.Type == TaskType.DESATURATE):
+                    #callKey = "EvalfromADCS" + "." + assetTask.Key.Name
+                    #foo = self.Dependecies.GetDependencyFunc(callKey)
+                    #sum += System.Double(foo(eit))
+                #if(task.Type == TaskType.IMAGING):
+                    #callKey = "EvalfromPayload" + "." + assetTask.Key.Name
+                    #foo = self.Dependencies.GetDependecyFunc(callKey)
+                    #sum += System.Double(foo(eit))
+        return sum + 1.0

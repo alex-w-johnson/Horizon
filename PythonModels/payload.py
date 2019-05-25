@@ -116,7 +116,7 @@ class payload(HSFSubsystem.Subsystem):
     def MDHSUB_NewDataProfile_PAYLOADSUB(self, event):
         return event.State.GetProfile(self.PIXELS_KEY)
 
-    def EVAL_targetvalue_PALOADSUB(self, event):
+    def EVAL_targetvalue_PAYLOADSUB(self, event):
         return event.Task.Target.Value
 
     def DependencyCollector(self, currentEvent):

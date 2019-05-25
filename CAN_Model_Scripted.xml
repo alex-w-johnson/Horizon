@@ -48,17 +48,22 @@
         axmagtorx2="[0.0; 1.0; 0.0]"
         axmagtorx3="[0.0; 0.0; 1.0]"
         peakB="[0.2; 0.2; 0.2]"
-        maxpowmagtorx="[0.6; 0.6; 0.6]"
-        residualdipole="[0.0; 0.0; 0.1]">
+        maxpowmagtorx="[0.6; 0.6; 0.6]">
       </Magtorquers>
       <Guidance
-        antisolaraxis ="[0.0; 0.0; 1.0]">
+        antisolaraxis ="[0.0; 0.0; 1.0]"
+        slewtime ="200.0"
+        dwelltime ="100.0"
+        boreaxis ="[0.0; 0.0; 1.0]"
+        antennaaxis ="[-1.0; 0.0; 0.0]">
       </Guidance>
       <Control
+        pointing ="0.2"
+        beamwidth ="0.2"
         kpslew="[0.00018; 0.000175; 0.000199]"
         kdslew="[0.00821; 0.007976; 0.009073]">
       </Control>
-      <IC type="Matrix" key="ECI_Pointing_Vector(XYZ)" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[0.0; 0.0; 0.0]"></IC>
       <IC type="Double" key="SolarBoreElongation" value="180.0"></IC>
       <IC type="Double" key="EarthBoreAngle" value="90"></IC>
       <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>

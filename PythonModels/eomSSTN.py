@@ -26,8 +26,6 @@ from System import Array
 from System import Xml
 from HSFUniverse import WMM
 from HSFUniverse import ExponentialAtmosphere
-#from System import Datetime #For using WMM
-
 
 class eomSSTN(EOMS):
     # Base class is Utilities.EOMS b/c it is typecast to type DynamicEOMS in the EOMFactory, per Adam's suggestion - AJ
@@ -62,7 +60,7 @@ class eomSSTN(EOMS):
         instance.atmos = ExponentialAtmosphere()
         
         # Residual dipole property
-        instance.ResDipole = Matrix[System.Double](instance.AssetName + '.' + 'residualdipole')
+        instance.ResDipole = Matrix[System.Double](node.Attributes["residualdipole"].Value)
         return instance
     
     def PythonAccessor(self, t, y, param, environment):
@@ -104,7 +102,6 @@ class eomSSTN(EOMS):
         wwb[2] = wwyb
         wwb[3] = wwzb
         etaI = qb0*Matrix[System.Double].Eye(3)
-        
         epsbecidot = 0.5*Matrix[System.Double].CrossMatrix(epsbeci)*wbeci + 0.5*etaI*wbeci
 
         # Current Julian Date
@@ -114,7 +111,7 @@ class eomSSTN(EOMS):
         # T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
         # M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)
         T_control = Matrix[System.Double]('[0;0;0]')
-        M_dipole = Matrix[System.Double]('[0;0;0]') +  self.ResDipole
+        M_dipole = self.ResDipole
         # State transition matrix equations
         dy = Matrix[System.Double](16,1)
         dy[1,1] = vxeci

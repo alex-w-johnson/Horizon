@@ -10,7 +10,7 @@
 		numSchedCropTo="20"
 		simStepSeconds="1">
 		<SCRIPTED_EVALUATOR
-			src="..\..\..\eval.py"
+			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eval.py"
 			className="eval">
 		</SCRIPTED_EVALUATOR>
 	</SCHEDULER_PARAMETERS>

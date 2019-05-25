@@ -29,11 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PythonModels", "PythonModels\PythonModels.pyproj", "{212CB1B3-7627-4E33-9C66-F8456AF75A55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EOMS_Test", "EOMS_Test\EOMS_Test.csproj", "{61758077-0EE0-4D05-8DBA-795AC05F2962}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSFUniverseUnitTest", "HSFUniverseUnitTest\HSFUniverseUnitTest.csproj", "{596FA71B-12FA-40E5-89B6-DE19547A2A0F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilitiesQuatRotateTests", "UtilitiesQuatRotateTests\UtilitiesQuatRotateTests.csproj", "{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,18 +143,6 @@ Global
 		{212CB1B3-7627-4E33-9C66-F8456AF75A55}.Realease Fast|x86.ActiveCfg = Release|Any CPU
 		{212CB1B3-7627-4E33-9C66-F8456AF75A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{212CB1B3-7627-4E33-9C66-F8456AF75A55}.Release|x86.ActiveCfg = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Debug|x86.Build.0 = Debug|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Realease Fast|Any CPU.ActiveCfg = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Realease Fast|Any CPU.Build.0 = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Realease Fast|x86.ActiveCfg = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Realease Fast|x86.Build.0 = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Release|x86.ActiveCfg = Release|Any CPU
-		{61758077-0EE0-4D05-8DBA-795AC05F2962}.Release|x86.Build.0 = Release|Any CPU
 		{596FA71B-12FA-40E5-89B6-DE19547A2A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{596FA71B-12FA-40E5-89B6-DE19547A2A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{596FA71B-12FA-40E5-89B6-DE19547A2A0F}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -171,18 +155,6 @@ Global
 		{596FA71B-12FA-40E5-89B6-DE19547A2A0F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{596FA71B-12FA-40E5-89B6-DE19547A2A0F}.Release|x86.ActiveCfg = Release|Any CPU
 		{596FA71B-12FA-40E5-89B6-DE19547A2A0F}.Release|x86.Build.0 = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Debug|x86.Build.0 = Debug|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Realease Fast|Any CPU.ActiveCfg = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Realease Fast|Any CPU.Build.0 = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Realease Fast|x86.ActiveCfg = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Realease Fast|x86.Build.0 = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Release|x86.ActiveCfg = Release|Any CPU
-		{D66D8CC3-5660-4960-97EC-E1CEB9109ED9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
