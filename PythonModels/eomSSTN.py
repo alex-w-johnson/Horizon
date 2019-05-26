@@ -34,7 +34,8 @@ class eomSSTN(EOMS):
         instance.Cd = float(node.Attributes["cd"].Value)
         instance.CxArea = float(node.Attributes["cxareaavg"].Value)
         instance.CoP = Matrix[System.Double](node.Attributes["cop"].Value)
-        
+        instance.CoM = Matrix[float](node.Attributes["com"].Value)
+
         # Implemented to allow asset StateVarKeys to be created for individual assets (See Adam Frye's eomSwarm.py for example)
         if (node.Attributes["Name"] != None):
             instance.AssetName = str(node.Attributes["Name"].Value)
@@ -53,9 +54,38 @@ class eomSSTN(EOMS):
         instance.MAGTORQDIPOLE_KEY = StateVarKey[Matrix[System.Double]](instance.AssetName + '.' + 'magtorq_dipole')
         instance.IsWheelsVec = Matrix[System.Double](node.Attributes["iswheels"].Value)
         instance.IsWheels = Matrix[System.Double](3,3)
+        instance.ItWheelsVec = Matrix[float](node.Attributes["itwheels"].Value)
         instance.IsWheels[1,1] = instance.IsWheelsVec[1]
         instance.IsWheels[2,2] = instance.IsWheelsVec[2]
         instance.IsWheels[3,3] = instance.IsWheelsVec[3]
+        instance.ItWheels = Matrix[float](3,3)
+        #for idx in range(1,instance.ItWheelsVec.NumRows+1):
+            #instance.ItWheels[idx,idx] = instance.ItWheelsVec[idx]
+        instance.ItWheels[1,1] = instance.ItWheelsVec[1]
+        instance.ItWheels[2,2] = instance.ItWheelsVec[2]
+        instance.ItWheels[3,3] = instance.ItWheelsVec[3]
+        instance.WheelMass = Matrix[float](node.Attributes["wheelsmass"].Value)
+        instance.WheelOrigin = Matrix[float](node.Attributes["wheelorigin"].Value)
+        print("origin is okay")
+        instance.Wheel1Pos = Matrix[float](node.Attributes["poswheel1"].Value)
+        instance.Wheel2Pos = Matrix[float](node.Attributes["poswheel2"].Value)
+        instance.Wheel3Pos = Matrix[float](node.Attributes["poswheel3"].Value)
+        print("wheel positions are okay")
+        com2w1 = instance.WheelOrigin+instance.Wheel1Pos-instance.CoM
+        com2w2 = instance.WheelOrigin+instance.Wheel2Pos-instance.CoM
+        com2w3 = instance.WheelOrigin+instance.Wheel3Pos-instance.CoM
+        w1r2 = Matrix[float].Norm(com2w1)*Matrix[float].Norm(com2w1)
+        w2r2 = Matrix[float].Norm(com2w2)*Matrix[float].Norm(com2w2)
+        w3r2 = Matrix[float].Norm(com2w3)*Matrix[float].Norm(com2w3)
+        w1outer = com2w1*Matrix[float].Transpose(com2w1)
+        w2outer = com2w2*Matrix[float].Transpose(com2w2)
+        w3outer = com2w3*Matrix[float].Transpose(com2w3)
+        w1parAxis = instance.WheelMass[1]*(w1r2*Matrix[float].Eye(3)-w1outer)
+        w2parAxis = instance.WheelMass[2]*(w2r2*Matrix[float].Eye(3)-w2outer)
+        w3parAxis = instance.WheelMass[3]*(w3r2*Matrix[float].Eye(3)-w3outer)
+        wTotParAxis = w1parAxis + w2parAxis + w3parAxis
+        Jbus = instance.Imat + instance.IsWheels + 2*instance.ItWheels + wTotParAxis
+        instance.Imat = Jbus
         instance.wmm = WMM()
         instance.atmos = ExponentialAtmosphere()
         

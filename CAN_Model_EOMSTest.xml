@@ -16,6 +16,10 @@
         iswheels="[0.00003; 0.00003; 0.00003]"
         itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
         wheelsmass="[0.13; 0.13; 0.13]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
         residualdipole ="[0.0; 0.0; 0.1]"
         Name ="Asset1">
       </EOMS>

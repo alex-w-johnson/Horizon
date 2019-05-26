@@ -16,6 +16,10 @@
         iswheels="[0.00003; 0.00003; 0.00003]"
         itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
         wheelsmass="[0.13; 0.13; 0.13]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
         residualdipole ="[0.0; 0.0; 0.1]"
         Name ="Asset1">
       </EOMS>
@@ -34,9 +38,10 @@
         wheelsmass="[0.13; 0.13; 0.13]"
         iswheels="[3E-05; 3E-05; 3E-05]"
         itwheels="[1.5E-05; 1.5E-05; 1.5-05]"
-        poswheel1="[0.095;-0.05;0.03]"
-        poswheel2="[0.05; -0.095; 0.03]"
-        poswheel3="[0.05; -0.05; 0.015]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405;0.4;-0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
         idlepowwheels="[0.5; 0.5; 0.5]"
         maxpowwheels="[5.5; 5.5; 5.5]"
         peaktorque="[0.004; 0.004; 0.004]"
@@ -53,7 +58,7 @@
       <Guidance
         antisolaraxis ="[0.0; 0.0; 1.0]"
         slewtime ="200.0"
-        dwelltime ="100.0"
+        dwelltime ="120.0"
         boreaxis ="[0.0; 0.0; 1.0]"
         antennaaxis ="[-1.0; 0.0; 0.0]">
       </Guidance>

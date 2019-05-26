@@ -34,11 +34,11 @@
     <Compile Include="Adcs.py" />
     <Compile Include="comm.py" />
     <Compile Include="eomSSTN.py" />
-    <Compile Include="eomTest.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="eval.py" />
     <Compile Include="mdh.py" />
+    <Compile Include="adcsTest.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="payload.py" />
     <Compile Include="power.py" />
   </ItemGroup>

@@ -89,11 +89,6 @@ class payload(HSFSubsystem.Subsystem):
 
              position = self.Asset.AssetDynamicState
              timage = ts + timetocapture / 2
-             m_SC_pos_at_tf_ECI = position.PositionECI(timage)
-             m_target_pos_at_tf_ECI = self._task.Target.DynamicState.PositionECI(timage)
-             m_pv = m_target_pos_at_tf_ECI - m_SC_pos_at_tf_ECI
-             pos_norm = -m_SC_pos_at_tf_ECI / Matrix[System.Double].Norm(-m_SC_pos_at_tf_ECI)
-             pv_norm = m_pv / Matrix[System.Double].Norm(m_pv)
 
              self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage, pixels))
              self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage + 1, 0.0))
