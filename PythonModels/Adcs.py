@@ -100,11 +100,28 @@ class adcs(HSFSubsystem.Subsystem):
         return prof1
 
     def EVAL_desaturation_ADCSSUB(self, event):
-        task = event.GetAssetTask
+        task = event.GetAssetTask(self.Asset)
         if task.Type is DESATURATE:
             return -1.0 * (event.GetTaskEnd - event.GetTaskStart)
+        else:
+            return 0.0
 
     def CanPerform(self, event, universe):
+        # TODO: Evaluate whether a task can be completed during an Access window by 
+        # Finding the target's dynamic state during the entire event
+        # Calculating the necessary time-varying attitude setpoint to successfully slew to the target
+        # Simulate slewing to the target by propagating a "Slewing" dynamic state until endSlewTime (endSlewTime = es + slewtimerequirement{from XML file})
+        #   Use a while loop to update command quats, rates, and torque commands at 1 Hz rate
+        #   Propagate "Slewing" dynamic state using all of these updated values at same 1 Hz rate
+        # If pointing error is less than pointing error required, then: 
+        #   Update boolean HSFProfile "isTracking" to True from eventStartTime to taskEndTime
+        #   Set taskStartTime to endSlewTime
+        #   Calculate the necessary time-varying attitude setpoint to successfully slew to the target
+        #   Use a while loop to update command quats, rates, and torque commands at 1 Hz rate
+        #   Add torque commands as integrator parameters to assetDynState
+        #   Propagate assetDynState at 1Hz rate up until taskEndTime (taskStartTime + dwellTime{per XML file})
+        #   Return True
+
         # Event information
         asset = self.Asset
         es = event.GetEventStart(asset)
@@ -140,12 +157,13 @@ class adcs(HSFSubsystem.Subsystem):
                 if wheelSpeedsEs[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                     return False
             
-            # Check slew time capability
+             # Check slew time capability
             if (te < es + self.slewtime):
                 return False
             targetPosTime = targetDynState(time)
             targetPosMat = Matrix[float](targetPosTime.ToString())
-            slewDynState = DynamicState(DynamicStateType.DYNAMIC_ECI,eomSSTN,assetDynState(time))
+            slewDynState = DynamicState(assetDynState.Type, assetDynState.Eoms, assetDynState(time))
+
             # Reset time to 0.0 so state propagates from slew initial conditions
             timeSlew = 0.0
             while(timeSlew < self.slewtime):
@@ -225,6 +243,7 @@ class adcs(HSFSubsystem.Subsystem):
                 self._newState.AddValue(self.ISTRACKING_KEY,HSFProfile[bool](te, False))
                 return True
             else:
+                assetDynState.Add(es,assetDynState.DynamicStateECI(es))
                 return False
         elif (taskType == TaskType.COMM):
             # Point -X-axis towards target, point +Z-axis towards projection of Y_LVLH onto target pointing vector plane

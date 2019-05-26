@@ -105,7 +105,8 @@
 			subsystemName = "Comm"
 			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\comm.py"
 			className="comm"
-      peakDataRate ="208.75">
+      peakDataRate ="208.75"
+      minElevAngle="10">
       <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
       <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset1"></DEPENDENCY>
     </SUBSYSTEM>

@@ -33,7 +33,9 @@ class comm(HSFSubsystem.Subsystem):
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
-        instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(mb/s)')
+        instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
+        instance.minElevAngle = float(node.Attributes["minElevAngle"].Value)
+        instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(B/s)')
         instance.addKey(instance.DATARATE_KEY)
         return instance
 		
@@ -49,6 +51,18 @@ class comm(HSFSubsystem.Subsystem):
     def CanPerform(self, event, universe):
         if (self._task.Type == TaskType.COMM):
             newProf = self.DependencyCollector(event)
+            asset = self.Asset
+            assetDynState = asset.DynamicState
+            task = event.GetAssetTask(asset)
+            ts = event.GetTaskStart(asset)
+            target = task.Target
+            targDynState = target.DynamicState
+            targPos = targDynState.PositionECI(ts)
+            assetPos = assetassetDynState.PositionECI(ts)
+            rho = targPos - assetPos
+            elevAngle = (System.Math.Acos(Vector.Dot(assetPos,targPos) / Vector.Norm(assetPos) / Vector.Norm(targPos)) * 180.0 / System.Math.PI) - 90.0
+            if elevAngle < self.minElevAngle:
+                return False
             if (newProf.Empty() == False):
                 event.State.SetProfile(self.DATARATE_KEY, newProf)
         return True

@@ -36,14 +36,14 @@ class payload(HSFSubsystem.Subsystem):
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
 
         instance.PIXELS_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'numpixels')
-        instance.PAYLOADON_KEY = Utilities.StateVarKey[System.Boolean](instance.Asset.Name + '.' + 'eosensoron')
+        instance.PAYLOADON_KEY = Utilities.StateVarKey[System.Boolean](instance.Asset.Name + '.' + 'payloadon')
         instance.addKey(instance.PIXELS_KEY)
         instance.addKey(instance.PAYLOADON_KEY)
         instance._subFieldNumPixels = 5000
         instance._fullFieldNumPixels = 1050000
         instance._subFieldCaptureTime = 90
         instance._fullFieldCaptureTime = 100
-        instance._pixelDepth = 8
+        instance._pixelDepth = 1
         if (node.Attributes['subFieldNumPixels'] != None):
             instance._subFieldNumPixels = float(node.Attributes['subFieldNumPixels'].Value.ToString())
         if (node.Attributes['fullFieldNumPixels'] != None):
