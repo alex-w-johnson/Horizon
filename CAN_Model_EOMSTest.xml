@@ -2,7 +2,7 @@
   <ASSET assetName="Asset1">
     <DynamicState
 			DynamicStateType="DYNAMIC_ECI"
-			ICs="[0.0; 6992.86; 0.0; 1.0516; 0; 7.4953; 0.533605910691400; 0.463966304892071; 0.463966304892071; 0.533605910691400; 0.0; 0.0; -0.001082354252268; 0.0; 0.0; 0.0]">
+			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; -2.7105054e-20; -0.0011179537; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
         src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eomSSTN.py"

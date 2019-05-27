@@ -1,2 +1,2 @@
-Asset1.DynamicState_time,Asset1.DynamicState_R_x,Asset1.DynamicState_R_y,Asset1.DynamicState_R_z,Asset1.DynamicState_V_x,Asset1.DynamicState_V_y,Asset1.DynamicState_V_z,
-0,0,6992.86,0,1.0516,0,7.4953
+Asset1.DynamicState_time,Asset1.DynamicState_R_x,Asset1.DynamicState_R_y,Asset1.DynamicState_R_z,Asset1.DynamicState_V_x,Asset1.DynamicState_V_y,Asset1.DynamicState_V_z,Asset1.DynamicState_Q_0,Asset1.DynamicState_Q_1,Asset1.DynamicState_Q_2,Asset1.DynamicState_Q_3,Asset1.DynamicState_Omega_1,Asset1.DynamicState_Omega_2,Asset1.DynamicState_Omega_3,Asset1.DynamicState_OmegaW_1,Asset1.DynamicState_OmegaW_2,Asset1.DynamicState_OmegaW_3,
+0,946.53201,6777.837,0,0.97622974,-0.1363315,7.5870761,0.56678126,0.49790907,0.43320732,-0.49312978,0,-2.7105054E-20,-0.0011179537,0,0,0

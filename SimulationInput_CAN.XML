@@ -6,8 +6,8 @@
 	</SIMULATION_PARAMETERS>
 
 	<SCHEDULER_PARAMETERS
-		maxNumSchedules="40"
-		numSchedCropTo="20"
+		maxNumSchedules="1"
+		numSchedCropTo="2"
 		simStepSeconds="1">
 		<SCRIPTED_EVALUATOR
 			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eval.py"

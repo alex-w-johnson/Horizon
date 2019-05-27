@@ -1,0 +1,79 @@
+﻿<TARGETDECK>
+  <TARGET
+		TargetName = "imagetarget1"
+		TargetType = "LocationTarget"
+		TaskType = "IMAGING"
+		MaxTimes = "16"
+		Value = "3">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[-2.26E+15; -8.80E+14; -4.78E+14]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "flyalong"
+		TargetType = "FlyingAlong"
+		TaskType = "FLYALONG"
+		MaxTimes = "1E9"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[-1E9; 0; 0]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "flyalong"
+		TargetType = "FlyingAlong"
+		TaskType = "FLYALONG"
+		MaxTimes = "1E9"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[+1E9; 0; 0]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "flyalong"
+		TargetType = "FlyingAlong"
+		TaskType = "FLYALONG"
+		MaxTimes = "1E9"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[0; -1E9; 0]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "flyalong"
+		TargetType = "FlyingAlong"
+		TaskType = "FLYALONG"
+		MaxTimes = "1E9"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[0; 1E9; 0]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "flyalong"
+		TargetType = "FlyingAlong"
+		TaskType = "FLYALONG"
+		MaxTimes = "1E9"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[0; 0; -1E9]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "flyalong"
+		TargetType = "FlyingAlong"
+		TaskType = "FLYALONG"
+		MaxTimes = "1E9"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[0; 0; 1E9]">
+    </DynamicState>
+  </TARGET>
+</TARGETDECK>

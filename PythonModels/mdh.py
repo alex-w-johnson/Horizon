@@ -33,12 +33,12 @@ class mdh(HSFSubsystem.Subsystem):
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
-
+        if (node.Attributes['peakDataRate'] != None):
+            instance._peakDataRate = float(node.Attributes['peakDataRate'].Value.ToString())
         if (node.Attributes['bufferSize'] != None):
             instance._bufferSize = float(node.Attributes['bufferSize'].Value.ToString())
         instance.DATABUFFERRATIO_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'databufferfillratio')
         instance.addKey(instance.DATABUFFERRATIO_KEY)
-
         return instance
 		
     def GetDependencyDictionary(self):
@@ -71,7 +71,6 @@ class mdh(HSFSubsystem.Subsystem):
             return False
         if(self/_task.Type == TaskType.COMM):
              ts = event.GetTaskStart(self.Asset)
-             event.SetTaskEnd(self.Asset, ts + 60.0)
              te = event.GetTaskEnd(self.Asset)
              data = self._bufferSize * self._newState.GetLastValue(self.Dkeys[0]).Value
              if( data / 2 > 50):
@@ -94,7 +93,9 @@ class mdh(HSFSubsystem.Subsystem):
         return prof1
 
     def COMMSUB_DataRateProfile_MDHSUB(self, event):
-        datarate = 5000 * (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset)) 
+        datarate = (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset)) 
+        if datarate >= self._peakDataRate:
+            datarate = self._peakDataRate
         prof1 = HSFProfile[System.Double]()
         if (datarate != 0):
             prof1[event.GetTaskStart(self.Asset)] = datarate

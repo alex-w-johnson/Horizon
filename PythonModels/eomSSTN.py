@@ -50,8 +50,8 @@ class eomSSTN(EOMS):
         instance.Imat[1,1] = instance.Ixx
         instance.Imat[2,2] = instance.Iyy
         instance.Imat[3,3] = instance.Izz
-        instance.WHEELTORQUE_KEY = StateVarKey[Matrix[System.Double]](instance.AssetName + '.' + 'rxwheel_torque')
-        instance.MAGTORQDIPOLE_KEY = StateVarKey[Matrix[System.Double]](instance.AssetName + '.' + 'magtorq_dipole')
+        instance.WHEELTORQUE_KEY = StateVarKey[Matrix[System.Double]](instance.AssetName + '.' + 'rxwheeltorque')
+        instance.MAGTORQDIPOLE_KEY = StateVarKey[Matrix[System.Double]](instance.AssetName + '.' + 'magtorqmdipole')
         instance.IsWheelsVec = Matrix[System.Double](node.Attributes["iswheels"].Value)
         instance.IsWheels = Matrix[System.Double](3,3)
         instance.ItWheelsVec = Matrix[float](node.Attributes["itwheels"].Value)
@@ -66,11 +66,9 @@ class eomSSTN(EOMS):
         instance.ItWheels[3,3] = instance.ItWheelsVec[3]
         instance.WheelMass = Matrix[float](node.Attributes["wheelsmass"].Value)
         instance.WheelOrigin = Matrix[float](node.Attributes["wheelorigin"].Value)
-        print("origin is okay")
         instance.Wheel1Pos = Matrix[float](node.Attributes["poswheel1"].Value)
         instance.Wheel2Pos = Matrix[float](node.Attributes["poswheel2"].Value)
         instance.Wheel3Pos = Matrix[float](node.Attributes["poswheel3"].Value)
-        print("wheel positions are okay")
         com2w1 = instance.WheelOrigin+instance.Wheel1Pos-instance.CoM
         com2w2 = instance.WheelOrigin+instance.Wheel2Pos-instance.CoM
         com2w3 = instance.WheelOrigin+instance.Wheel3Pos-instance.CoM
@@ -94,6 +92,7 @@ class eomSSTN(EOMS):
         return instance
     
     def PythonAccessor(self, t, y, param, environment):
+        #print(t)
         xeci = y[1,1]
         yeci = y[2,1]
         zeci = y[3,1]
@@ -135,7 +134,7 @@ class eomSSTN(EOMS):
         epsbecidot = 0.5*Matrix[System.Double].CrossMatrix(epsbeci)*wbeci + 0.5*etaI*wbeci
 
         # Current Julian Date
-        jdCurrent = UserModel.SimParameters.SimStartJD
+        jdCurrent = UserModel.SimParameters.SimStartJD + t/86400.0
 
         # ADCS control inputs
         # T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
@@ -158,9 +157,11 @@ class eomSSTN(EOMS):
         dy[8,1] = epsbecidot[1]
         dy[9,1] = epsbecidot[2]
         dy[10,1] = epsbecidot[3]
+        
         #print('done')
         #print('Calc Disturbs')
-        T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent)    
+        T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent) 
+        #print(["Current Applied Torque:" + T_dist.ToString()])
         #print('done')
         Imat = self.Imat
         #print('Calc Ang Accels')
@@ -176,6 +177,7 @@ class eomSSTN(EOMS):
         dy[14,1] = omegaWDot[1]
         dy[15,1] = omegaWDot[2]
         dy[16,1] = omegaWDot[3]
+        #print(System.String(Matrix[float].Transpose(dy)))
         return dy
     
     def CalcForces(self,r_eci,v_eci):
@@ -196,6 +198,7 @@ class eomSSTN(EOMS):
         #print('grad')
         #print(T_gravgrad)
         T_total = T_drag + T_mag + T_gravgrad + T_control
+        #print(["T_mag = " + T_mag.ToString()])
         return T_total
 
     def CalcGravityForce(self,r):
@@ -221,7 +224,7 @@ class eomSSTN(EOMS):
     def CalcDragForce(self,r_eci,v_eci):
         rho = self.CalcAtmosDens(r_eci)
         #print(rho)
-        vnorm = Matrix[System.Double].Norm(v_eci)
+        vnorm = 1000.0*Matrix[System.Double].Norm(v_eci)
         F_d = -1*rho*1000.0*v_eci*vnorm*self.Cd*self.CxArea
         #print(F_d)
         return F_d
@@ -230,11 +233,12 @@ class eomSSTN(EOMS):
         fdrag = self.CalcDragForce(r_eci,v_eci)
         #print('Drag')
         T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
-        #print('Tdrag')
+        #print(T_d)
         return T_d
 
     def CalcMagMoment(self,r_eci,JD,M_dipole,qb_eci):
         bField = self.CalcCurrentMagField(r_eci,JD)
+        #print(["B [T] = "+bField.ToString()])
         #print('bfield')
         #print(type(bField))
         bFieldBody = Quat.Rotate(qb_eci,bField)
@@ -249,7 +253,7 @@ class eomSSTN(EOMS):
         r5 = rnorm**5
         rb = Quat.Rotate(qb_eci,r_eci)
         #print(rb)
-        T_g = 3.0*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/rnorm
+        T_g = 3.0*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/r5
         return T_g
 
     def CalcAtmosDens(self,r_eci):
@@ -257,6 +261,7 @@ class eomSSTN(EOMS):
         h = Matrix[System.Double].Norm(r_eci) - rE
         #print(h)
         # Based on exp. atmosphere model from Vallado Table 8-4
+        #print(System.DateTime.Now.ToString("HH:mm:ss"))
         rho = self.atmos.density(h)
         return rho
 
@@ -329,4 +334,5 @@ class eomSSTN(EOMS):
         bvecECIMat[1] = bvecECI[1]
         bvecECIMat[2] = bvecECI[2]
         bvecECIMat[3] = bvecECI[3]
-        return bvecECIMat
+        #print(["B func [T] = "+bvecECIMat.ToString()])
+        return bvecECIMat*1.0e-9

@@ -109,6 +109,22 @@ namespace HSFUniverse
             _stateData.Add(simTime, dynamicState);
         }
 
+        /// <summary>
+        /// Removes dynamic state data until time simTime.
+        /// </summary>
+        /// <param name="simTime"></param>
+        /// <returns></returns>
+        public void RemoveStatesUntil(double simTime) // Run this by The Real Sim Shady himself
+        {
+            int currStateIndex = _stateData.IndexOfKey(simTime);
+            double timeToResetFrom = _stateData.Last().Key;
+            int idxToResetFrom = _stateData.IndexOfKey(timeToResetFrom);
+            for(int resetIdx = idxToResetFrom; resetIdx > currStateIndex; resetIdx--)
+            {
+                _stateData.Remove(_stateData.Keys[resetIdx]);
+            }
+        }
+
         public Vector DynamicStateECI(double simTime) //Should we be interpolating?
         {
             return this[simTime]; 
@@ -331,12 +347,23 @@ namespace HSFUniverse
             string vx = Name + "_V_x,";
             string vy = Name + "_V_y,";
             string vz = Name + "_V_z,";
+            string q0 = Name + "_Q_0,";
+            string q1 = Name + "_Q_1,";
+            string q2 = Name + "_Q_2,";
+            string q3 = Name + "_Q_3,";
+            string omega1 = Name + "_Omega_1,";
+            string omega2 = Name + "_Omega_2,";
+            string omega3 = Name + "_Omega_3,";
+            string omegaW1 = Name + "_OmegaW_1,";
+            string omegaW2 = Name + "_OmegaW_2,";
+            string omegaW3 = Name + "_OmegaW_3,";
+
             // header
-            csv.AppendLine(t + rx + ry + rz + vx + vy + vz );
+            csv.AppendLine(t + rx + ry + rz + vx + vy + vz + q0 + q1 + q2 + q3 + omega1 + omega2 + omega3 + omegaW1 + omegaW2 + omegaW3);
 
             // data
             foreach (var d in _stateData)
-                csv.AppendLine(d.Key + "," + d.Value[1] + "," + d.Value[2] + "," + d.Value[3] + "," + d.Value[4] + "," + d.Value[5] + "," + d.Value[6]);
+                csv.AppendLine(d.Key + "," + d.Value[1] + "," + d.Value[2] + "," + d.Value[3] + "," + d.Value[4] + "," + d.Value[5] + "," + d.Value[6] + "," + d.Value[7] + "," + d.Value[8] + "," + d.Value[9] + "," + d.Value[10] + "," + d.Value[11] + "," + d.Value[12] + "," + d.Value[13] + "," + d.Value[14] + "," + d.Value[15] + "," + d.Value[16]);
 
             return csv.ToString();
         }

@@ -38,7 +38,7 @@
   <Class Name="HSFUniverse.DynamicState" Collapsed="true">
     <Position X="12" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BCIkAAAAAEAwAIAMDAQACAQAAQAAABAAAQAIACAAAAg=</HashCode>
+      <HashCode>BCIkAAAAAEAwAIAMDAQACAQAAQAAABAAEQAIACAAAAg=</HashCode>
       <FileName>DynamicState.cs</FileName>
     </TypeIdentifier>
   </Class>
