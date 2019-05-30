@@ -50,7 +50,7 @@ namespace Utilities
             Matrix<double> c2 = new Matrix<double>(3, 1);
             Matrix<double> c3 = new Matrix<double>(3, 1);
             Vector b = new Vector(3);
-            c1 = (2 * q._eta - 1.0) * Matrix<double>.Eye(3);
+            c1 = (2 * (q._eta * q._eta) - 1.0) * Matrix<double>.Eye(3);
             Matrix<double> epsilon = new Matrix<double>(q._eps.ToString());
             Matrix<double> quatEps = Matrix<double>.Transpose(epsilon);
             c2 = 2 * quatEps * Matrix<double>.Transpose(quatEps);
@@ -65,7 +65,7 @@ namespace Utilities
             Matrix<double> c2 = new Matrix<double>(3, 1);
             Matrix<double> c3 = new Matrix<double>(3, 1);
             Matrix<double> b = new Matrix<double>(3, 1);
-            c1 = (2 * q._eta - 1.0) * Matrix<double>.Eye(3);
+            c1 = (2 * (q._eta * q._eta) - 1.0) * Matrix<double>.Eye(3);
             Matrix<double> epsilon = new Matrix<double>(q._eps.ToString());
             Matrix<double> quatEps = Matrix<double>.Transpose(epsilon);
             c2 = 2 * quatEps * Matrix<double>.Transpose(quatEps);
