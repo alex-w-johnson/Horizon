@@ -13,7 +13,7 @@
         cxareaavg="0.1584"
         cd="2.2"
         moi="[0.15; 0.15; 0.15]"
-        iswheels="[0.00003; 0.00003; 0.00003]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
         itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
         wheelsmass="[0.13; 0.13; 0.13]"
         wheelorigin="[0.1; 0.0; 0.1]"
@@ -57,7 +57,7 @@
       </Magtorquers>
       <Guidance
         antisolaraxis ="[0.0; 0.0; 1.0]"
-        slewtime ="200.0"
+        slewtime ="450.0"
         dwelltime ="120.0"
         boreaxis ="[0.0; 0.0; 1.0]"
         antennaaxis ="[-1.0; 0.0; 0.0]">
@@ -66,7 +66,10 @@
         pointingbound ="0.2"
         beamwidth ="0.2"
         kpslew="[0.0003216; 0.0003216; 0.0003216]"
-        kdslew="[0.0068; 0.0068; 0.0068]">
+        kdslew="[0.0068; 0.0068; 0.0068]"
+        kpdesat="[4.914E-5; 4.914E-5; 4.914E-5]"
+        kddesat="[0.0022; 0.0022; 0.0022]"
+        trackrate="0.002">
       </Control>
       <IC type="Matrix" key="ECI_Pointing_Vector(XYZ)" value="[-0.9813; 0.137; 0.1355]"></IC>
       <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
@@ -74,6 +77,7 @@
       <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
       <IC type="Matrix" key="WheelTorque" value="[0.0; 0.0; 0.0]"></IC>
       <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Bool" key="IsTracking" value="0"></IC>
       <DEPENDENCY subsystemName="Access"></DEPENDENCY>
     </SUBSYSTEM>
   </ASSET>

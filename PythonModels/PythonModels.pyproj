@@ -8,13 +8,13 @@
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
-    <InterpreterId>IronPython|2.7-64</InterpreterId>
-    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>IronPython|2.7-32</InterpreterId>
+    <LaunchProvider>IronPython (.NET) launcher</LaunchProvider>
     <OutputPath>.</OutputPath>
     <Name>PythonModels</Name>
     <RootNamespace>PythonModels</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <DebugStdLib>False</DebugStdLib>
+    <DebugStdLib>True</DebugStdLib>
     <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -25,10 +25,6 @@
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
-  <ItemGroup>
-    <InterpreterReference Include="IronPython|2.7-32" />
-    <InterpreterReference Include="IronPython|2.7-64" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="Adcs.py" />
     <Compile Include="comm.py" />
@@ -114,6 +110,10 @@
       <AssemblyName>System.XML.dll</AssemblyName>
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.XML.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="IronPython|2.7-32" />
+    <InterpreterReference Include="IronPython|2.7-64" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

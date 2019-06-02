@@ -139,9 +139,9 @@
       <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
     </CONSTRAINT>
     <CONSTRAINT
-      value="45.0"
+      value="135.0"
       subsystemName="ADCS"
-      type="FAIL_IF_HIGHER">
+      type="FAIL_IF_LOWER">
       <STATEVAR type ="Double" key="SolarBoreElongation"></STATEVAR>
     </CONSTRAINT>
     <CONSTRAINT

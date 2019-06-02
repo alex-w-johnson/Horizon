@@ -2,7 +2,7 @@
 	<SIMULATION_PARAMETERS
 		SimStartJD="2459285.5"
 		SimStartSeconds="0.0"
-		SimEndSeconds="100">
+		SimEndSeconds="600">
 	</SIMULATION_PARAMETERS>
 
 	<SCHEDULER_PARAMETERS

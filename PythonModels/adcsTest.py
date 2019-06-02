@@ -323,7 +323,7 @@ class adcs(HSFSubsystem.Subsystem):
             qBodCom = Quat.Conjugate(qComLam)*qBodLam
             qErr = Matrix[float](qBodCom._eps)
             propError = self.PropErrorCalc(self,self.kpvec,qErr)
-            rEs = Matrix[float].Norm(posEs)
+            rEs = Vector.Norm(assetPosEs.ToString())
             lvlhRate = Matrix[float].Cross(posEs,velEs)/(rEs*rEs)
             deriError = self.DeriErrorCalc(self,self.kdvec,controlRatesEs - lvlhRate)
             T_control = -propError -deriError
@@ -343,7 +343,7 @@ class adcs(HSFSubsystem.Subsystem):
             qBodCom = Quat.Conjugate(qComLam)*qBodLam
             qErr = Matrix[float](qBodCom._eps)
             propError = self.PropErrorCalc(self,self.kpvec,qErr)
-            rEs = Matrix[float].Norm(posEs)
+            rEs = Vector.Norm(assetPosEs.ToString())
             lvlhRate = Matrix[float].Cross(posEs,velEs)/(rEs*rEs)
             deriError = self.DeriErrorCalc(self,self.kdvec,controlRatesEs - lvlhRate)
             T_control = -propError -deriError
