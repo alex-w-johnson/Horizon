@@ -24,21 +24,25 @@ class eval(HSFScheduler.TargetValueEvaluator):
     def __init__(self, deps):
         pass
     def Evaluate(self, sched):
-        sum = 0
+        sum = 0.0
         for eit in sched.AllStates.Events:
             for assetTask in eit.Tasks:
                 task = assetTask.Value
                 sum += task.Target.Value
+                if(task.Type == TaskType.FLYALONG):
+                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
+                    foo = self.Dependencies.GetDependencyFunc(callKey)
+                    sum+= System.Double(foo(eit))
+                elif(task.Type == TaskType.DESATURATE):
+                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
+                    foo = self.Dependencies.GetDependencyFunc(callKey)
+                    sum+= System.Double(foo(eit))
                 #if(task.Type == TaskType.COMM):
                     #callKey = "EvalfromMDH" + "." + assetTask.Key.Name
                     #foo = self.Dependencies.GetDependencyFunc(callKey)
-                    #sum += System.Double(foo(eit))
-                #if(task.Type == TaskType.DESATURATE):
-                    #callKey = "EvalfromADCS" + "." + assetTask.Key.Name
-                    #foo = self.Dependecies.GetDependencyFunc(callKey)
-                    #sum += System.Double(foo(eit))
+                    #sum += System.Double(foo(eit))               
                 #if(task.Type == TaskType.IMAGING):
                     #callKey = "EvalfromPayload" + "." + assetTask.Key.Name
                     #foo = self.Dependencies.GetDependecyFunc(callKey)
                     #sum += System.Double(foo(eit))
-        return sum + 1.0
+        return sum
