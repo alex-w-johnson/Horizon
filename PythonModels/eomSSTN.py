@@ -72,9 +72,12 @@ class eomSSTN(EOMS):
         com2w1 = instance.WheelOrigin+instance.Wheel1Pos-instance.CoM
         com2w2 = instance.WheelOrigin+instance.Wheel2Pos-instance.CoM
         com2w3 = instance.WheelOrigin+instance.Wheel3Pos-instance.CoM
-        w1r2 = Matrix[float].Norm(com2w1)*Matrix[float].Norm(com2w1)
-        w2r2 = Matrix[float].Norm(com2w2)*Matrix[float].Norm(com2w2)
-        w3r2 = Matrix[float].Norm(com2w3)*Matrix[float].Norm(com2w3)
+        w1rnorm = Vector.Norm(Vector(com2w1.ToString()))
+        w2rnorm = Vector.Norm(Vector(com2w2.ToString()))
+        w3rnorm = Vector.Norm(Vector(com2w3.ToString()))
+        w1r2 = w1rnorm*w1rnorm
+        w2r2 = w2rnorm*w2rnorm
+        w3r2 = w3rnorm*w3rnorm
         w1outer = com2w1*Matrix[float].Transpose(com2w1)
         w2outer = com2w2*Matrix[float].Transpose(com2w2)
         w3outer = com2w3*Matrix[float].Transpose(com2w3)
@@ -137,10 +140,10 @@ class eomSSTN(EOMS):
         jdCurrent = UserModel.SimParameters.SimStartJD + t/86400.0
 
         # ADCS control inputs
-        # T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
-        # M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)
-        T_control = Matrix[System.Double]('[0;0;0]')
-        M_dipole = self.ResDipole
+        T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
+        M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)+self.ResDipole
+        #T_control = Matrix[System.Double]('[0;0;0]')
+        #M_dipole = self.ResDipole
         # State transition matrix equations
         dy = Matrix[System.Double](16,1)
         dy[1,1] = vxeci
@@ -197,8 +200,9 @@ class eomSSTN(EOMS):
         T_gravgrad = self.CalcGravGradMoment(r_eci,qb_eci)
         #print('grad')
         #print(T_gravgrad)
+        #print(T_control)
         T_total = T_drag + T_mag + T_gravgrad + T_control
-        #print(["T_mag = " + T_mag.ToString()])
+        #print(["T_tot = " + T_total.ToString()])
         return T_total
 
     def CalcGravityForce(self,r):
@@ -307,7 +311,7 @@ class eomSSTN(EOMS):
         currDateTime = System.DateTime(Y,M,D,h,m,s,kind)
         return currDateTime
 
-    def CalcCurrentMagField(self,r_eci,JD): # PROBLEM IS HERE
+    def CalcCurrentMagField(self,r_eci,JD):
         r_eciVec = Vector(3)
         r_eciVec[1] = r_eci[1]
         r_eciVec[2] = r_eci[2]
