@@ -5,7 +5,7 @@
 			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; -2.7105054e-20; -0.0011179537; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
-        src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eomSSTN.py"
+        src="..\..\..\PythonModels\eomSSTN.py"
         className="eomSSTN"
         mass="8.5"
         com="[0.0; 0.0; 0.133]"
@@ -31,7 +31,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Adcs"
-      src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\Adcs.py"
+      src="..\..\..\PythonModels\Adcs.py"
       className ="adcs">
       <Wheels
         numwheels="3"

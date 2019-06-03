@@ -8,9 +8,9 @@
 	<SCHEDULER_PARAMETERS
 		maxNumSchedules="1"
 		numSchedCropTo="2"
-		simStepSeconds="1">
+		simStepSeconds="10">
 		<SCRIPTED_EVALUATOR
-			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eval.py"
+			src="..\..\..\PythonModels\eval.py"
 			className="eval">
 		</SCRIPTED_EVALUATOR>
 	</SCHEDULER_PARAMETERS>
