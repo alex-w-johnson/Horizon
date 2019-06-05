@@ -69,7 +69,7 @@ class mdh(HSFSubsystem.Subsystem):
                 return True
           #  Logger.Report("SSDR")
             return False
-        if(self/_task.Type == TaskType.COMM):
+        if(self._task.Type == TaskType.COMM):
              ts = event.GetTaskStart(self.Asset)
              te = event.GetTaskEnd(self.Asset)
              data = self._bufferSize * self._newState.GetLastValue(self.Dkeys[0]).Value
