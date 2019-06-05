@@ -86,7 +86,7 @@ class eomSSTN(EOMS):
         w3parAxis = instance.WheelMass[3]*(w3r2*Matrix[float].Eye(3)-w3outer)
         wTotParAxis = w1parAxis + w2parAxis + w3parAxis
         Jbus = instance.Imat + instance.IsWheels + 2*instance.ItWheels + wTotParAxis
-        instance.Imat = Jbus
+        #instance.Imat = Jbus
         instance.wmm = WMM()
         instance.atmos = ExponentialAtmosphere()
         
