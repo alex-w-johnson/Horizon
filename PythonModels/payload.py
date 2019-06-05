@@ -96,6 +96,8 @@ class payload(HSFSubsystem.Subsystem):
              self._newState.AddValue(self.PAYLOADON_KEY, KeyValuePair[System.Double, System.Boolean](ts, True))
              self._newState.AddValue(self.PAYLOADON_KEY, KeyValuePair[System.Double, System.Boolean](te, False))
              return True
+         else:
+             return True
 
     def CanExtend(self, event, universe, extendTo):
         return super(payload, self).CanExtend(event, universe, extendTo)
