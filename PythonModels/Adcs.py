@@ -225,12 +225,15 @@ class adcs(HSFSubsystem.Subsystem):
                 assetOrbState[4] = slewVelTime[1]
                 assetOrbState[5] = slewVelTime[2]
                 assetOrbState[6] = slewVelTime[3]
+                qLam0 = self.CalcLVLHECIState(assetOrbState)
                 qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
                 qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,slewQuatTime)
                 qBodCom = Quat.Conjugate(qComLam)*qBodLam
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                 propError = self.PropErrorCalc(self.kpvec,qErr)
+                #print("prop error: " + propError.ToString())
                 deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
+                #print("deri error: " + deriError.ToString())
                 T_control = -1.0*propError -deriError
                 for i in range(1,self.numwheels+1):
                     if abs(T_control[i]) > self.peaktorqwheels[i]:
@@ -240,12 +243,16 @@ class adcs(HSFSubsystem.Subsystem):
                 timeSlew += dt
                 slewBoreAxis = Quat.Rotate(Quat.Conjugate(slewQuatTime), self.boreaxis)
                 r_AT = targetPosMat - slewPosTime
-                pointError = 180.0* System.Math.Acos(  Matrix[float].Dot( slewBoreAxis,r_AT )/Vector.Norm( Vector(r_AT.ToString()) )  ) /System.Math.PI
+                pointError = 180.0* System.Math.Acos(  Matrix[float].Dot( slewBoreAxis,r_AT )/(Vector.Norm( Vector(r_AT.ToString()) )*Vector.Norm(Vector(slewBoreAxis.ToString())))) /System.Math.PI
                 #print("pointing error: " + pointError.ToString())
-                trackRateError = Vector.Norm(Vector(slewRatesTime.ToString()))
+                trackingRate = Vector(2)
+                trackingRate[1] = slewRatesTime[1]
+                trackingRate[2] = slewRatesTime[2]
+                trackRateError = Vector.Norm(trackingRate)
                 #print("tracking error: " + trackRateError.ToString())
                 #print(pointError.ToString())
                 if (pointError <= self.pointingbound) and (trackRateError <= self.trackRate):
+                    print("Imaging")
                     event.SetTaskStart(asset,time + timeSlew)
                     ts = event.GetTaskStart(asset)
                     event.SetTaskEnd(asset,ts + self.dwelltime)
@@ -270,8 +277,12 @@ class adcs(HSFSubsystem.Subsystem):
                         if time < ts:
                             qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
                             qComLamHold = qComLam
+                            qCom0Hold = qLam0*qComLamHold
                         elif time >= ts and time < te:
-                            qComLam = qComLamHold
+                            qCom0 = qCom0Hold
+                            #print(qCom0)
+                            qComLam = Quat.Conjugate(qLam0)*qCom0
+                            #print(qLam0*qComLam)
                             #print("qCommand: " + qComLam.ToString())
                         qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
                         qBodCom = Quat.Conjugate(qComLam)*qBodLam
@@ -279,7 +290,10 @@ class adcs(HSFSubsystem.Subsystem):
                         #print("qError: " + qErr.ToString())
                         propError = self.PropErrorCalc(self.kpvec,qErr)
                         #print("pError: " + propError.ToString())
-                        deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
+                        r = Vector.Norm(Vector(assetPosTime.ToString()))
+                        lvlhRate = Matrix[float].Cross(assetPosTime,Matrix[float](assetVelTime.ToString()))/(r*r)
+                        lvlhRate = Quat.Rotate(qLam0,lvlhRate)
+                        deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime-lvlhRate)
                         #print("dError: " + deriError.ToString())
                         T_control = -1.0*propError -deriError
                         for i in range(1,self.numwheels+1):
