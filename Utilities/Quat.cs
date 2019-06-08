@@ -86,6 +86,41 @@ namespace Utilities
             double eps3 = (A[1, 2] - A[2, 1]) / (4.0 * eta);
             return new Quat(eta, eps1, eps2, eps3);
         }
+        
+        /// <summary>
+        /// Spherical linear interpolation between two quaternions q0 and q1 given double t from 0 to 1, where t = 0.0 => q0, and t = 1.0 => q1
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="q0"></param>
+        /// <param name="q1"></param>
+        /// <returns name="qInterp"></returns>
+        public static Quat Slerp(double t, Quat q0, Quat q1)
+        {
+            const double THRESHOLD = 0.9995;
+            double dot = q0._eta * q1._eta + Vector.Dot(q0._eps, q1._eps);
+            if (dot < 0.0)
+            {
+                q1._eta = -1.0 * q1._eta;
+                q1._eps = -1.0 * q1._eps;
+                dot = -1.0 * dot;
+            }
+            if (dot > THRESHOLD)
+            {
+                // Linear interpolate quaternion for small interpolations 
+                Quat qLinterp = new Quat(q0._eta + t * (q1._eta - q0._eta), q0._eps + t * (q1._eps - q0._eps));
+                return qLinterp;
+            }
+            double theta0 = System.Math.Acos(dot);
+            double theta = theta0 * t;
+            double sTheta = System.Math.Sin(theta);
+            double sTheta0 = System.Math.Sin(theta0);
+            double cTheta = System.Math.Cos(theta);
+            double s0 = cTheta - dot * sTheta / sTheta0;
+            double s1 = sTheta / sTheta0;
+            Quat qInterp = new Quat(s0 * q0._eta + s1 * q1._eta, s0 * q0._eps + s1 * q1._eps);
+            return qInterp;
+
+        }
 
         public static Quat operator *(Quat q, Quat p)
         {
