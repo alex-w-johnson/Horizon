@@ -226,8 +226,14 @@ class adcs(HSFSubsystem.Subsystem):
                 assetOrbState[5] = slewVelTime[2]
                 assetOrbState[6] = slewVelTime[3]
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
+                tNormSlew = timeSlew/self.slewtime
+                #print(tNormSlew)
                 qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
+                #print("Nominal Command: "+ qComLam.ToString())
                 qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,slewQuatTime)
+                #print("Body-LVLH: " + qBodLam.ToString())
+                qComLam = Quat.Slerp(tNormSlew,qBodLam,qComLam)
+                #print("Interp Command: " + qComLam.ToString())
                 qBodCom = Quat.Conjugate(qComLam)*qBodLam
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                 propError = self.PropErrorCalc(self.kpvec,qErr)
@@ -260,6 +266,8 @@ class adcs(HSFSubsystem.Subsystem):
                     event.SetEventEnd(asset,te)
                     ee = event.GetEventEnd(asset)
                     while(time < te):
+                        tNorm = (time - es)/ts
+                        print("Normalized Maneuver Time: " + tNorm.ToString())
                         assetPosTime = assetDynState.PositionECI(time)
                         assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
                         assetVelTime = assetDynState.VelocityECI(time)
@@ -274,8 +282,12 @@ class adcs(HSFSubsystem.Subsystem):
                         assetOrbState[5] = assetVelTime[2]
                         assetOrbState[6] = assetVelTime[3]
                         qLam0 = self.CalcLVLHECIState(assetOrbState)
+                        qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
                         if time < ts:
                             qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
+                            print("Nominal Command: "+ qComLam.ToString())
+                            qComLam = Quat.Slerp(tNorm,qBodLam,qComLam)
+                            print("Interp Command: " + qComLam.ToString())
                             qComLamHold = qComLam
                             qCom0Hold = qLam0*qComLamHold
                         elif time >= ts and time < te:
@@ -284,7 +296,6 @@ class adcs(HSFSubsystem.Subsystem):
                             qComLam = Quat.Conjugate(qLam0)*qCom0
                             #print(qLam0*qComLam)
                             #print("qCommand: " + qComLam.ToString())
-                        qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
                         qBodCom = Quat.Conjugate(qComLam)*qBodLam
                         qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                         #print("qError: " + qErr.ToString())
