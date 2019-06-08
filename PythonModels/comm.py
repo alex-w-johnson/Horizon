@@ -60,7 +60,9 @@ class comm(HSFSubsystem.Subsystem):
             targPos = targDynState.PositionECI(ts)
             assetPos = assetassetDynState.PositionECI(ts)
             rho = targPos - assetPos
-            elevAngle = (System.Math.Acos(Vector.Dot(assetPos,targPos) / Vector.Norm(assetPos) / Vector.Norm(targPos)) * 180.0 / System.Math.PI) - 90.0
+            rhoDotTargPos = Vector.Dot(rho,targPos)
+            elevAngle = (System.Math.PI / 2.0) - System.Math.Acos(rhoDotTargPos/Vector.Norm(rho)/Vector.Norm(targPos))
+            elevAngle = elevAngle * 90.0 / (2*System.Math.PI)
             if elevAngle < self.minElevAngle:
                 return False
             if (newProf.Empty() == False):
