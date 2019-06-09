@@ -52,17 +52,18 @@ class comm(HSFSubsystem.Subsystem):
         if (self._task.Type == TaskType.COMM):
             newProf = self.DependencyCollector(event)
             asset = self.Asset
-            assetDynState = asset.DynamicState
+            assetDynState = asset.AssetDynamicState
             task = event.GetAssetTask(asset)
             ts = event.GetTaskStart(asset)
             target = task.Target
             targDynState = target.DynamicState
             targPos = targDynState.PositionECI(ts)
-            assetPos = assetassetDynState.PositionECI(ts)
+            assetPos = assetDynState.PositionECI(ts)
             rho = targPos - assetPos
             rhoDotTargPos = Vector.Dot(rho,targPos)
-            elevAngle = (System.Math.PI / 2.0) - System.Math.Acos(rhoDotTargPos/Vector.Norm(rho)/Vector.Norm(targPos))
-            elevAngle = elevAngle * 90.0 / (2*System.Math.PI)
+            elevAngle = System.Math.Acos(rhoDotTargPos/Vector.Norm(rho)/Vector.Norm(targPos)) - (System.Math.PI / 2.0)
+            elevAngle = elevAngle * 180.0 / System.Math.PI
+            print(elevAngle)
             if elevAngle < self.minElevAngle:
                 return False
             if (newProf.Empty() == False):

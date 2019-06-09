@@ -105,5 +105,15 @@
       <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
     </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Comm"
+			src="..\..\..\PythonModels\comm.py"
+			className="comm"
+      peakDataRate ="187500"
+      minElevAngle="10">
+      <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
+      <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset1"></DEPENDENCY>
+    </SUBSYSTEM>
   </ASSET>
 </MODEL>

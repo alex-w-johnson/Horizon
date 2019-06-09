@@ -1,0 +1,13 @@
+﻿<TARGETDECK>
+  <TARGET
+		TargetName = "groundstation1"
+		TargetType = "FacilityTarget"
+		TaskType = "COMM"
+		MaxTimes = "10"
+		Value = "3">
+    <DynamicState
+			DynamicStateType = "STATIC_LLA"
+			ICs = "[0.0; -95.0000; 0.0]">
+    </DynamicState>
+  </TARGET>
+</TARGETDECK>

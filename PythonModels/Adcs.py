@@ -141,7 +141,6 @@ class adcs(HSFSubsystem.Subsystem):
         #   Add integrator parameters to maintain lvlh pointing
         #   Return False
 
-        
         # Event information
         asset = self.Asset
         es = event.GetEventStart(asset)
@@ -149,6 +148,10 @@ class adcs(HSFSubsystem.Subsystem):
         te = event.GetTaskEnd(asset)
         ee = event.GetEventEnd(asset)
         dt = SchedParameters.SimStepSeconds
+
+        # Find if already tracking
+        #isItTracking = self._newState.GetFullProfile(self.ISTRACKING_KEY)
+        #print(isItTracking)
 
         # Task information
         task = event.GetAssetTask(asset)
@@ -267,7 +270,7 @@ class adcs(HSFSubsystem.Subsystem):
                     ee = event.GetEventEnd(asset)
                     while(time < te):
                         tNorm = (time - es)/ts
-                        print("Normalized Maneuver Time: " + tNorm.ToString())
+                        #print("Normalized Maneuver Time: " + tNorm.ToString())
                         assetPosTime = assetDynState.PositionECI(time)
                         assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
                         assetVelTime = assetDynState.VelocityECI(time)
@@ -285,9 +288,9 @@ class adcs(HSFSubsystem.Subsystem):
                         qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
                         if time < ts:
                             qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
-                            print("Nominal Command: "+ qComLam.ToString())
+                            #print("Nominal Command: "+ qComLam.ToString())
                             qComLam = Quat.Slerp(tNorm,qBodLam,qComLam)
-                            print("Interp Command: " + qComLam.ToString())
+                            #print("Interp Command: " + qComLam.ToString())
                             qComLamHold = qComLam
                             qCom0Hold = qLam0*qComLamHold
                         elif time >= ts and time < te:
@@ -448,11 +451,18 @@ class adcs(HSFSubsystem.Subsystem):
                 return False
         elif (taskType == TaskType.COMM):
             # Point -X-axis towards target, point +Z-axis towards projection of Y_LVLH onto target pointing vector plane
+            
+            # Check if desaturating
+            if self.isDesaturating:
+                return False
+
+            #Check Wheel Speeds
             for wheelIdx in range(1,self.numWheels+1):
                 if assetWheelRates[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                     return False
+
             # Set up scheduling evaluation for comms task
-            event.SetTaskEnd(asset,time + self.slewtime + 600.0)
+            event.SetTaskEnd(asset,time + self.slewtime + 60.0)
             te = event.GetTaskEnd(asset)
             event.SetEventEnd(asset,te)
             ee = event.GetEventEnd(asset)
@@ -498,14 +508,21 @@ class adcs(HSFSubsystem.Subsystem):
                 slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
                 slewDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
                 timeSlew += dt
-                pointError = 180.0 * System.Math.Acos(Matrix[float].Dot( Quat.Rotate(slewQuatTime, self.boreaxis),(targetPosMat - slewPosTime) )/Vector.Norm( Vector(targetPosMat.ToString())-Vector(slewPosTime.ToString()) ))/System.Math.PI
-                if (pointError < self.beamwidth):
+                slewAntAxis = Quat.Rotate(Quat.Conjugate(slewQuatTime), self.antennaaxis)
+                r_AT = targetPosMat - slewPosTime
+                pointError = 180.0* System.Math.Acos(  Matrix[float].Dot( slewAntAxis,r_AT )/(Vector.Norm( Vector(r_AT.ToString()) )*Vector.Norm(Vector(slewAntAxis.ToString())))) /System.Math.PI
+                #print(pointError)
+                #print(self.beamwidth)
+                if (pointError <= self.beamwidth):
+                    print("Downlinking")
                     event.SetTaskStart(asset,time + timeSlew)
                     ts = event.GetTaskStart(asset)
-                    teNew = ts;
-                    for timeindex in range(1,math.floor(te/dt)):
-                        if not GeometryUtilities.hasLOS(assetDynState.PositionECI(timeindex),targetDynState.PositionECI(timeindex)):
-                            teNew = ts + timeindex*dt
+                    event.SetTaskEnd(asset,ts + 60.0)
+                    tEndIdx = int(math.floor(te/dt))
+                    teNew = event.GetTaskEnd(asset)
+                    #for timeindex in range(1,tEndIdx):
+                        #if not GeometryUtilities.hasLOS(assetDynState.PositionECI(timeindex),targetDynState.PositionECI(timeindex)):
+                            #teNew = ts + timeindex*dt
                     event.SetTaskEnd(asset,teNew)
                     te = event.GetTaskEnd(asset)
                     event.SetEventEnd(asset,te)
@@ -516,7 +533,7 @@ class adcs(HSFSubsystem.Subsystem):
                         assetVelTime = assetDynState.VelocityECI(time)
                         assetQuatTime = assetDynState.Quaternions(time)
                         assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
-                        assetRatesTime = assetDynState.EulerRates(time)
+                        assetRatesTime = Matrix[float].Transpose(assetDynState.EulerRates(time))
                         assetOrbState = Matrix[float](6,1)
                         assetOrbState[1] = assetPosTime[1]
                         assetOrbState[2] = assetPosTime[2]
@@ -526,6 +543,11 @@ class adcs(HSFSubsystem.Subsystem):
                         assetOrbState[6] = assetVelTime[3]
                         targetPos = targetDynState.PositionECI(time)
                         targetPosMat = Matrix[float].Transpose(Matrix[float](targetPos.ToString()))
+                        if not GeometryUtilities.hasLOS(assetDynState.PositionECI(time),targetDynState.PositionECI(time)):
+                            event.SetTaskEnd(asset,time)
+                            event.SetEventEnd(asset,time)
+                            te = event.GetTaskEnd(asset)
+                            ee = event.GetEventEnd(asset)
                         qCom0 = self.CalcCommsCommandFrame(assetOrbState,targetPosMat)
                         qLam0 = self.CalcLVLHECIState(assetOrbState)
                         qComLam = Quat.Conjugate(qLam0)*qCom0
@@ -558,8 +580,7 @@ class adcs(HSFSubsystem.Subsystem):
                         time += dt
                     self._newState.AddValue(self.ISTRACKING_KEY,HSFProfile[bool](te, False))
                     return True
-                else:
-                    return False
+            return False
         return False
 
     def CanExtend(self, event, universe, extendTo):
@@ -684,16 +705,17 @@ class adcs(HSFSubsystem.Subsystem):
         x_com0 = Matrix[System.Double](3,1)
         y_com0 = Matrix[System.Double](3,1)
         z_com0 = Matrix[System.Double](3,1)
-        x_com0 = -1.0*rhoNorm
+        x_com0 = -1.0*rhoHat
         hOrbVec = Matrix[System.Double].Cross(r_oa,v_oa)
         y_lvlh0 = -hOrbVec/Vector.Norm(Vector(hOrbVec.ToString()))
         y_lvlhProj = y_lvlh0 - Matrix[System.Double].Dot(rhoHat,y_lvlh0)*rhoHat
         z_com0 = y_lvlhProj
         y_com0 = Matrix[System.Double].Cross(z_com0,x_com0)
-        C_com0 = Matrix[System.Double].SetColumn(C_com0,1,x_com0)
-        C_com0 = Matrix[System.Double].SetColumn(C_com0,2,y_com0)
-        C_com0 = Matrix[System.Double].SetColumn(C_com0,3,z_com0)
-        pass
+        C_com0.SetColumn(1,x_com0)
+        C_com0.SetColumn(2,y_com0)
+        C_com0.SetColumn(3,z_com0)
+        q_com0 = Quat.Mat2Quat(C_com0)
+        return q_com0
 
     def CalcDesatCommandDipole(self, bBody, T_command):
         # Cross-product dipole control law for desaturating reaction wheels
