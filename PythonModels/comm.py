@@ -10,7 +10,7 @@ clr.AddReferenceByName('HSFUniverse')
 clr.AddReferenceByName('UserModel')
 clr.AddReferenceByName('MissionElements')
 clr.AddReferenceByName('HSFSystem')
-
+clr.AddReference("Microsoft.Office.Interop.Excel")
 import System.Xml
 import HSFSystem
 import HSFSubsystem
@@ -18,6 +18,7 @@ import MissionElements
 import Utilities
 import HSFUniverse
 import UserModel
+import Microsoft.Office.Interop.Excel as Excel
 from HSFSystem import *
 from System.Xml import XmlNode
 from Utilities import *
@@ -28,11 +29,22 @@ from System import Func, Delegate
 from System.Collections.Generic import Dictionary
 from IronPython.Compiler import CallTarget0
 
+
 class comm(HSFSubsystem.Subsystem):
     def __new__(cls, node, asset):
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
+        #instance.LinkBudgetPath = str(System.AppDomain.CurrentDomain.BaseDirectory)+str(node.Attributes["linkBudgetPath"].Value)
+        instance.LinkBudgetPath = r"C:\Users\Alex\source\repos\alex-w-johnson\Horizon\CANSat Link Budget.xls"
+        excel = Excel.ApplicationClass()
+        workbook = excel.Workbooks.Open(instance.LinkBudgetPath)
+        datasheet = workbook.Worksheets.Item[13]
+        dataRateCell = datasheet.Range["L5"]
+        #print(dataRateCell)
+        dataRateVal = dataRateCell.Value[str]
+        print(dataRateVal)
+        #L5
         instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
         instance.minElevAngle = float(node.Attributes["minElevAngle"].Value)
         instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(B/s)')

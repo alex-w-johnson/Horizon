@@ -110,6 +110,7 @@
 			subsystemName = "Comm"
 			src="..\..\..\PythonModels\comm.py"
 			className="comm"
+      linkBudgetPath="CANSat Link Budget.xls"
       peakDataRate ="187500"
       minElevAngle="10">
       <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
