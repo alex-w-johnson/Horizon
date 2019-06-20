@@ -35,17 +35,28 @@ class comm(HSFSubsystem.Subsystem):
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
-        #instance.LinkBudgetPath = str(System.AppDomain.CurrentDomain.BaseDirectory)+str(node.Attributes["linkBudgetPath"].Value)
-        instance.LinkBudgetPath = r"C:\Users\Alex\source\repos\alex-w-johnson\Horizon\CANSat Link Budget.xls"
+        instance.LinkBudgetFile = str(node.Attributes["linkBudgetPath"].Value)
+        currDirectory = System.AppDomain.CurrentDomain.BaseDirectory
+        pathToRemove = "Horizon\\bin\\Debug\\"
+        if currDirectory.endswith(pathToRemove):
+            LinkBudgetPath = currDirectory.replace(pathToRemove,instance.LinkBudgetFile)
+        #print(linkPath)
+        #LinkBudgetPath = 'C:\\Users\\Alex\\source\\repos\\alex-w-johnson\\Horizon\\CANSat_Link_Budget.xls'
+        #C:\Users\Alex\source\repos\alex-w-johnson\Horizon\CANSat Link Budget.xls
         excel = Excel.ApplicationClass()
-        workbook = excel.Workbooks.Open(instance.LinkBudgetPath)
-        datasheet = workbook.Worksheets.Item[13]
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(LinkBudgetPath,False)
+        datasheet = workbook.Worksheets(14) # TODO: make this select the overview sheet in the AMSAT budget workbook
         dataRateCell = datasheet.Range["L5"]
-        #print(dataRateCell)
-        dataRateVal = dataRateCell.Value[str]
+        dataRateVal = dataRateCell.Value2/8.0 # Given in sheet in bps, convert to B/s
+        workbook.Close()
         print(dataRateVal)
-        #L5
-        instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
+        if dataRateVal:
+            instance.maxDataRate = dataRateVal
+        elif node.Attributes["peakDataRate"].Value:
+            instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
+        else:
+            instance.maxDataRate = 1200.0 #9600 bps
         instance.minElevAngle = float(node.Attributes["minElevAngle"].Value)
         instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(B/s)')
         instance.addKey(instance.DATARATE_KEY)
