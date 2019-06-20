@@ -172,7 +172,7 @@ namespace HSFUniverse
         /// <returns></returns>
         public Matrix<double> Quaternions(double simTime)
         {
-            return _stateData[simTime][new MatrixIndex(7, 10)];
+            return this[simTime][new MatrixIndex(7, 10)];
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace HSFUniverse
         /// <returns></returns>
         public Matrix<double> EulerRates(double simTime)
         {
-            return _stateData[simTime][new MatrixIndex(11, 13)];
+            return this[simTime][new MatrixIndex(11, 13)];
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace HSFUniverse
         /// <returns></returns>
         public Matrix<double> WheelRates(double simTime)
         {
-            return _stateData[simTime][new MatrixIndex(14, 16)];
+            return this[simTime][new MatrixIndex(14, 16)];
         }
         #endregion
 
