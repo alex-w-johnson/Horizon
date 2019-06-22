@@ -5,7 +5,7 @@
 			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; -2.7105054e-20; -0.0011179537; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
-        src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\eomSSTN.py"
+        src="..\..\..\PythonModels\eomSSTN.py"
         className="eomSSTN"
         mass="8.5"
         com="[0.0; 0.0; 0.133]"
@@ -13,7 +13,7 @@
         cxareaavg="0.1584"
         cd="2.2"
         moi="[0.15; 0.15; 0.15]"
-        iswheels="[0.00003; 0.00003; 0.00003]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
         itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
         wheelsmass="[0.13; 0.13; 0.13]"
         wheelorigin="[0.1; 0.0; 0.1]"
@@ -31,15 +31,15 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Adcs"
-      src="..\..\..\Adcs.py"
+      src="..\..\..\PythonModels\Adcs.py"
       className ="adcs">
       <Wheels
         numwheels="3"
         wheelsmass="[0.13; 0.13; 0.13]"
-        iswheels="[3E-05; 3E-05; 3E-05]"
-        itwheels="[1.5E-05; 1.5E-05; 1.5-05]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
         wheelorigin="[0.1; 0.0; 0.1]"
-        poswheel1="[-0.405;0.4;-0.21]"
+        poswheel1="[-0.405; 0.4; -0.21]"
         poswheel2="[-0.21; 0.095; -0.29]"
         poswheel3="[-0.21; 0.79; -.405]"
         idlepowwheels="[0.5; 0.5; 0.5]"
@@ -57,29 +57,33 @@
       </Magtorquers>
       <Guidance
         antisolaraxis ="[0.0; 0.0; 1.0]"
-        slewtime ="200.0"
+        slewtime ="240.0"
         dwelltime ="120.0"
         boreaxis ="[0.0; 0.0; 1.0]"
         antennaaxis ="[-1.0; 0.0; 0.0]">
       </Guidance>
       <Control
-        pointing ="0.2"
-        beamwidth ="0.2"
-        kpslew="[0.0003216; 0.0003216; 0.0003216]"
-        kdslew="[0.0068; 0.0068; 0.0068]">
+        pointingbound ="0.1"
+        beamwidth ="2"
+        kpslew="[0.0065; 0.0065; 0.0065]"
+        kdslew="[0.0311; 0.0311; 0.0311]"
+        kpdesat="[4.914E-5; 4.914E-5; 4.914E-5]"
+        kddesat="[0.0022; 0.0022; 0.0022]"
+        trackrate="0.003">
       </Control>
-      <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[-0.9821; 0.1372; 0.1288]"></IC>
-      <IC type="Double" key="SolarBoreElongation" value="176.0297"></IC>
+      <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[-0.9813; 0.137; 0.1355]"></IC>
+      <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
       <IC type="Double" key="EarthBoreAngle" value="90"></IC>
       <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
       <IC type="Matrix" key="WheelTorque" value="[0.0; 0.0; 0.0]"></IC>
       <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Bool" key="IsTracking" value="0"></IC>
       <DEPENDENCY subsystemName="Access"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Payload"
-			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\payload.py"
+			src="..\..\..\PythonModels\payload.py"
 			className="payload"
       fullFieldNumPixels="1048576"
       subFieldNumPixels="16384"
@@ -93,7 +97,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "MDH"
-			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\mdh.py"
+			src="..\..\..\PythonModels\mdh.py"
 			className="mdh"
       compressionRatio ="1.5"
       bufferSize="8.0e+9"
@@ -104,7 +108,7 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Comm"
-			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\comm.py"
+			src="..\..\..\PythonModels\comm.py"
 			className="comm"
       peakDataRate ="187500"
       minElevAngle="10">
@@ -114,11 +118,12 @@
     <SUBSYSTEM
 			Type="scripted"
 			subsystemName = "Power"
-			src="C:\Users\Alex\Source\Repos\alex-w-johnson\Horizon\PythonModels\power.py"
+			src="..\..\..\PythonModels\power.py"
 			className="power"
 			batterySize="100000"
       panelEfficiency="0.25"
-			panelArea="0.18">
+			panelArea="0.18"
+      panelDensity="0.75">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset1"></DEPENDENCY>
@@ -127,15 +132,15 @@
       <DEPENDENCY subsystemName="Comm" fcnName="PowerfromComm.asset1"></DEPENDENCY>
     </SUBSYSTEM>
     <CONSTRAINT
-			value="0.25"
-			subsystemName="Power"
-			type="FAIL_IF_HIGHER">
+          value="0.25"
+          subsystemName="Power"
+          type="FAIL_IF_HIGHER">
       <STATEVAR type = "Double" key="DepthofDischarge"></STATEVAR>
     </CONSTRAINT>
     <CONSTRAINT
-			value="0.85"
-			subsystemName="MDH"
-			type="FAIL_IF_HIGHER">
+          value="0.85"
+          subsystemName="MDH"
+          type="FAIL_IF_HIGHER">
       <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
     </CONSTRAINT>
     <CONSTRAINT
