@@ -140,8 +140,12 @@ class eomSSTN(EOMS):
         jdCurrent = UserModel.SimParameters.SimStartJD + t/86400.0
 
         # ADCS control inputs
-        T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
-        M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)+self.ResDipole
+        if param.Mdata.IsEmpty:
+            T_control = Matrix[System.Double]('[0;0;0]')
+            M_dipole = self.ResDipole
+        else:
+            T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
+            M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)+self.ResDipole
         #T_control = Matrix[System.Double]('[0;0;0]')
         #M_dipole = self.ResDipole
         # State transition matrix equations
