@@ -104,9 +104,9 @@ class adcs(HSFSubsystem.Subsystem):
 
     def POWERSUB_PowerProfile_ADCSSUB(self, event):
         prof1 = HSFProfile[float]()
-        prof1[event.GetEventStart(self.Asset)] = 30
-        prof1[event.GetTaskStart(self.Asset)] = 60
-        prof1[event.GetTaskEnd(self.Asset)] = 30
+        prof1[event.GetEventStart(self.Asset)] = 5
+        prof1[event.GetTaskStart(self.Asset)] = 10
+        prof1[event.GetTaskEnd(self.Asset)] = 5
         return prof1
 
     def EVAL_tasktype_ADCSSUB(self, event):
@@ -388,12 +388,15 @@ class adcs(HSFSubsystem.Subsystem):
         elif (taskType == TaskType.DESATURATE):
             # Implement desaturation maneuver here
             # Point -X-axis to nadir, point +z-axis towards Y_LVLH
+            
             # Check if desaturated already
             isDesated = True
+            self.isDesaturating = False
             for idx in range(1,self.numWheels+1):
-                isDesated = (isDesated and (assetWheelRates[idx] < 0.2*self.maxspeedwheels[idx]))
+                isDesated = (isDesated and (assetWheelRates[idx] < 0.3*self.maxspeedwheels[idx]))
             if (not isDesated):
                 self.isDesaturating = True
+                event.SetTaskStart(asset,es)
                 event.SetTaskEnd(asset,es+dt)
                 event.SetEventEnd(asset,es+dt)
                 qCom0 = self.CalcNadirCommandFrame(assetOrbState)
@@ -406,10 +409,10 @@ class adcs(HSFSubsystem.Subsystem):
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 rEs = Vector.Norm(assetPosEs)
                 lvlhRate = Vector.Cross(assetPosEs,assetVelEs)/(rEs*rEs)
-                lvlhRate = Quat.Rotate(qLam0,lvlhRate)
+                lvlhRate = Quat.Rotate(assetQuatEs,lvlhRate)
                 lvlhRate = Matrix[float](lvlhRate.ToString())
                 lvlhRate = Matrix[float].Transpose(lvlhRate)
-                deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs-lvlhRate)
+                deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs)
                 T_control = -propError -deriError
                 print("Control "+ T_control.ToString())
                 r_eci = Matrix[float](3,1)
@@ -448,6 +451,7 @@ class adcs(HSFSubsystem.Subsystem):
                 #print("IsDesaturating")
                 return True
             elif isDesated:
+                self.isDesaturating = False
                 return False
         elif (taskType == TaskType.COMM):
             # Point -X-axis towards target, point +Z-axis towards projection of Y_LVLH onto target pointing vector plane
@@ -510,7 +514,8 @@ class adcs(HSFSubsystem.Subsystem):
                 timeSlew += dt
                 slewAntAxis = Quat.Rotate(Quat.Conjugate(slewQuatTime), self.antennaaxis)
                 r_AT = targetPosMat - slewPosTime
-                pointError = 180.0* System.Math.Acos(  Matrix[float].Dot( slewAntAxis,r_AT )/(Vector.Norm( Vector(r_AT.ToString()) )*Vector.Norm(Vector(slewAntAxis.ToString())))) /System.Math.PI
+                dotProd = Matrix[float].Dot( slewAntAxis,r_AT )
+                pointError = 180.0* System.Math.Acos( dotProd /(Vector.Norm( Vector(r_AT.ToString()) )) )/System.Math.PI
                 #print(pointError)
                 #print(self.beamwidth)
                 if (pointError <= self.beamwidth):
@@ -518,16 +523,12 @@ class adcs(HSFSubsystem.Subsystem):
                     event.SetTaskStart(asset,time + timeSlew)
                     ts = event.GetTaskStart(asset)
                     event.SetTaskEnd(asset,ts + 60.0)
-                    tEndIdx = int(math.floor(te/dt))
-                    teNew = event.GetTaskEnd(asset)
-                    #for timeindex in range(1,tEndIdx):
-                        #if not GeometryUtilities.hasLOS(assetDynState.PositionECI(timeindex),targetDynState.PositionECI(timeindex)):
-                            #teNew = ts + timeindex*dt
-                    event.SetTaskEnd(asset,teNew)
                     te = event.GetTaskEnd(asset)
+                    if ts == te:
+                        event.SetTaskEnd(asset,ts + 60.0)
                     event.SetEventEnd(asset,te)
                     ee = event.GetEventEnd(asset)
-                    while(time < ee):
+                    while(time < te):
                         assetPosTime = assetDynState.PositionECI(time)
                         assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
                         assetVelTime = assetDynState.VelocityECI(time)
@@ -551,15 +552,17 @@ class adcs(HSFSubsystem.Subsystem):
                         qCom0 = self.CalcCommsCommandFrame(assetOrbState,targetPosMat)
                         qLam0 = self.CalcLVLHECIState(assetOrbState)
                         qComLam = Quat.Conjugate(qLam0)*qCom0
+                        qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
+                        qBodCom = Quat.Conjugate(qComLam)*qBodLam
                         qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                         propError = self.PropErrorCalc(self.kpvec,qErr)
-                        deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
+                        deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
                         T_control = -1.0*propError -deriError
                         for i in range(1,self.numwheels+1):
                             if abs(T_control[i]) > self.peaktorqwheels[i]:
                                 T_control[i] = math.copysign(self.peaktorqwheels[i],T_control[i])
-                        slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
-                        slewDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
+                        assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
+                        assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
                         # Update ADCS states
                         borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
                         borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
@@ -737,6 +740,8 @@ class adcs(HSFSubsystem.Subsystem):
         for i in range(1,4):
             absValTmag = System.Math.Abs(T_dipole[i])
             T_brake[i] = magBrakeRatio*absValTmag*omegaWheels[i]/self.maxspeedwheels[i]
+            if T_brake[i] * T_dipole[i] >= 0.0:
+                T_brake[i] = 0.0
             if System.Math.Abs(T_brake[i]) > self.peaktorqwheels[i]:
                 T_brake[i] = System.Math.Sign(T_brake[i])*self.peaktorqwheels[i]
             #print(T_brake)
