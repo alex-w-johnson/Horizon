@@ -80,7 +80,7 @@ class mdh(HSFSubsystem.Subsystem):
              if (data - dataqueout < 0):
                  dataqueout = data
              if (dataqueout > 0):
-                 self._newState.AddValue(self.DATABUFFERRATIO_KEY, KeyValuePair[System.Double, System.Double](te, (data - dataqueout) / _bufferSize))
+                 self._newState.AddValue(self.DATABUFFERRATIO_KEY, KeyValuePair[System.Double, System.Double](te, (data - dataqueout) / self._bufferSize))
              return True
         return True
 
@@ -93,8 +93,10 @@ class mdh(HSFSubsystem.Subsystem):
         return prof1
 
     def COMMSUB_DataRateProfile_MDHSUB(self, event):
-        datarate = (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset)) 
-        if datarate >= self._peakDataRate:
+        #datarate = (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) / (event.GetTaskEnd(self.Asset) - event.GetTaskStart(self.Asset)) 
+        #if datarate >= self._peakDataRate:
+        datarate = 0.0
+        if (event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskStart(self.Asset)).Value - event.State.GetValueAtTime(self.DATABUFFERRATIO_KEY, event.GetTaskEnd(self.Asset)).Value) > 0.0:
             datarate = self._peakDataRate
         prof1 = HSFProfile[System.Double]()
         if (datarate != 0):
