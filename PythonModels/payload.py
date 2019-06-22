@@ -90,14 +90,13 @@ class payload(HSFSubsystem.Subsystem):
              position = self.Asset.AssetDynamicState
              timage = ts + timetocapture / 2
 
-             self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage, pixels))
+             self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage, self._pixelDepth*pixels))
              self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage + 1, 0.0))
 
              self._newState.AddValue(self.PAYLOADON_KEY, KeyValuePair[System.Double, System.Boolean](ts, True))
              self._newState.AddValue(self.PAYLOADON_KEY, KeyValuePair[System.Double, System.Boolean](te, False))
              return True
-         else:
-             return True
+         return True
 
     def CanExtend(self, event, universe, extendTo):
         return super(payload, self).CanExtend(event, universe, extendTo)
