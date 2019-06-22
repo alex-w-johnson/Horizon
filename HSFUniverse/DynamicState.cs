@@ -172,7 +172,7 @@ namespace HSFUniverse
         /// <returns></returns>
         public Matrix<double> Quaternions(double simTime)
         {
-            return _stateData[simTime][new MatrixIndex(7, 10)];
+            return this[simTime][new MatrixIndex(7, 10)];
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace HSFUniverse
         /// <returns></returns>
         public Matrix<double> EulerRates(double simTime)
         {
-            return _stateData[simTime][new MatrixIndex(11, 13)];
+            return this[simTime][new MatrixIndex(11, 13)];
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace HSFUniverse
         /// <returns></returns>
         public Matrix<double> WheelRates(double simTime)
         {
-            return _stateData[simTime][new MatrixIndex(14, 16)];
+            return this[simTime][new MatrixIndex(14, 16)];
         }
         #endregion
 
@@ -218,13 +218,13 @@ namespace HSFUniverse
             double simTime = _stateData.Last().Key + SchedParameters.SimStepSeconds;
             if (simTime > SimParameters.SimEndSeconds)
                 simTime = SimParameters.SimEndSeconds;
-
+            
             Matrix<double> tSpan = new Matrix<double>(new double[1, 2] { { _stateData.Last().Key, simTime } });
             // Update the integrator parameters using the information in the XML Node
 
             Matrix<double> data = Integrator.RK45(Eoms, tSpan, InitialConditions(), _integratorOptions, IntegratorParameters);
 
-            for (int index = 1; index <= data.Length; index++)
+            for (int index = 1; index <= data.NumCols; index++)//changed .Length to .NumCols
                 _stateData[data[1, index]] = (Vector)data[new MatrixIndex(2, data.NumRows), index];
         }
         /// <summary>
