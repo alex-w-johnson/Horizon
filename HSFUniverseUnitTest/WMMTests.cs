@@ -34,18 +34,18 @@ namespace HSFUniverse.Tests
         {
             get
             { 
-                yield return new TestCaseData(new DateTime(2015, 1, 1), 0, 80, 0, 6627.1, -445.9, 54432.2, 83.04, -3.85);
-                yield return new TestCaseData(new DateTime(2015, 1, 1), 0, 0, 120, 39518.2, 392.9, -11252.4, -15.89, 0.57);
-                yield return new TestCaseData(new DateTime(2015, 1, 1), 0, -80, 240, 5797.3, 15761.1, -52919.1, -72.39, 69.81);
-                yield return new TestCaseData(new DateTime(2015, 1, 1), 100, 80, 0, 6314.3, -471.6, 52269.8, 83.09, -4.27);
-                yield return new TestCaseData(new DateTime(2015, 1, 1), 100, 0, 120, 37535.6, 364.4, -10773.4, -16.01, 0.56);
-                yield return new TestCaseData(new DateTime(2015, 1, 1), 100, -80, 240, 5613.1, 14791.5, -50378.6, -72.57, 69.22);
-                yield return new TestCaseData(new DateTime(2017, 7, 2), 0, 80, 0, 6599.4, -317.1, 54459.2, 83.08, -2.75);
-                yield return new TestCaseData(new DateTime(2017, 7, 2), 0, 0, 120, 39571.4, 222.5, -11030.1, -15.57, 0.32);
-                yield return new TestCaseData(new DateTime(2017, 7, 2), 0, -80, 240, 5873.8, 15781.4, -52687.9, -72.28, 69.58);
-                yield return new TestCaseData(new DateTime(2017, 7, 2), 100, 80, 0, 6290.5, -348.5, 52292.7, 83.13, -3.17);
-                yield return new TestCaseData(new DateTime(2017, 7, 2), 100, 0, 120, 37585.5, 209.5, -10564.2, -15.70, 0.32);
-                yield return new TestCaseData(new DateTime(2017, 7, 2), 100, -80, 240, 5683.5, 14808.8, -50163.0, -72.45, 69.00);
+                yield return new TestCaseData(new DateTime(2015, 1, 1), 0, 80, 0, 6636.6, -451.9, 54408.9, 83.03, -3.90);
+                yield return new TestCaseData(new DateTime(2015, 1, 1), 0, 0, 120, 39521.1, 377.7, -11228.8, -15.86, 0.55);
+                yield return new TestCaseData(new DateTime(2015, 1, 1), 0, -80, 240, 5796.3, 15759.1, -52927.1, -72.40, 69.81);
+                yield return new TestCaseData(new DateTime(2015, 1, 1), 100, 80, 0, 6323.4, -477.6, 52249.1, 83.08, -4.32);
+                yield return new TestCaseData(new DateTime(2015, 1, 1), 100, 0, 120, 37538.1, 351.1, -10751.1, -15.98, 0.54);
+                yield return new TestCaseData(new DateTime(2015, 1, 1), 100, -80, 240, 5612.2, 14789.3, -50385.8, -72.57, 69.22);
+                yield return new TestCaseData(new DateTime(2017, 7, 2), 0, 80, 0, 6605.2, -298.7, 54506.3, 83.08, -2.59);
+                yield return new TestCaseData(new DateTime(2017, 7, 2), 0, 0, 120, 39569.4, 252.3, -11067.9, -15.63, 0.37);
+                yield return new TestCaseData(new DateTime(2017, 7, 2), 0, -80, 240, 5864.6, 15764.1, -52706.1, -72.30, 69.59);
+                yield return new TestCaseData(new DateTime(2017, 7, 2), 100, 80, 0, 6294.3, -331.1, 52337.8, 83.13, -3.01);
+                yield return new TestCaseData(new DateTime(2017, 7, 2), 100, 0, 120, 37584.4, 235.7, -10600.5, -15.75, 0.36);
+                yield return new TestCaseData(new DateTime(2017, 7, 2), 100, -80, 240, 5674.9, 14793.1, -50179.5, -72.48, 69.01);
             }
         }
     }

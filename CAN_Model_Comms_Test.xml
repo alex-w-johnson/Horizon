@@ -11,7 +11,7 @@
         com="[0.0; 0.0; 0.133]"
         cop="[0.0; 0.0; -0.1042]"
         cxareaavg="0.1584"
-        cd="2.2"
+        cd="0.0"
         moi="[0.15; 0.15; 0.15]"
         iswheels="[3E-5; 3E-5; 3E-5]"
         itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
@@ -20,7 +20,7 @@
         poswheel1="[-0.405; 0.4; -0.21]"
         poswheel2="[-0.21; 0.095; -0.29]"
         poswheel3="[-0.21; 0.79; -.405]"
-        residualdipole ="[0.0; 0.0; 0.1]"
+        residualdipole ="[0.0; 0.0; 0.0]"
         Name ="Asset1">
       </EOMS>
     </DynamicState>
@@ -32,7 +32,8 @@
 			Type="scripted"
 			subsystemName = "Adcs"
       src="..\..\..\PythonModels\Adcs.py"
-      className ="adcs">
+      className ="adcs"
+      dynStepSize="2">
       <Wheels
         numwheels="3"
         wheelsmass="[0.13; 0.13; 0.13]"
@@ -102,7 +103,7 @@
       compressionRatio ="1.5"
       bufferSize="8.0e+9"
       peakDataRate ="187500">
-      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
+      <IC type="Double" key="DataBufferFillRatio" value="0.2"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
@@ -110,6 +111,7 @@
 			subsystemName = "Comm"
 			src="..\..\..\PythonModels\comm.py"
 			className="comm"
+      linkBudgetPath="CANSat_Link_Budget.xls"
       peakDataRate ="187500"
       minElevAngle="10">
       <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>

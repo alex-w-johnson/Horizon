@@ -10,7 +10,7 @@ clr.AddReferenceByName('HSFUniverse')
 clr.AddReferenceByName('UserModel')
 clr.AddReferenceByName('MissionElements')
 clr.AddReferenceByName('HSFSystem')
-
+clr.AddReference("Microsoft.Office.Interop.Excel")
 import System.Xml
 import HSFSystem
 import HSFSubsystem
@@ -18,6 +18,7 @@ import MissionElements
 import Utilities
 import HSFUniverse
 import UserModel
+import Microsoft.Office.Interop.Excel as Excel
 from HSFSystem import *
 from System.Xml import XmlNode
 from Utilities import *
@@ -28,12 +29,34 @@ from System import Func, Delegate
 from System.Collections.Generic import Dictionary
 from IronPython.Compiler import CallTarget0
 
+
 class comm(HSFSubsystem.Subsystem):
     def __new__(cls, node, asset):
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
-        instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
+        instance.LinkBudgetFile = str(node.Attributes["linkBudgetPath"].Value)
+        currDirectory = System.AppDomain.CurrentDomain.BaseDirectory
+        pathToRemove = "Horizon\\bin\\Debug\\"
+        if currDirectory.endswith(pathToRemove):
+            LinkBudgetPath = currDirectory.replace(pathToRemove,instance.LinkBudgetFile)
+        #print(linkPath)
+        #LinkBudgetPath = 'C:\\Users\\Alex\\source\\repos\\alex-w-johnson\\Horizon\\CANSat_Link_Budget.xls'
+        #C:\Users\Alex\source\repos\alex-w-johnson\Horizon\CANSat Link Budget.xls
+        excel = Excel.ApplicationClass()
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(LinkBudgetPath,False)
+        datasheet = workbook.Worksheets(14) # TODO: make this select the overview sheet in the AMSAT budget workbook
+        dataRateCell = datasheet.Range["L5"]
+        dataRateVal = dataRateCell.Value2/8.0 # Given in sheet in bps, convert to B/s
+        workbook.Close()
+        print(dataRateVal)
+        if dataRateVal:
+            instance.maxDataRate = dataRateVal
+        elif node.Attributes["peakDataRate"].Value:
+            instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
+        else:
+            instance.maxDataRate = 1200.0 #9600 bps
         instance.minElevAngle = float(node.Attributes["minElevAngle"].Value)
         instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(B/s)')
         instance.addKey(instance.DATARATE_KEY)
