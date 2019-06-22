@@ -74,7 +74,14 @@ class comm(HSFSubsystem.Subsystem):
         return super(comm, self).CanExtend(event, universe, extendTo)
 
     def POWERSUB_PowerProfile_COMMSUB(self, event):
-        return event.State.GetProfile(self.DATARATE_KEY)
+        prof1 = HSFProfile[System.Double]()
+        prof1[event.GetEventStart(self.Asset)] = 5.0
+        prof1[event.GetTaskStart(self.Asset)] = 5.0
+        if self._task.Type == TaskType.COMM:
+            prof1[event.GetTaskStart(self.Asset)] = 10.0
+        prof1[event.GetTaskEnd(self.Asset)] = 5.0
+        prof1[event.GetEventEnd(self.Asset)] = 5.0
+        return prof1
 
     def DependencyCollector(self, currentEvent):
         return super(comm, self).DependencyCollector(currentEvent)
