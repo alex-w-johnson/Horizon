@@ -89,7 +89,11 @@ class eomSSTN(EOMS):
         #instance.Imat = Jbus
         instance.wmm = WMM()
         instance.atmos = ExponentialAtmosphere()
-        
+        # Geometry data
+        instance.geometry = Matrix[float](node.Attributes["geometry"].Value)
+        instance.faceCentroids = instance.geometry[":",MatrixIndex(7,9)]
+        instance.faceNormals = instance.geometry[":",MatrixIndex(10,12)]
+        instance.faceAreas = instance.geometry.GetColumn(13)
         # Residual dipole property
         instance.ResDipole = Matrix[System.Double](node.Attributes["residualdipole"].Value)
         return instance
@@ -138,7 +142,6 @@ class eomSSTN(EOMS):
 
         # Current Julian Date
         jdCurrent = UserModel.SimParameters.SimStartJD + t/86400.0
-
         # ADCS control inputs
         if param.Mdata.IsEmpty:
             T_control = Matrix[System.Double]('[0;0;0]')
@@ -146,67 +149,46 @@ class eomSSTN(EOMS):
         else:
             T_control = param.GetValue(self.WHEELTORQUE_KEY) # Correct way to get parameters from ADCS? Ask Mehiel - AJ
             M_dipole = param.GetValue(self.MAGTORQDIPOLE_KEY)+self.ResDipole
-        #T_control = Matrix[System.Double]('[0;0;0]')
-        #M_dipole = self.ResDipole
         # State transition matrix equations
         dy = Matrix[System.Double](16,1)
         dy[1,1] = vxeci
         dy[2,1] = vyeci
         dy[3,1] = vzeci
         #print('Calc Accels')
-        acceleration = self.CalcForces(Reci,Veci)
+        acceleration = self.CalcForces(Reci,Veci,qbeci)
         #print('Done')
         dy[4,1] = acceleration[1]
         dy[5,1] = acceleration[2]
         dy[6,1] = acceleration[3]
-        #print('Calc QuatDot')
         dy[7,1] = -0.5*Matrix[System.Double].Dot(Matrix[System.Double](epsbeci.ToString()),wbeci)
         dy[8,1] = epsbecidot[1]
         dy[9,1] = epsbecidot[2]
         dy[10,1] = epsbecidot[3]
-        
-        #print('done')
-        #print('Calc Disturbs')
         T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent) 
-        #print(["Current Applied Torque:" + T_dist.ToString()])
-        #print('done')
         Imat = self.Imat
-        #print('Calc Ang Accels')
         omegaDot = Matrix[System.Double].Inverse(Imat)*(T_dist-Matrix[System.Double].Cross(wbeci,Imat*wbeci)) # Correct formula for body rate integration? Or need wheel momentum? -AJ        
         dy[11,1] = omegaDot[1]
         dy[12,1] = omegaDot[2]
         dy[13,1] = omegaDot[3]
-        #print('done')
         IsWheels = self.IsWheels
-        #print('Calc Wheel Dots')
         omegaWDot = Matrix[System.Double].Inverse(IsWheels)*(-T_control-Matrix[System.Double].Cross(wbeci,IsWheels*wwb)) # Fairly confident, ask Mehiel anyways - AJ
-        #print('done')
         dy[14,1] = omegaWDot[1]
         dy[15,1] = omegaWDot[2]
         dy[16,1] = omegaWDot[3]
-        #print(System.String(Matrix[float].Transpose(dy)))
         return dy
     
-    def CalcForces(self,r_eci,v_eci):
+    def CalcForces(self,r_eci,v_eci,qb_eci):
         a_grav = self.CalcGravityForce(r_eci)
         a_J2 = self.CalcJ2Force(r_eci)
-        a_drag = self.CalcDragForce(r_eci,v_eci)/self.Mass
+        a_drag = self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
         a_total = a_grav + a_J2 + a_drag
         return a_total
 
     def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole,jdCurrent):
-        T_drag = self.CalcDragMoment(r_eci,v_eci)
-        #print('drag')
-        #print(T_drag)
+        T_drag = self.CalcDragMoment(r_eci,v_eci,qb_eci)
         T_mag = self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
-        #print('mag')
-        #print(T_mag)
         T_gravgrad = self.CalcGravGradMoment(r_eci,qb_eci)
-        #print('grad')
-        #print(T_gravgrad)
-        #print(T_control)
         T_total = T_drag + T_mag + T_gravgrad + T_control
-        #print(["T_tot = " + T_total.ToString()])
         return T_total
 
     def CalcGravityForce(self,r):
@@ -229,29 +211,70 @@ class eomSSTN(EOMS):
         aJ2[3] = -((3*J2*mu*(rE**2)*r[3])/(2*(rnorm**5)))*(3-((5*(r[3]**2))/(rnorm**2)))
         return aJ2
 
-    def CalcDragForce(self,r_eci,v_eci):
+    def CalcDragForce(self,r_eci,v_eci,qb_eci):
         rho = self.CalcAtmosDens(r_eci)
-        #print(rho)
         vnorm = 1000.0*Matrix[System.Double].Norm(v_eci)
-        F_d = -1*rho*1000.0*v_eci*vnorm*self.Cd*self.CxArea
-        #print(F_d)
+        F_d = Quat.Rotate(Quat.Conjugate(qb_eci),self.CalcTotalPanelDrag(rho,r_eci,v_eci,qb_eci,self.faceNormals,self.faceAreas))
         return F_d
 
-    def CalcDragMoment(self,r_eci,v_eci):
-        fdrag = self.CalcDragForce(r_eci,v_eci)
-        #print('Drag')
-        T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
-        #print(T_d)
+    def CalcTotalPanelDrag(self,rho,r_eci,v_eci,qb_eci,SurfNormMat,SurfAreaVec):
+        # Calcs total panel drag in newtons
+        totalPanelDrag = Matrix[float](3,1)
+        for pan in range(1,SurfNormMat.NumRows):
+            totalPanelDrag += self.CalcPanelDragForce(rho,r_eci,v_eci,qb_eci,SurfNormMat[pan,":"],SurfAreaVec[pan])
+        return totalPanelDrag
+
+    def CalcPanelDragForce(self,rho,r_eci,v_eci,qb_eci,surfNormal,surfArea):
+        # Calcs drag force on an individual panel in the body frame
+        vRam = self.CalcRamVelocity(r_eci,v_eci)
+        vRamBody = Quat.Rotate(qb_eci,vRam)
+        vRamBodyNormalized = vRamBody/Matrix[float].Norm(vRamBody)
+        ndotv = self.CalcRamIncDotProd(r_eci,v_eci,qb_eci,surfNormal)
+        if (ndotv >= 0.0):
+            panDragBody = Matrix[float](3,1,0.0)
+        elif (ndotv < 0.0):
+            panDragBody = 1000.0*Matrix[float].Norm(vRamBody)*ndotv*rho*(1000.0*vRamBody)*surfArea
+        return panDragBody
+
+    def CalcRamIncDotProd(self,r_eci,v_eci,qb_eci,surfNormal):
+        # Calculates the normalized dot product b/w a panel normal vector and the ram velocity vector in the body frame
+        vRam = self.CalcRamVelocity(r_eci,v_eci)
+        vRamBody = Quat.Rotate(qb_eci,vRam)
+        vRamBodyNormalized = vRamBody/Matrix[float].Norm(vRamBody)
+        ndotv = Matrix[float].Dot(surfNormal,vRamBodyNormalized)
+        return ndotv
+
+    def CalcRamVelocity(self,r_eci,v_eci):
+        omegaEarth = Matrix[float](3,1)
+        omegaEarth[3] = 7.2921159e-5 #rad/s, ECI earth rotational speed
+        vRam = v_eci - Matrix[float].Cross(omegaEarth,r_eci) #km/s
+        return vRam
+    
+    def CalcCoP(self,r_eci,v_eci,qb_eci,SurfNormMat,SurfAreaMat,SurfCentMat):
+        # Calculates CoP per Damaren De Ruiter pp. 231 (above Eq. 12.3)
+        numerator = Matrix[float](3,1)
+        denominator = 0.0
+        for pan in range(1,SurfNormMat.NumRows):
+            ndotv = self.CalcRamIncDotProd(r_eci,v_eci,qb_eci,SurfNormMat[pan,":"])
+            if (ndotv < 0.0):
+                rhoCM2CP = Matrix[float].Transpose(SurfCentMat[pan,":"]) - self.CoM
+                denom = ndotv*SurfAreaMat[pan] 
+                numerator += rhoCM2CP*denom
+                denominator += denom
+        cop = numerator/denominator
+        return cop
+
+
+    def CalcDragMoment(self,r_eci,v_eci,qb_eci):
+        fdrag = Quat.Rotate(qb_eci,self.CalcDragForce(r_eci,v_eci,qb_eci))
+        CoP = self.CalcCoP(r_eci,v_eci,qb_eci,self.faceNormals,self.faceAreas,self.faceCentroids)
+        #T_d = Matrix[System.Double].Cross(self.CoP,fdrag)
+        T_d = Matrix[float].Cross(CoP,fdrag)
         return T_d
 
     def CalcMagMoment(self,r_eci,JD,M_dipole,qb_eci):
         bField = self.CalcCurrentMagField(r_eci,JD)
-        #print(["B [T] = "+bField.ToString()])
-        #print('bfield')
-        #print(type(bField))
         bFieldBody = Quat.Rotate(qb_eci,bField)
-        #print('bfieldBody')
-        #print(type(bFieldBody))
         magMoment = Matrix[System.Double].Cross(M_dipole,bFieldBody)
         return magMoment
 
@@ -260,21 +283,19 @@ class eomSSTN(EOMS):
         rnorm = Matrix[System.Double].Norm(r_eci)
         r5 = rnorm**5
         rb = Quat.Rotate(qb_eci,r_eci)
-        #print(rb)
         T_g = 3.0*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/r5
         return T_g
 
     def CalcAtmosDens(self,r_eci):
         rE = 6378.137
         h = Matrix[System.Double].Norm(r_eci) - rE
-        #print(h)
         # Based on exp. atmosphere model from Vallado Table 8-4
-        #print(System.DateTime.Now.ToString("HH:mm:ss"))
         rho = self.atmos.density(h)
         return rho
 
     def CalcCurrentYMDhms(self,JD):
         # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date" algorithm
+        # Visit https://www.celestrak.com/software/vallado-sw.php for more information
         J2000 = 2451545.0 #JD for Jan. 1 2000
         Y2000 = 2000.0 
         T2000 = (JD - J2000)/365.25 # Number of Julian centuries (*100) from Jan. 1, 2000
@@ -286,12 +307,10 @@ class eomSSTN(EOMS):
             lyrs = math.floor(0.25*(Y-Y2000-1))
             days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
         dayofyr = math.floor(days)
-
         # determine month
         lmonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         if Y % 4.0 == 0:
             lmonth[2] = 29
-
         # for loop to determine calendar month
         idx = 1
         tempint = 0
@@ -300,7 +319,6 @@ class eomSSTN(EOMS):
             idx += 1
         M = idx
         D = dayofyr - tempint
-
         # find hours, minutes, seconds
         temp = (days - dayofyr) * 24.0
         h = math.floor(temp)
@@ -342,5 +360,4 @@ class eomSSTN(EOMS):
         bvecECIMat[1] = bvecECI[1]
         bvecECIMat[2] = bvecECI[2]
         bvecECIMat[3] = bvecECI[3]
-        #print(["B func [T] = "+bvecECIMat.ToString()])
-        return bvecECIMat*1.0e-9
+        return bvecECIMat*1.0e-9 # convert from nT to Teslas
