@@ -40,7 +40,7 @@ class adcs(HSFSubsystem.Subsystem):
         # 3 = Control
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
-        instance.POINTVEC_KEY = StateVarKey[Matrix[float]](instance.Asset.Name + '.' + 'eci_pointing_vector(xyz)')
+        instance.POINTVEC_KEY = StateVarKey[Matrix[float]](instance.Asset.Name + '.' + 'bore_pointing_vector(xyz)')
         instance.SOLARELONG_KEY = StateVarKey[float](instance.Asset.Name + '.' + 'solarboreelongation')
         instance.EARTHELONG_KEY = StateVarKey[float](instance.Asset.Name + '.' + 'earthboreangle')
         instance.RAMANGLE_KEY = StateVarKey[float](instance.Asset.Name + '.' + 'ramdirectionboreangle')
@@ -452,7 +452,59 @@ class adcs(HSFSubsystem.Subsystem):
                 return True
             elif isDesated:
                 self.isDesaturating = False
-                return False
+                qCom0 = self.CalcNadirCommandFrame(assetOrbState)
+                qLam0 = self.CalcLVLHECIState(assetOrbState)
+                qComLam = Quat.Conjugate(qLam0)*qCom0
+                qBodLam  = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatEs)
+                qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                qErr = Matrix[float](qBodCom._eps.ToString())
+                qErr = Matrix[float].Transpose(qErr)
+                propError = self.PropErrorCalc(self.kpvec,qErr)
+                rEs = Vector.Norm(assetPosEs)
+                lvlhRate = Vector.Cross(assetPosEs,assetVelEs)/(rEs*rEs)
+                lvlhRate = Quat.Rotate(assetQuatEs,lvlhRate)
+                lvlhRate = Matrix[float](lvlhRate.ToString())
+                lvlhRate = Matrix[float].Transpose(lvlhRate)
+                deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs)
+                T_control = -propError -deriError
+                print("Control "+ T_control.ToString())
+                r_eci = Matrix[float](3,1)
+                for i in range(1,4):
+                    r_eci[i,1] = assetPosEs[i]
+                mDipoleCommand = self.CalcDesatCommandDipole(self.CalcBodyMagField(r_eci,SimParameters.SimStartJD,assetQuatEs),T_control)
+                #print("Dipole Calced")
+                Tdipole = self.CalcMagMoment(r_eci,SimParameters.SimStartJD,mDipoleCommand,assetQuatEs)
+                print("Dipole Torque: "+Tdipole.ToString())
+                #print("Magtorq Calced")
+                T_braking = self.CalcDesatCommandWheelTorque(Tdipole,assetWheelRates)
+                print("Braking: "+ T_braking.ToString())
+                #print("Braking Calced")
+                assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_braking)
+                assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, mDipoleCommand)
+                #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
+                #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))
+                borePointing = Quat.Rotate(Quat.Conjugate(assetQuatEs),self.boreaxis)
+                borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
+                solPosNormVec = self.sun.getEarSunVec(es)/Vector.Norm(Vector(self.sun.getEarSunVec(es).ToString()))
+                #print("solPosNormVec: " + solPosNormVec.ToString()+ "    boreAxis: "+ borePointing.ToString())
+                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec))*180.0/System.Math.PI
+                #print(Matrix[float].Dot(borePointing,solPosNormVec).ToString())
+                nadirVec = -1.0*Matrix[float](assetPosEs.ToString())/Vector.Norm(assetPosEs)
+                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec))*180.0/System.Math.PI
+                ramVec = assetVelEs/Vector.Norm(assetVelEs)
+                ramVec = Matrix[float](ramVec.ToString())
+                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec))*180.0/System.Math.PI
+                self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](es,borePointing))
+                self._newState.AddValue(self.SOLARELONG_KEY,HSFProfile[float](es,solElongAng))
+                self._newState.AddValue(self.EARTHELONG_KEY,HSFProfile[float](es,nadirBoreAng))
+                self._newState.AddValue(self.RAMANGLE_KEY,HSFProfile[float](es,ramAng))
+                self._newState.AddValue(self.ISTRACKING_KEY,HSFProfile[bool](es, False))
+                self._newState.AddValue(self.WHEELTORQUE_KEY,HSFProfile[Matrix[float]](es,T_braking))
+                self._newState.AddValue(self.MAGTORQDIPOLE_KEY,HSFProfile[Matrix[float]](es,mDipoleCommand))
+                event.SetTaskStart(asset,es)
+                event.SetTaskEnd(asset,es+dt)
+                event.SetEventEnd(asset,es+dt)
+                return True
         elif (taskType == TaskType.COMM):
             # Point -X-axis towards target, point +Z-axis towards projection of Y_LVLH onto target pointing vector plane
             
