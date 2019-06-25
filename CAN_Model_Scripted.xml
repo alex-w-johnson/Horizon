@@ -75,7 +75,7 @@
       <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
       <IC type="Double" key="EarthBoreAngle" value="90"></IC>
       <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
-      <IC type="Matrix" key="WheelTorque" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="RxWheelTorque" value="[0.0; 0.0; 0.0]"></IC>
       <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
       <IC type="Bool" key="IsTracking" value="0"></IC>
       <DEPENDENCY subsystemName="Access"></DEPENDENCY>
