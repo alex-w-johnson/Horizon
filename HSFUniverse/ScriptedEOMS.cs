@@ -35,6 +35,7 @@ namespace HSFUniverse
             var ops = engine.Operations;
             var p = engine.GetSearchPaths();
             p.Add(AppDomain.CurrentDomain.BaseDirectory + "\\..\\..\\..\\PythonScripting");
+            p.Add(AppDomain.CurrentDomain.BaseDirectory + "\\..\\..\\..\\PythonModels");
             engine.SetSearchPaths(p);
             engine.ExecuteFile(pythonFilePath, scope);
             var pythonType = scope.GetVariable(className);
