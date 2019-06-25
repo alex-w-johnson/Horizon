@@ -180,7 +180,7 @@ class eomSSTN(EOMS):
     def CalcForces(self,r_eci,v_eci,qb_eci):
         a_grav = self.CalcGravityForce(r_eci)
         a_drag = self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
-        a_total = a_grav + a_J2 + a_drag
+        a_total = a_grav + a_drag
         return a_total
 
     def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole,jdCurrent):
@@ -198,10 +198,10 @@ class eomSSTN(EOMS):
         agrav[1] = -mu*r[1]/r3
         agrav[2] = -mu*r[2]/r3
         agrav[3] = -mu*r[3]/r3
-        agrav+=self.CalcJ2Force(r)
-        agrav+=self.CalcJ3Force(r)
-        agrav+=self.CalcJ4Force(r)
-        agrav+=selif.CalcJ5Force(r)
+        agrav += self.CalcJ2Force(r)
+        agrav += self.CalcJ3Force(r)
+        agrav += self.CalcJ4Force(r)
+        agrav += self.CalcJ5Force(r)
         return agrav
 
     def CalcJ2Force(self,r):
@@ -219,7 +219,7 @@ class eomSSTN(EOMS):
         mu = 398600.4418
         J3 = -2.533e-06
         rE = 6378.137
-        rnorm = Matrix[System.Double].norm(r)
+        rnorm = Matrix[System.Double].Norm(r)
         aJ3 = Matrix[System.Double](3,1)
         gamma = -(5.0*J3/2.0)*(rE/rnorm)**3
         alpha = -( (3*(r[3]/rnorm))-7*(r[3]/rnorm)**3 )
@@ -232,7 +232,7 @@ class eomSSTN(EOMS):
         mu = 398600.4418
         J4 = -1.620e-06
         rE = 6378.137
-        rnorm = Matrix[System.Double].norm(r)
+        rnorm = Matrix[System.Double].Norm(r)
         aJ4 = Matrix[System.Double](3,1)
         gamma = -5*J4*(rE/rnorm)**4/8.0
         fourthord = 63*(r[3]/rnorm)**4 #4th order term
@@ -249,7 +249,7 @@ class eomSSTN(EOMS):
         mu = 398600.4418
         J5 = -2.273e-07
         rE = 6378.137
-        rnorm = Matrix[System.Double].norm(r)
+        rnorm = Matrix[System.Double].Norm(r)
         aJ5 = Matrix[System.Double](3,1)
         gamma = -J5*(rE/rnorm)**5/8
         c12=3*( (35*r[3]/rnorm) -(210*(r[3]/rnorm)**3) + (231*(r[3]/rnorm)**5) )

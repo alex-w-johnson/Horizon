@@ -4,65 +4,10 @@
 		TargetType = "FlyingAlong"
 		TaskType = "FLYALONG"
 		MaxTimes = "1000000000"
-		Value = "1">
+		Value = "10">
     <DynamicState
 			DynamicStateType = "STATIC_ECI"
-			ICs = "[-1E9; 0; 0]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "control"
-		TargetType = "FlyingAlong"
-		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
-		Value = "1">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[+1E9; 0; 0]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "control"
-		TargetType = "FlyingAlong"
-		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
-		Value = "1">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[0; -1E9; 0]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "control"
-		TargetType = "FlyingAlong"
-		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
-		Value = "1">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[0; 1E9; 0]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "control"
-		TargetType = "FlyingAlong"
-		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
-		Value = "1">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[0; 0; -1E9]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "control"
-		TargetType = "FlyingAlong"
-		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
-		Value = "1">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[0; 0; 1E9]">
+			ICs = "[-1.469507729932651E08; 2.052524454762490E07; 8.898546976340212E06]">
     </DynamicState>
   </TARGET>
 </TARGETDECK>

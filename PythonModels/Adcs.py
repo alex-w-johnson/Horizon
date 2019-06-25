@@ -362,7 +362,7 @@ class adcs(HSFSubsystem.Subsystem):
             lvlhRate = Quat.Rotate(qLam0,lvlhRate)
             lvlhRate = Matrix[float](lvlhRate.ToString())
             lvlhRate = Matrix[float].Transpose(lvlhRate)
-            deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs - lvlhRate)
+            deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs-Quat.Rotate(qBodLam,lvlhRate))
             T_control = -propError -deriError
             assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
             assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))

@@ -31,9 +31,6 @@
     <Compile Include="eomSSTN.py" />
     <Compile Include="eval.py" />
     <Compile Include="mdh.py" />
-    <Compile Include="adcsTest.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="payload.py" />
     <Compile Include="power.py" />
   </ItemGroup>

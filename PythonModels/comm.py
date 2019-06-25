@@ -50,7 +50,7 @@ class comm(HSFSubsystem.Subsystem):
         dataRateCell = datasheet.Range["L5"]
         dataRateVal = dataRateCell.Value2/8.0 # Given in sheet in bps, convert to B/s
         workbook.Close()
-        print(dataRateVal)
+        #print(dataRateVal)
         if dataRateVal:
             instance.maxDataRate = dataRateVal
         elif node.Attributes["peakDataRate"].Value:
