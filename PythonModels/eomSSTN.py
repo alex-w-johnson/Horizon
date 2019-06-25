@@ -179,7 +179,6 @@ class eomSSTN(EOMS):
     
     def CalcForces(self,r_eci,v_eci,qb_eci):
         a_grav = self.CalcGravityForce(r_eci)
-        a_J2 = self.CalcJ2Force(r_eci)
         a_drag = self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
         a_total = a_grav + a_J2 + a_drag
         return a_total
@@ -192,12 +191,17 @@ class eomSSTN(EOMS):
         return T_total
 
     def CalcGravityForce(self,r):
+        # Calc 2-body, J2, J3, J4, and J5 acceleration
         mu = 398600.4418
         r3 = Matrix[System.Double].Norm(r)**3
         agrav = Matrix[System.Double](3,1)
         agrav[1] = -mu*r[1]/r3
         agrav[2] = -mu*r[2]/r3
         agrav[3] = -mu*r[3]/r3
+        agrav+=self.CalcJ2Force(r)
+        agrav+=self.CalcJ3Force(r)
+        agrav+=self.CalcJ4Force(r)
+        agrav+=selif.CalcJ5Force(r)
         return agrav
 
     def CalcJ2Force(self,r):
@@ -210,6 +214,51 @@ class eomSSTN(EOMS):
         aJ2[2] = -((3*J2*mu*(rE**2)*r[2])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
         aJ2[3] = -((3*J2*mu*(rE**2)*r[3])/(2*(rnorm**5)))*(3-((5*(r[3]**2))/(rnorm**2)))
         return aJ2
+
+    def CalcJ3Force(self,r):
+        mu = 398600.4418
+        J3 = -2.533e-06
+        rE = 6378.137
+        rnorm = Matrix[System.Double].norm(r)
+        aJ3 = Matrix[System.Double](3,1)
+        gamma = -(5.0*J3/2.0)*(rE/rnorm)**3
+        alpha = -( (3*(r[3]/rnorm))-7*(r[3]/rnorm)**3 )
+        beta = Matrix[System.Double](3,1,0.0)
+        beta[3] = 1 - 5*(r[3]/rnorm)**2
+        aJ3 = -(gamma*mu/(rnorm**2)) * ( (alpha*r/rnorm) + 0.6*beta )
+        return aJ3
+
+    def CalcJ4Force(self,r):
+        mu = 398600.4418
+        J4 = -1.620e-06
+        rE = 6378.137
+        rnorm = Matrix[System.Double].norm(r)
+        aJ4 = Matrix[System.Double](3,1)
+        gamma = -5*J4*(rE/rnorm)**4/8.0
+        fourthord = 63*(r[3]/rnorm)**4 #4th order term
+        xy02order = 3-42*(r[3]/rnorm)**2 #0 and 2nd order terms for x and y components
+        c12 = xy02order + fourthord
+        c3 = -15 + 70*(r[3]/rnorm)**2 - fourthord
+        aJ4[1] = c12*r[1]/rnorm
+        aJ4[2] = c12*r[2]/rnorm
+        aJ4[3] = c3*r[3]/rnorm
+        aJ4 *= gamma*mu/(rnorm**2)
+        return aJ4
+
+    def CalcJ5Force(self,r):
+        mu = 398600.4418
+        J5 = -2.273e-07
+        rE = 6378.137
+        rnorm = Matrix[System.Double].norm(r)
+        aJ5 = Matrix[System.Double](3,1)
+        gamma = -J5*(rE/rnorm)**5/8
+        c12=3*( (35*r[3]/rnorm) -(210*(r[3]/rnorm)**3) + (231*(r[3]/rnorm)**5) )
+        c3 = 15- 315*((r[3]/rnorm)**2) + 945*((r[3]/rnorm)**4) - 693*((r[3]/rnorm)**6)
+        aJ5[1]= c12*r[1]/rnorm
+        aJ5[2] = c12*r[2]/rnorm
+        aJ5[3] = c3*r[3]/rnorm
+        aJ5 *= gamma*mu/(rnorm**2)
+        return aJ5
 
     def CalcDragForce(self,r_eci,v_eci,qb_eci):
         rho = self.CalcAtmosDens(r_eci)
