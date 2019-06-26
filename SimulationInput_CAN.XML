@@ -2,13 +2,14 @@
 	<SIMULATION_PARAMETERS
 		SimStartJD="2459285.5"
 		SimStartSeconds="0.0"
-		SimEndSeconds="2000">
+		SimEndSeconds="5600"
+    DynamicStepSize="2">
 	</SIMULATION_PARAMETERS>
 
 	<SCHEDULER_PARAMETERS
 		maxNumSchedules="1"
 		numSchedCropTo="2"
-		simStepSeconds="2">
+		simStepSeconds="600">
 		<SCRIPTED_EVALUATOR
 			src="..\..\..\PythonModels\eval.py"
 			className="eval">

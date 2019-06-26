@@ -21,6 +21,8 @@ namespace UserModel
         
         public static string OutputDirector { get; private set; }
 
+        public static double DynamicStepSize { get; private set; }
+
         private static bool _isInitialized = false;
         #endregion
 
@@ -53,6 +55,13 @@ namespace UserModel
                 Console.WriteLine("\tEnd Epoch: {0} seconds", SimEndSeconds);
 
                 //OutputDirector = simulationXMLNode.Attributes["OutputDirectory"].Value;
+
+                if (simulationXMLNode.Attributes["DynamicStepSize"] != null)
+                    DynamicStepSize = Convert.ToDouble(simulationXMLNode.Attributes["DynamicStepSize"].Value);
+                else
+                    DynamicStepSize = SchedParameters.SimStepSeconds;
+
+                Console.WriteLine("\tDynamic State Step Size: {0} seconds", DynamicStepSize);
 
                 return true;
             }
