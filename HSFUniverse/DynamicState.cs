@@ -57,7 +57,7 @@ namespace HSFUniverse
                 Type = (DynamicStateType)Enum.Parse(typeof(DynamicStateType), typeString);
             }
             Vector ics = new Vector(dynamicStateXMLNode.Attributes["ICs"].Value.ToString());
-            _stateData = new SortedList<double, Vector>((int)(SimParameters.SimEndSeconds/SchedParameters.SimStepSeconds));
+            _stateData = new SortedList<double, Vector>((int)(SimParameters.SimEndSeconds/SimParameters.DynamicStepSize));
             _stateData.Add(0.0, ics);
 
             if (!(Type == DynamicStateType.STATIC_LLA || Type == DynamicStateType.STATIC_ECI))
@@ -84,7 +84,6 @@ namespace HSFUniverse
             else
             {
                 Eoms = null;
-                //_stateDataTimeStep = 30.0;
             }
 
         }
@@ -93,11 +92,10 @@ namespace HSFUniverse
         {
             Name = name;
             _integratorOptions = new IntegratorOptions();
-            _stateData = new SortedList<double, Vector>((int)(SimParameters.SimEndSeconds / SchedParameters.SimStepSeconds));
+            _stateData = new SortedList<double, Vector>((int)(SimParameters.SimEndSeconds / SimParameters.DynamicStepSize));
             _stateData.Add(0.0, initialConditions);
             Type = type;
             Eoms = eoms;
-            //_stateDataTimeStep = stateDataTimeStep;
         }
         #endregion
 
@@ -215,7 +213,7 @@ namespace HSFUniverse
 
         private void DynamicPropagateState()
         {
-            double simTime = _stateData.Last().Key + SchedParameters.SimStepSeconds;
+            double simTime = _stateData.Last().Key + SimParameters.DynamicStepSize;
             if (simTime > SimParameters.SimEndSeconds)
                 simTime = SimParameters.SimEndSeconds;
             

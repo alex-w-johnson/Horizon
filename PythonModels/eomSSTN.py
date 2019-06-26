@@ -179,14 +179,17 @@ class eomSSTN(EOMS):
     
     def CalcForces(self,r_eci,v_eci,qb_eci):
         a_grav = self.CalcGravityForce(r_eci)
-        a_drag = self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
+        #a_drag = self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
+        a_drag = Matrix[float](3,1,0.0)
         a_total = a_grav + a_drag
         return a_total
 
     def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole,jdCurrent):
-        T_drag = self.CalcDragMoment(r_eci,v_eci,qb_eci)
+        #T_drag = self.CalcDragMoment(r_eci,v_eci,qb_eci)
+        T_drag = Matrix[float](3,1,0.0)
         T_mag = self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
-        T_gravgrad = self.CalcGravGradMoment(r_eci,qb_eci)
+        #T_gravgrad = self.CalcGravGradMoment(r_eci,qb_eci)
+        T_gravgrad = Matrix[float](3,1,0.0)
         T_total = T_drag + T_mag + T_gravgrad + T_control
         return T_total
 
@@ -199,9 +202,9 @@ class eomSSTN(EOMS):
         agrav[2] = -mu*r[2]/r3
         agrav[3] = -mu*r[3]/r3
         agrav += self.CalcJ2Force(r)
-        agrav += self.CalcJ3Force(r)
-        agrav += self.CalcJ4Force(r)
-        agrav += self.CalcJ5Force(r)
+        #agrav += self.CalcJ3Force(r)
+        #agrav += self.CalcJ4Force(r)
+        #agrav += self.CalcJ5Force(r)
         return agrav
 
     def CalcJ2Force(self,r):
@@ -294,7 +297,7 @@ class eomSSTN(EOMS):
         return ndotv
 
     def CalcRamVelocity(self,r_eci,v_eci):
-        omegaEarth = Matrix[float](3,1)
+        omegaEarth = Matrix[float](3,1,0.0)
         omegaEarth[3] = 7.2921159e-5 #rad/s, ECI earth rotational speed
         vRam = v_eci - Matrix[float].Cross(omegaEarth,r_eci) #km/s
         return vRam
