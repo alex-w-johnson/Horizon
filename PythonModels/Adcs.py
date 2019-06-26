@@ -33,10 +33,10 @@ from System import Array
 
 class adcs(HSFSubsystem.Subsystem):
     def __new__(cls, node, asset):
-        # N.B re: ChildNode indices (See CAN Model XML File for Details): 
-        # 0 = Wheels 
-        # 1 = Magtorquers 
-        # 2 = Guidance 
+        # N.B re: ChildNode indices (See CAN Model XML File for Details):
+        # 0 = Wheels
+        # 1 = Magtorquers
+        # 2 = Guidance
         # 3 = Control
         instance = HSFSubsystem.Subsystem.__new__(cls)
         instance.Asset = asset
@@ -134,23 +134,32 @@ class adcs(HSFSubsystem.Subsystem):
             return 0.0
 
     def CanPerform(self, event, universe):
-        # TODO: Evaluate whether a task can be completed during an Access window by 
+        # TODO: Evaluate whether a task can be completed during an Access
+        # window by
         # Finding the target's dynamic state during the entire event
-        # Calculating the necessary time-varying attitude setpoint to successfully slew to the target
-        # Simulate slewing to the target by propagating a "Slewing" dynamic state until endSlewTime (endSlewTime = es + slewtime{from XML file})
-        #   Use a while loop to update command quats, rates, and torque commands at 1 Hz rate
-        #   Propagate "Slewing" dynamic state using all of these updated values at same 1 Hz rate
-        # If pointing error is less than pointing error required, then: 
-        #   Update boolean HSFProfile "isTracking" to True from eventStartTime to taskEndTime
+        # Calculating the necessary time-varying attitude setpoint to
+        # successfully slew to the target
+        # Simulate slewing to the target by propagating a "Slewing" dynamic
+        # state until endSlewTime (endSlewTime = es + slewtime{from XML file})
+        #   Use a while loop to update command quats, rates, and torque
+        #   commands at 1 Hz rate
+        #   Propagate "Slewing" dynamic state using all of these updated values
+        #   at same 1 Hz rate
+        # If pointing error is less than pointing error required, then:
+        #   Update boolean HSFProfile "isTracking" to True from eventStartTime
+        #   to taskEndTime
         #   Set taskStartTime to endSlewTime
-        #   Calculate the necessary time-varying attitude setpoint to successfully slew to the target
-        #   Use a while loop to update command quats, rates, and torque commands at 1 Hz rate
+        #   Calculate the necessary time-varying attitude setpoint to
+        #   successfully slew to the target
+        #   Use a while loop to update command quats, rates, and torque
+        #   commands at 1 Hz rate
         #   Add torque commands as integrator parameters to assetDynState
-        #   Propagate assetDynState at 1Hz rate up until taskEndTime (taskStartTime + dwellTime{per XML file})
+        #   Propagate assetDynState at 1Hz rate up until taskEndTime
+        #   (taskStartTime + dwellTime{per XML file})
         #   Return True
-        # Else: 
-        #   Reset dynamic state to values at event start time 
-        #   Reset ADCS states to values at event start time 
+        # Else:
+        #   Reset dynamic state to values at event start time
+        #   Reset ADCS states to values at event start time
         #   Add integrator parameters to maintain lvlh pointing
         #   Return False
 
@@ -200,15 +209,17 @@ class adcs(HSFSubsystem.Subsystem):
         assetOrbState[6] = assetVelEs[3]
 
         if (taskType == TaskType.IMAGING):
-            # Implement roll-constrained slew maneuver here THEN HOLD INERTIAL POINTING AFTER TASK START
-            # Check to see if can slew to target: if true, then update control inputs accordingly to dynamic EOMS
+            # Implement roll-constrained slew maneuver here THEN HOLD INERTIAL
+            # POINTING AFTER TASK START
+            # Check to see if can slew to target: if true, then update control
+            # inputs accordingly to dynamic EOMS
             
             # Check if desaturating
             if self.isDesaturating:
                 return False
 
             # Check Wheel Speeds
-            for wheelIdx in range(1,self.numWheels+1):
+            for wheelIdx in range(1,self.numWheels + 1):
                 if assetWheelRates[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                     return False
             
@@ -226,7 +237,8 @@ class adcs(HSFSubsystem.Subsystem):
             slewDynState = DynamicState(asset.Name,dsType, dsEoms, dsIc)
             slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
             slewDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
-            # Reset time to 0.0 so state propagates from slew initial conditions
+            # Reset time to 0.0 so state propagates from slew initial
+            # conditions
             timeSlew = 0.0
             while(timeSlew < self.slewtime):
                 slewPosTime = slewDynState.PositionECI(timeSlew)
@@ -243,7 +255,7 @@ class adcs(HSFSubsystem.Subsystem):
                 assetOrbState[5] = slewVelTime[2]
                 assetOrbState[6] = slewVelTime[3]
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
-                tNormSlew = timeSlew/self.slewtime
+                tNormSlew = timeSlew / self.slewtime
                 #print(tNormSlew)
                 qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
                 #print("Nominal Command: "+ qComLam.ToString())
@@ -251,14 +263,14 @@ class adcs(HSFSubsystem.Subsystem):
                 #print("Body-LVLH: " + qBodLam.ToString())
                 qComLam = Quat.Slerp(tNormSlew,qBodLam,qComLam)
                 #print("Interp Command: " + qComLam.ToString())
-                qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                qBodCom = Quat.Conjugate(qComLam) * qBodLam
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 #print("prop error: " + propError.ToString())
                 deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
                 #print("deri error: " + deriError.ToString())
-                T_control = -1.0*propError -deriError
-                for i in range(1,self.numwheels+1):
+                T_control = -1.0 * propError - deriError
+                for i in range(1,self.numwheels + 1):
                     if abs(T_control[i]) > self.peaktorqwheels[i]:
                         T_control[i] = math.copysign(self.peaktorqwheels[i],T_control[i])
                 slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
@@ -266,7 +278,7 @@ class adcs(HSFSubsystem.Subsystem):
                 timeSlew += dt
                 slewBoreAxis = Quat.Rotate(Quat.Conjugate(slewQuatTime), self.boreaxis)
                 r_AT = targetPosMat - slewPosTime
-                pointError = 180.0* System.Math.Acos(  Matrix[float].Dot( slewBoreAxis,r_AT )/(Vector.Norm( Vector(r_AT.ToString()) )*Vector.Norm(Vector(slewBoreAxis.ToString())))) /System.Math.PI
+                pointError = 180.0 * System.Math.Acos(Matrix[float].Dot(slewBoreAxis,r_AT) / (Vector.Norm(Vector(r_AT.ToString())) * Vector.Norm(Vector(slewBoreAxis.ToString())))) / System.Math.PI
                 #print("pointing error: " + pointError.ToString())
                 trackingRate = Vector(2)
                 trackingRate[1] = slewRatesTime[1]
@@ -283,7 +295,7 @@ class adcs(HSFSubsystem.Subsystem):
                     event.SetEventEnd(asset,te)
                     ee = event.GetEventEnd(asset)
                     while(time < te):
-                        tNorm = (time - es)/ts
+                        tNorm = (time - es) / ts
                         #print("Normalized Maneuver Time: " + tNorm.ToString())
                         assetPosTime = assetDynState.PositionECI(time)
                         assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
@@ -306,39 +318,39 @@ class adcs(HSFSubsystem.Subsystem):
                             qComLam = Quat.Slerp(tNorm,qBodLam,qComLam)
                             #print("Interp Command: " + qComLam.ToString())
                             qComLamHold = qComLam
-                            qCom0Hold = qLam0*qComLamHold
+                            qCom0Hold = qLam0 * qComLamHold
                         elif time >= ts and time < te:
                             qCom0 = qCom0Hold
                             #print(qCom0)
-                            qComLam = Quat.Conjugate(qLam0)*qCom0
+                            qComLam = Quat.Conjugate(qLam0) * qCom0
                             #print(qLam0*qComLam)
                             #print("qCommand: " + qComLam.ToString())
-                        qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                        qBodCom = Quat.Conjugate(qComLam) * qBodLam
                         qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                         #print("qError: " + qErr.ToString())
                         propError = self.PropErrorCalc(self.kpvec,qErr)
                         #print("pError: " + propError.ToString())
                         r = Vector.Norm(Vector(assetPosTime.ToString()))
-                        lvlhRate = Matrix[float].Cross(assetPosTime,Matrix[float](assetVelTime.ToString()))/(r*r)
+                        lvlhRate = Matrix[float].Cross(assetPosTime,Matrix[float](assetVelTime.ToString())) / (r * r)
                         lvlhRate = Quat.Rotate(qLam0,lvlhRate)
-                        deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime-lvlhRate)
+                        deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime - lvlhRate)
                         #print("dError: " + deriError.ToString())
-                        T_control = -1.0*propError -deriError
-                        for i in range(1,self.numwheels+1):
+                        T_control = -1.0 * propError - deriError
+                        for i in range(1,self.numwheels + 1):
                             if abs(T_control[i]) > self.peaktorqwheels[i]:
                                 T_control[i] = math.copysign(self.peaktorqwheels[i],T_control[i])
                         assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
                         assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
                         # Update ADCS states
                         borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
-                        borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
-                        solPosNormVec = self.sun.getEarSunVec(time)/Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
-                        solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec))*180.0/System.Math.PI
-                        nadirVec = -1.0*assetPosTime/Vector.Norm(Vector(assetPosTime.ToString()))
-                        nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec))*180.0/System.Math.PI
-                        ramVec = assetVelTime/Vector.Norm(assetVelTime)
+                        borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
+                        solPosNormVec = self.sun.getEarSunVec(time) / Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
+                        solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
+                        nadirVec = -1.0 * assetPosTime / Vector.Norm(Vector(assetPosTime.ToString()))
+                        nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
+                        ramVec = assetVelTime / Vector.Norm(assetVelTime)
                         ramVec = Matrix[float].Transpose(Matrix[float](ramVec.ToString()))
-                        ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec))*180.0/System.Math.PI
+                        ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                         self._newState.AddValue(self.POINTVEC_KEY, HSFProfile[Matrix[float]](time,borePointing))
                         self._newState.AddValue(self.SOLARELONG_KEY, HSFProfile[float](time,solElongAng))
                         self._newState.AddValue(self.EARTHELONG_KEY, HSFProfile[float](time,nadirBoreAng))
@@ -357,12 +369,12 @@ class adcs(HSFSubsystem.Subsystem):
             if self.isDesaturating:
                 return False
             # Check Wheel Speeds
-            for wheelIdx in range(1,self.numWheels+1):
+            for wheelIdx in range(1,self.numWheels + 1):
                 if assetWheelRates[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                     return False
             event.SetTaskStart(asset,es)
-            event.SetTaskEnd(asset,es+eventdt)
-            event.SetEventEnd(asset,es+eventdt)
+            event.SetTaskEnd(asset,es + eventdt)
+            event.SetEventEnd(asset,es + eventdt)
             while time <= ee:
                 assetPosTime = assetDynState.PositionECI(time)
                 assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
@@ -371,7 +383,7 @@ class adcs(HSFSubsystem.Subsystem):
                 assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
                 assetRatesTime = Matrix[float].Transpose(assetDynState.EulerRates(time))
                 assetWheelRatesTime = assetDynState.WheelRates(time)
-                for wheelIdx in range(1,self.numWheels+1):
+                for wheelIdx in range(1,self.numWheels + 1):
                     if assetWheelRatesTime[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                         return False
                 assetOrbState = Matrix[float](6,1)
@@ -381,35 +393,37 @@ class adcs(HSFSubsystem.Subsystem):
                 assetOrbState[4] = assetVelTime[1]
                 assetOrbState[5] = assetVelTime[2]
                 assetOrbState[6] = assetVelTime[3]
-                qCom0 = self.CalcNadirCommandFrame(assetOrbState)
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
-                qComLam = Quat.Conjugate(qLam0)*qCom0
-                qBodLam  = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
-                qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                qCom0 = self.CalcNadirCommandFrame(assetOrbState,qLam0)
+                qComLam = Quat.Conjugate(qLam0) * qCom0
+                qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime,qLam0)
+                qBodCom = Quat.Conjugate(qComLam) * qBodLam
+                self.qlam0_prev = qLam0
                 qErr = Matrix[float](qBodCom._eps.ToString())
                 qErr = Matrix[float].Transpose(qErr)
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 rTime = Matrix[float].Norm(assetPosTime)
-                lvlhRate = Vector.Cross(Vector(assetPosTime.ToString()),assetVelTime)/(rTime*rTime)
+                lvlhRate = Vector.Cross(Vector(assetPosTime.ToString()),assetVelTime) / (rTime * rTime)
                 lvlhRate = Quat.Rotate(qLam0,lvlhRate)
                 lvlhRate = Matrix[float](lvlhRate.ToString())
                 lvlhRate = Matrix[float].Transpose(lvlhRate)
-                lvlhRateInBody= Quat.Rotate(qBodLam,lvlhRate)
-                deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime-Quat.Rotate(qBodLam,lvlhRateInBody))
-                T_control = -propError -deriError
+                lvlhRateInBody = Quat.Rotate(qBodLam,lvlhRate)
+                deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime - Quat.Rotate(qBodLam,lvlhRateInBody))
+                T_control = -propError - deriError
                 assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
                 assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))
                 borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
-                borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
-                solPosNormVec = self.sun.getEarSunVec(time)/Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
-                #print("solPosNormVec: " + solPosNormVec.ToString()+ "    boreAxis: "+ borePointing.ToString())
-                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec))*180.0/System.Math.PI
+                borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
+                solPosNormVec = self.sun.getEarSunVec(time) / Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
+                #print("solPosNormVec: " + solPosNormVec.ToString()+ "
+                #boreAxis: "+ borePointing.ToString())
+                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
                 #print(Matrix[float].Dot(borePointing,solPosNormVec).ToString())
-                nadirVec = -1.0*Matrix[float](assetPosTime.ToString())/Matrix[float].Norm(assetPosTime)
-                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec))*180.0/System.Math.PI
-                ramVec = assetVelTime/Vector.Norm(assetVelTime)
+                nadirVec = -1.0 * Matrix[float](assetPosTime.ToString()) / Matrix[float].Norm(assetPosTime)
+                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
+                ramVec = assetVelTime / Vector.Norm(assetVelTime)
                 ramVec = Matrix[float](ramVec.ToString())
-                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec))*180.0/System.Math.PI
+                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                 self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](time,borePointing))
                 self._newState.AddValue(self.SOLARELONG_KEY,HSFProfile[float](time,solElongAng))
                 self._newState.AddValue(self.EARTHELONG_KEY,HSFProfile[float](time,nadirBoreAng))
@@ -417,7 +431,8 @@ class adcs(HSFSubsystem.Subsystem):
                 self._newState.AddValue(self.ISTRACKING_KEY,HSFProfile[bool](time, False))
                 self._newState.AddValue(self.WHEELTORQUE_KEY,HSFProfile[Matrix[float]](time,T_control))
                 self._newState.AddValue(self.MAGTORQDIPOLE_KEY,HSFProfile[Matrix[float]](time,Matrix[float]("[0.0; 0.0; 0.0]")))
-                #print("Sim Time: "+str(time)+"seconds | Current Time: "+System.DateTime.Now.ToString())
+                #print("Sim Time: "+str(time)+"seconds | Current Time:
+                #"+System.DateTime.Now.ToString())
                 time+=dt
             return True
         elif (taskType == TaskType.DESATURATE):
@@ -427,55 +442,58 @@ class adcs(HSFSubsystem.Subsystem):
             # Check if desaturated already
             isDesated = True
             self.isDesaturating = False
-            for idx in range(1,self.numWheels+1):
-                isDesated = (isDesated and (assetWheelRates[idx] < 0.3*self.maxspeedwheels[idx]))
+            for idx in range(1,self.numWheels + 1):
+                isDesated = (isDesated and (assetWheelRates[idx] < 0.3 * self.maxspeedwheels[idx]))
             if (not isDesated):
                 self.isDesaturating = True
                 event.SetTaskStart(asset,es)
-                event.SetTaskEnd(asset,es+dt)
-                event.SetEventEnd(asset,es+dt)
+                event.SetTaskEnd(asset,es + dt)
+                event.SetEventEnd(asset,es + dt)
                 qCom0 = self.CalcNadirCommandFrame(assetOrbState)
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
-                qComLam = Quat.Conjugate(qLam0)*qCom0
-                qBodLam  = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatEs)
-                qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                qComLam = Quat.Conjugate(qLam0) * qCom0
+                qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatEs)
+                qBodCom = Quat.Conjugate(qComLam) * qBodLam
                 qErr = Matrix[float](qBodCom._eps.ToString())
                 qErr = Matrix[float].Transpose(qErr)
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 rEs = Vector.Norm(assetPosEs)
-                lvlhRate = Vector.Cross(assetPosEs,assetVelEs)/(rEs*rEs)
+                lvlhRate = Vector.Cross(assetPosEs,assetVelEs) / (rEs * rEs)
                 lvlhRate = Quat.Rotate(assetQuatEs,lvlhRate)
                 lvlhRate = Matrix[float](lvlhRate.ToString())
                 lvlhRate = Matrix[float].Transpose(lvlhRate)
                 deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs)
-                T_control = -propError -deriError
-                print("Control "+ T_control.ToString())
+                T_control = -propError - deriError
+                print("Control " + T_control.ToString())
                 r_eci = Matrix[float](3,1)
                 for i in range(1,4):
                     r_eci[i,1] = assetPosEs[i]
                 mDipoleCommand = self.CalcDesatCommandDipole(self.CalcBodyMagField(r_eci,SimParameters.SimStartJD,assetQuatEs),T_control)
                 #print("Dipole Calced")
                 Tdipole = self.CalcMagMoment(r_eci,SimParameters.SimStartJD,mDipoleCommand,assetQuatEs)
-                print("Dipole Torque: "+Tdipole.ToString())
+                print("Dipole Torque: " + Tdipole.ToString())
                 #print("Magtorq Calced")
                 T_braking = self.CalcDesatCommandWheelTorque(Tdipole,assetWheelRates)
-                print("Braking: "+ T_braking.ToString())
+                print("Braking: " + T_braking.ToString())
                 #print("Braking Calced")
                 assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_braking)
                 assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, mDipoleCommand)
-                #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
-                #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))
+                #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,
+                #T_control)
+                #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,
+                #Matrix[float]("[0.0; 0.0; 0.0]"))
                 borePointing = Quat.Rotate(Quat.Conjugate(assetQuatEs),self.boreaxis)
-                borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
-                solPosNormVec = self.sun.getEarSunVec(es)/Vector.Norm(Vector(self.sun.getEarSunVec(es).ToString()))
-                #print("solPosNormVec: " + solPosNormVec.ToString()+ "    boreAxis: "+ borePointing.ToString())
-                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec))*180.0/System.Math.PI
+                borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
+                solPosNormVec = self.sun.getEarSunVec(es) / Vector.Norm(Vector(self.sun.getEarSunVec(es).ToString()))
+                #print("solPosNormVec: " + solPosNormVec.ToString()+ "
+                #boreAxis: "+ borePointing.ToString())
+                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
                 #print(Matrix[float].Dot(borePointing,solPosNormVec).ToString())
-                nadirVec = -1.0*Matrix[float](assetPosEs.ToString())/Vector.Norm(assetPosEs)
-                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec))*180.0/System.Math.PI
-                ramVec = assetVelEs/Vector.Norm(assetVelEs)
+                nadirVec = -1.0 * Matrix[float](assetPosEs.ToString()) / Vector.Norm(assetPosEs)
+                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
+                ramVec = assetVelEs / Vector.Norm(assetVelEs)
                 ramVec = Matrix[float](ramVec.ToString())
-                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec))*180.0/System.Math.PI
+                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                 self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](es,borePointing))
                 self._newState.AddValue(self.SOLARELONG_KEY,HSFProfile[float](es,solElongAng))
                 self._newState.AddValue(self.EARTHELONG_KEY,HSFProfile[float](es,nadirBoreAng))
@@ -489,46 +507,49 @@ class adcs(HSFSubsystem.Subsystem):
                 self.isDesaturating = False
                 qCom0 = self.CalcNadirCommandFrame(assetOrbState)
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
-                qComLam = Quat.Conjugate(qLam0)*qCom0
-                qBodLam  = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatEs)
-                qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                qComLam = Quat.Conjugate(qLam0) * qCom0
+                qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatEs)
+                qBodCom = Quat.Conjugate(qComLam) * qBodLam
                 qErr = Matrix[float](qBodCom._eps.ToString())
                 qErr = Matrix[float].Transpose(qErr)
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 rEs = Vector.Norm(assetPosEs)
-                lvlhRate = Vector.Cross(assetPosEs,assetVelEs)/(rEs*rEs)
+                lvlhRate = Vector.Cross(assetPosEs,assetVelEs) / (rEs * rEs)
                 lvlhRate = Quat.Rotate(assetQuatEs,lvlhRate)
                 lvlhRate = Matrix[float](lvlhRate.ToString())
                 lvlhRate = Matrix[float].Transpose(lvlhRate)
                 deriError = self.DeriErrorCalc(self.kdvec,assetRatesEs)
-                T_control = -propError -deriError
-                print("Control "+ T_control.ToString())
+                T_control = -propError - deriError
+                print("Control " + T_control.ToString())
                 r_eci = Matrix[float](3,1)
                 for i in range(1,4):
                     r_eci[i,1] = assetPosEs[i]
                 mDipoleCommand = self.CalcDesatCommandDipole(self.CalcBodyMagField(r_eci,SimParameters.SimStartJD,assetQuatEs),T_control)
                 #print("Dipole Calced")
                 Tdipole = self.CalcMagMoment(r_eci,SimParameters.SimStartJD,mDipoleCommand,assetQuatEs)
-                print("Dipole Torque: "+Tdipole.ToString())
+                print("Dipole Torque: " + Tdipole.ToString())
                 #print("Magtorq Calced")
                 T_braking = self.CalcDesatCommandWheelTorque(Tdipole,assetWheelRates)
-                print("Braking: "+ T_braking.ToString())
+                print("Braking: " + T_braking.ToString())
                 #print("Braking Calced")
                 assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_braking)
                 assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, mDipoleCommand)
-                #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
-                #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))
+                #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,
+                #T_control)
+                #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,
+                #Matrix[float]("[0.0; 0.0; 0.0]"))
                 borePointing = Quat.Rotate(Quat.Conjugate(assetQuatEs),self.boreaxis)
-                borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
-                solPosNormVec = self.sun.getEarSunVec(es)/Vector.Norm(Vector(self.sun.getEarSunVec(es).ToString()))
-                #print("solPosNormVec: " + solPosNormVec.ToString()+ "    boreAxis: "+ borePointing.ToString())
-                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec))*180.0/System.Math.PI
+                borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
+                solPosNormVec = self.sun.getEarSunVec(es) / Vector.Norm(Vector(self.sun.getEarSunVec(es).ToString()))
+                #print("solPosNormVec: " + solPosNormVec.ToString()+ "
+                #boreAxis: "+ borePointing.ToString())
+                solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
                 #print(Matrix[float].Dot(borePointing,solPosNormVec).ToString())
-                nadirVec = -1.0*Matrix[float](assetPosEs.ToString())/Vector.Norm(assetPosEs)
-                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec))*180.0/System.Math.PI
-                ramVec = assetVelEs/Vector.Norm(assetVelEs)
+                nadirVec = -1.0 * Matrix[float](assetPosEs.ToString()) / Vector.Norm(assetPosEs)
+                nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
+                ramVec = assetVelEs / Vector.Norm(assetVelEs)
                 ramVec = Matrix[float](ramVec.ToString())
-                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec))*180.0/System.Math.PI
+                ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                 self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](es,borePointing))
                 self._newState.AddValue(self.SOLARELONG_KEY,HSFProfile[float](es,solElongAng))
                 self._newState.AddValue(self.EARTHELONG_KEY,HSFProfile[float](es,nadirBoreAng))
@@ -537,18 +558,19 @@ class adcs(HSFSubsystem.Subsystem):
                 self._newState.AddValue(self.WHEELTORQUE_KEY,HSFProfile[Matrix[float]](es,T_braking))
                 self._newState.AddValue(self.MAGTORQDIPOLE_KEY,HSFProfile[Matrix[float]](es,mDipoleCommand))
                 event.SetTaskStart(asset,es)
-                event.SetTaskEnd(asset,es+dt)
-                event.SetEventEnd(asset,es+dt)
+                event.SetTaskEnd(asset,es + dt)
+                event.SetEventEnd(asset,es + dt)
                 return True
         elif (taskType == TaskType.COMM):
-            # Point -X-axis towards target, point +Z-axis towards projection of Y_LVLH onto target pointing vector plane
+            # Point -X-axis towards target, point +Z-axis towards projection of
+            # Y_LVLH onto target pointing vector plane
             
             # Check if desaturating
             if self.isDesaturating:
                 return False
 
             #Check Wheel Speeds
-            for wheelIdx in range(1,self.numWheels+1):
+            for wheelIdx in range(1,self.numWheels + 1):
                 if assetWheelRates[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                     return False
 
@@ -566,7 +588,8 @@ class adcs(HSFSubsystem.Subsystem):
             slewDynState = DynamicState(asset.Name,dsType, dsEoms, dsIc)
             slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
             slewDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
-            # Reset time to 0.0 so state propagates from slew initial conditions
+            # Reset time to 0.0 so state propagates from slew initial
+            # conditions
             timeSlew = 0.0
             while(timeSlew < self.slewtime):
                 slewPosTime = slewDynState.PositionECI(timeSlew)
@@ -586,14 +609,14 @@ class adcs(HSFSubsystem.Subsystem):
                 targetPosMat = Matrix[float].Transpose(Matrix[float](targetPos.ToString()))
                 qCom0 = self.CalcCommsCommandFrame(assetOrbState,targetPosMat)
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
-                qComLam = Quat.Conjugate(qLam0)*qCom0
+                qComLam = Quat.Conjugate(qLam0) * qCom0
                 qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,slewQuatTime)
-                qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                qBodCom = Quat.Conjugate(qComLam) * qBodLam
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
-                T_control = -1.0*propError -deriError
-                for i in range(1,self.numwheels+1):
+                T_control = -1.0 * propError - deriError
+                for i in range(1,self.numwheels + 1):
                     if abs(T_control[i]) > self.peaktorqwheels[i]:
                         T_control[i] = math.copysign(self.peaktorqwheels[i],T_control[i])
                 slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
@@ -601,8 +624,8 @@ class adcs(HSFSubsystem.Subsystem):
                 timeSlew += dt
                 slewAntAxis = Quat.Rotate(Quat.Conjugate(slewQuatTime), self.antennaaxis)
                 r_AT = targetPosMat - slewPosTime
-                dotProd = Matrix[float].Dot( slewAntAxis,r_AT )
-                pointError = 180.0* System.Math.Acos( dotProd /(Vector.Norm( Vector(r_AT.ToString()) )) )/System.Math.PI
+                dotProd = Matrix[float].Dot(slewAntAxis,r_AT)
+                pointError = 180.0 * System.Math.Acos(dotProd / (Vector.Norm(Vector(r_AT.ToString())))) / System.Math.PI
                 #print(pointError)
                 #print(self.beamwidth)
                 if (pointError <= self.beamwidth):
@@ -638,28 +661,28 @@ class adcs(HSFSubsystem.Subsystem):
                             ee = event.GetEventEnd(asset)
                         qCom0 = self.CalcCommsCommandFrame(assetOrbState,targetPosMat)
                         qLam0 = self.CalcLVLHECIState(assetOrbState)
-                        qComLam = Quat.Conjugate(qLam0)*qCom0
+                        qComLam = Quat.Conjugate(qLam0) * qCom0
                         qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime)
-                        qBodCom = Quat.Conjugate(qComLam)*qBodLam
+                        qBodCom = Quat.Conjugate(qComLam) * qBodLam
                         qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                         propError = self.PropErrorCalc(self.kpvec,qErr)
                         deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
-                        T_control = -1.0*propError -deriError
-                        for i in range(1,self.numwheels+1):
+                        T_control = -1.0 * propError - deriError
+                        for i in range(1,self.numwheels + 1):
                             if abs(T_control[i]) > self.peaktorqwheels[i]:
                                 T_control[i] = math.copysign(self.peaktorqwheels[i],T_control[i])
                         assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
                         assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
                         # Update ADCS states
                         borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
-                        borePointing = borePointing/Vector.Norm(Vector(borePointing.ToString()))
-                        solPosNormVec = self.sun.getEarSunVec(time)/Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
-                        solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec))*180.0/System.Math.PI
-                        nadirVec = -1.0*assetPosTime/Vector.Norm(Vector(assetPosTime.ToString()))
-                        nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec))*180.0/System.Math.PI
-                        ramVec = assetVelTime/Vector.Norm(assetVelTime)
+                        borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
+                        solPosNormVec = self.sun.getEarSunVec(time) / Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
+                        solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
+                        nadirVec = -1.0 * assetPosTime / Vector.Norm(Vector(assetPosTime.ToString()))
+                        nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
+                        ramVec = assetVelTime / Vector.Norm(assetVelTime)
                         ramVec = Matrix[float].Transpose(Matrix[float](ramVec.ToString()))
-                        ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec))*180.0/System.Math.PI
+                        ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                         self._newState.AddValue(self.POINTVEC_KEY, HSFProfile[Matrix[float]](time,borePointing))
                         self._newState.AddValue(self.SOLARELONG_KEY, HSFProfile[float](time,solElongAng))
                         self._newState.AddValue(self.EARTHELONG_KEY, HSFProfile[float](time,nadirBoreAng))
@@ -684,7 +707,8 @@ class adcs(HSFSubsystem.Subsystem):
         r_oa = state[MatrixIndex(1,3),1]
         v_oa = state[MatrixIndex(4,6),1]
         
-        # Determine LVLH Frame (+Z direction = nadir, +Y direction = -1* R cross V
+        # Determine LVLH Frame (+Z direction = nadir, +Y direction = -1* R
+        # cross V
         q_lam0 = self.CalcLVLHECIState(state)
 
         # Determine Command Frame
@@ -693,27 +717,26 @@ class adcs(HSFSubsystem.Subsystem):
         rhoHat = rho / Vector.Norm(Vector(rho.ToString()))
         z_com0 = rhoHat
         rNorm = Vector.Norm(Vector(r_oa.ToString()))
-        nadirVec = -1.0*r_oa/rNorm
+        nadirVec = -1.0 * r_oa / rNorm
         z_lam0 = Matrix[float](3,1)
         z_lam0[1] = nadirVec[1]
         z_lam0[2] = nadirVec[2]
         z_lam0[3] = nadirVec[3]
-        nadirProj = z_lam0 - Matrix[System.Double].Dot(z_com0,z_lam0)*z_com0
-        x_com0 = -1.0*nadirProj
+        nadirProj = z_lam0 - Matrix[System.Double].Dot(z_com0,z_lam0) * z_com0
+        x_com0 = -1.0 * nadirProj
         y_com0 = Matrix[System.Double].Cross(z_com0,x_com0)
         C_com0.SetColumn(1,x_com0)
         C_com0.SetColumn(2,y_com0)
         C_com0.SetColumn(3,z_com0)
         q_com0 = Quat.Mat2Quat(C_com0)
 
-        # Determine Command Quaternion w.r.t. LVLH Frame
-        q_Command = Quat.Conjugate(q_lam0)*q_com0
+        # Determine Command Quaternion w.r.t.  LVLH Frame
+        q_Command = Quat.Conjugate(q_lam0) * q_com0
         return q_Command
 
     # Calculates orientation of body frame with respect to lvlh frame
-    def CalcBodyAttitudeLVLH(self,state,qb_eci):
-        q_lam0 = self.CalcLVLHECIState(state)
-        q_bodLam = Quat.Conjugate(q_lam0)*qb_eci
+    def CalcBodyAttitudeLVLH(self,state,qb_eci,q_lam0):
+        q_bodLam = Quat.Conjugate(q_lam0) * qb_eci
         return q_bodLam
         
     def PropErrorCalc(self,kp_vec,pStateError):
@@ -738,13 +761,13 @@ class adcs(HSFSubsystem.Subsystem):
         z_lam0 = Matrix[System.Double](3,1)
         C_lam0 = Matrix[System.Double](3,3)
         rNorm = Vector.Norm(Vector(r_oa.ToString()))
-        nadirVec = -1.0*r_oa/rNorm
+        nadirVec = -1.0 * r_oa / rNorm
         z_lam0[1] = nadirVec[1]
         z_lam0[2] = nadirVec[2]
         z_lam0[3] = nadirVec[3]
-        yVec = -1.0*Matrix[float].Cross(r_oa,v_oa)
+        yVec = -1.0 * Matrix[float].Cross(r_oa,v_oa)
         ynorm = Vector.Norm(Vector(yVec.ToString()))
-        yVec = yVec/ynorm
+        yVec = yVec / ynorm
         y_lam0[1] = yVec[1]
         y_lam0[2] = yVec[2]
         y_lam0[3] = yVec[3]
@@ -753,10 +776,11 @@ class adcs(HSFSubsystem.Subsystem):
         C_lam0.SetColumn(2,y_lam0)
         C_lam0.SetColumn(3,z_lam0)
         q_lam0 = Quat.Mat2Quat(C_lam0)
-        if (self.qlam0_prev == None):
+        q_lam0_prev = self.qlam0_prev
+        if (q_lam0_prev == None):
             return q_lam0
-        if Quat.Dot(q_lam0, self.qlam0_prev) < 0.0:
-            print("Quaternion flipped!")
+        if Quat.Dot(q_lam0, q_lam0_prev) < 0.0:
+            #print("Quaternion flipped!")
             q_lam0 = -1.0 * q_lam0
         return q_lam0
 
@@ -788,10 +812,10 @@ class adcs(HSFSubsystem.Subsystem):
         x_com0 = Matrix[System.Double](3,1)
         y_com0 = Matrix[System.Double](3,1)
         z_com0 = Matrix[System.Double](3,1)
-        x_com0 = -1.0*rhoHat
+        x_com0 = -1.0 * rhoHat
         hOrbVec = Matrix[System.Double].Cross(r_oa,v_oa)
-        y_lvlh0 = -hOrbVec/Vector.Norm(Vector(hOrbVec.ToString()))
-        y_lvlhProj = y_lvlh0 - Matrix[System.Double].Dot(rhoHat,y_lvlh0)*rhoHat
+        y_lvlh0 = -hOrbVec / Vector.Norm(Vector(hOrbVec.ToString()))
+        y_lvlhProj = y_lvlh0 - Matrix[System.Double].Dot(rhoHat,y_lvlh0) * rhoHat
         z_com0 = y_lvlhProj
         y_com0 = Matrix[System.Double].Cross(z_com0,x_com0)
         C_com0.SetColumn(1,x_com0)
@@ -803,42 +827,47 @@ class adcs(HSFSubsystem.Subsystem):
     def CalcDesatCommandDipole(self, bBody, T_command):
         # Cross-product dipole control law for desaturating reaction wheels
         # All vectors in BODY frame
-        # Per Eq. 16 of "Reaction Wheels Desaturation Using Magnetorquers and Static Input Allocation" - 2015
+        # Per Eq.  16 of "Reaction Wheels Desaturation Using Magnetorquers and
+        # Static Input Allocation" - 2015
         bBody2 = Vector.Norm(Vector(bBody.ToString())) * Vector.Norm(Vector(bBody.ToString()))
-        tauM = Matrix[System.Double].Cross(bBody,T_command)/bBody2
+        tauM = Matrix[System.Double].Cross(bBody,T_command) / bBody2
         # Saturated magtorquer condition
         for i in range(1,4):
             if System.Math.Abs(tauM[i]) > self.peakbmagtorx[i]:
-                tauM[i] = System.Math.Sign(tauM[i])*self.peakbmagtorx[i]
+                tauM[i] = System.Math.Sign(tauM[i]) * self.peakbmagtorx[i]
         return tauM
 
     def CalcDesatCommandWheelTorque(self, T_dipole, omegaWheels):
-        magBrakeRatio = 0.7 # Derived from Simulink simulation results, there's probably an entire research paper to back this up
-        # TODO: Check we have enough power to brake this hard while desaturating
+        magBrakeRatio = 0.7 # Derived from Simulink simulation results, there's probably an entire
+                            # research paper to back this up
+        # TODO: Check we have enough power to brake this hard while
+                                   # desaturating
         T_brake = Matrix[System.Double](3,1)
         # Direction to apply braking torque
         for i in range(1,4):
             absValTmag = System.Math.Abs(T_dipole[i])
-            T_brake[i] = magBrakeRatio*absValTmag*omegaWheels[i]/self.maxspeedwheels[i]
+            T_brake[i] = magBrakeRatio * absValTmag * omegaWheels[i] / self.maxspeedwheels[i]
             if T_brake[i] * T_dipole[i] >= 0.0:
                 T_brake[i] = 0.0
             if System.Math.Abs(T_brake[i]) > self.peaktorqwheels[i]:
-                T_brake[i] = System.Math.Sign(T_brake[i])*self.peaktorqwheels[i]
+                T_brake[i] = System.Math.Sign(T_brake[i]) * self.peaktorqwheels[i]
             #print(T_brake)
         return T_brake
 
     def CalcCurrentYMDhms(self,JD):
-        # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date" algorithm
-        J2000 = 2451545.0 #JD for Jan. 1 2000
+        # calculates current utc year, month, day, hour, minute, and second and
+        # returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date"
+        # algorithm
+        J2000 = 2451545.0 #JD for Jan.  1 2000
         Y2000 = 2000.0 
-        T2000 = (JD - J2000)/365.25 # Number of Julian centuries (*100) from Jan. 1, 2000
+        T2000 = (JD - J2000) / 365.25 # Number of Julian centuries (*100) from Jan.  1, 2000
         Y = Y2000 + math.floor(T2000)
-        lyrs = math.floor(0.25*(Y-Y2000-1))
-        days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
+        lyrs = math.floor(0.25 * (Y - Y2000 - 1))
+        days = (JD - J2000) - (365.0 * (Y - Y2000) + lyrs)
         if days < 1.0:
-            Y = Y-1
-            lyrs = math.floor(0.25*(Y-Y2000-1))
-            days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
+            Y = Y - 1
+            lyrs = math.floor(0.25 * (Y - Y2000 - 1))
+            days = (JD - J2000) - (365.0 * (Y - Y2000) + lyrs)
         dayofyr = math.floor(days)
 
         # determine month
@@ -858,7 +887,7 @@ class adcs(HSFSubsystem.Subsystem):
         # find hours, minutes, seconds
         temp = (days - dayofyr) * 24.0
         h = math.floor(temp)
-        temp = (temp-h) * 60.0
+        temp = (temp - h) * 60.0
         m = math.floor(temp)
         s = (temp - m) * 60.0
         out = [Y,M,D,h,m,s]
@@ -897,7 +926,7 @@ class adcs(HSFSubsystem.Subsystem):
         bvecECIMat[2] = bvecECI[2]
         bvecECIMat[3] = bvecECI[3]
         #print(["B func [T] = "+bvecECIMat.ToString()])
-        return bvecECIMat*1.0e-9
+        return bvecECIMat * 1.0e-9
 
     def CalcMagMoment(self,r_eci,JD,M_dipole,qb_eci):
         bFieldBody = self.CalcBodyMagField(r_eci,JD,qb_eci)
