@@ -43,6 +43,17 @@ namespace Utilities
             }
             return p;
         }
+        /// <summary>
+        /// Calculates the dot product of the elements of 2 quaternions
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="p"></param>
+        /// <returns name="dotprod"></returns>
+        public static double Dot(Quat q, Quat p)
+        {
+            double dotprod = (q._eta * p._eta) + Vector.Dot(q._eps, p._eps);
+            return dotprod;
+        }
 
         public static Vector Rotate(Quat q, Vector a)
         {
@@ -120,6 +131,20 @@ namespace Utilities
             Quat qInterp = new Quat(s0 * q0._eta + s1 * q1._eta, s0 * q0._eps + s1 * q1._eps);
             return qInterp;
 
+        }
+
+        public static Quat operator *(Quat q, double a)
+        {
+            q._eta *= a;
+            q._eps = q._eps * a;
+            return q;
+        }
+
+        public static Quat operator *(double a, Quat q)
+        {
+            q._eta *= a;
+            q._eps = q._eps * a;
+            return q;
         }
 
         public static Quat operator *(Quat q, Quat p)

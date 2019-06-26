@@ -89,6 +89,19 @@ class adcs(HSFSubsystem.Subsystem):
         instance.trackRate = float(node.ChildNodes[3].Attributes["trackrate"].Value)
         instance.wmm = WMM()
         instance.sun = Sun()
+        # Calculate initial lvlh quaternion
+        assetOrbState0 = Matrix[float](6,1)
+        assetInitDynState = asset.AssetDynamicState.InitialConditions()
+        assetPos0 = assetInitDynState[MatrixIndex(1,3)]
+        assetVel0 = assetInitDynState[MatrixIndex(4,6)]
+        assetOrbState0[1] = assetPos0[1]
+        assetOrbState0[2] = assetPos0[2]
+        assetOrbState0[3] = assetPos0[3]
+        assetOrbState0[4] = assetVel0[1]
+        assetOrbState0[5] = assetVel0[2]
+        assetOrbState0[6] = assetVel0[3]
+        instance.qlam0_prev = None
+        instance.qlam0_prev = instance.CalcLVLHECIState(assetOrbState0)
         return instance
 
     def GetDependencyDictionary(self):
@@ -349,11 +362,13 @@ class adcs(HSFSubsystem.Subsystem):
             event.SetTaskStart(asset,es)
             event.SetTaskEnd(asset,es+dt)
             event.SetEventEnd(asset,es+dt)
-            qCom0 = self.CalcNadirCommandFrame(assetOrbState)
+            
             qLam0 = self.CalcLVLHECIState(assetOrbState)
+            qCom0 = self.CalcNadirCommandFrame(assetOrbState,qLam0)
             qComLam = Quat.Conjugate(qLam0)*qCom0
             qBodLam  = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatEs)
             qBodCom = Quat.Conjugate(qComLam)*qBodLam
+            self.qlam0_prev = qLam0
             qErr = Matrix[float](qBodCom._eps.ToString())
             qErr = Matrix[float].Transpose(qErr)
             propError = self.PropErrorCalc(self.kpvec,qErr)
@@ -718,30 +733,23 @@ class adcs(HSFSubsystem.Subsystem):
         C_lam0.SetColumn(2,y_lam0)
         C_lam0.SetColumn(3,z_lam0)
         q_lam0 = Quat.Mat2Quat(C_lam0)
+        if (self.qlam0_prev == None):
+            return q_lam0
+        if Quat.Dot(q_lam0, self.qlam0_prev) < 0.0:
+            print("Quaternion flipped!")
+            q_lam0 = -1.0 * q_lam0
         return q_lam0
 
-    def CalcNadirCommandFrame(self,state):
+    def CalcNadirCommandFrame(self,state,q_lam0):
         r_oa = state[MatrixIndex(1,3),1]
         v_oa = state[MatrixIndex(4,6),1]
         x_lam0 = Matrix[System.Double](3,1)
         y_lam0 = Matrix[System.Double](3,1)
         z_lam0 = Matrix[System.Double](3,1)
         C_com0 = Matrix[System.Double](3,3)
-        rNorm = Vector.Norm(Vector(r_oa.ToString()))
-        #print("rNorm" + rNorm.ToString())
-        nadirVec = -1.0*r_oa/rNorm
-        #print(nadirVec)
-        z_lam0[1] = nadirVec[1]
-        z_lam0[2] = nadirVec[2]
-        z_lam0[3] = nadirVec[3]
-        yVec = -1.0*Matrix[float].Cross(r_oa,v_oa)
-        ynorm = Vector.Norm(Vector(yVec.ToString()))
-        yVec = yVec/ynorm
-        y_lam0[1] = yVec[1]
-        y_lam0[2] = yVec[2]
-        y_lam0[3] = yVec[3]
-        #print(y_lam0)
-        x_lam0 = Matrix[float].Cross(y_lam0,z_lam0)
+        z_lam0 = Quat.Rotate(Quat.Conjugate(q_lam0),Matrix[System.Double]("[0.0;0.0;1.0]"))
+        y_lam0 = Quat.Rotate(Quat.Conjugate(q_lam0),Matrix[System.Double]("[0.0;1.0;0.0]"))
+        x_lam0 = Quat.Rotate(Quat.Conjugate(q_lam0),Matrix[System.Double]("[1.0;0.0;0.0]"))
         C_com0.SetColumn(1,-z_lam0)
         C_com0.SetColumn(2,-x_lam0)
         C_com0.SetColumn(3,y_lam0)
