@@ -37,12 +37,12 @@ class comm(HSFSubsystem.Subsystem):
         instance.Name = instance.Asset.Name + '.' + node.Attributes['subsystemName'].Value.ToString().ToLower()
         instance.LinkBudgetFile = str(node.Attributes["linkBudgetPath"].Value)
         currDirectory = System.AppDomain.CurrentDomain.BaseDirectory
-        pathToRemove = "Horizon\\bin\\Debug\\"
+        if "Debug" in currDirectory:
+            pathToRemove = "Horizon\\bin\\Debug\\"
+        if "Release" in currDirectory:
+            pathToRemove = "Horizon\\bin\\Release\\"
         if currDirectory.endswith(pathToRemove):
             LinkBudgetPath = currDirectory.replace(pathToRemove,instance.LinkBudgetFile)
-        #print(linkPath)
-        #LinkBudgetPath = 'C:\\Users\\Alex\\source\\repos\\alex-w-johnson\\Horizon\\CANSat_Link_Budget.xls'
-        #C:\Users\Alex\source\repos\alex-w-johnson\Horizon\CANSat Link Budget.xls
         excel = Excel.ApplicationClass()
         excel.Visible = False
         workbook = excel.Workbooks.Open(LinkBudgetPath,False)
@@ -94,6 +94,8 @@ class comm(HSFSubsystem.Subsystem):
         return True
 
     def CanExtend(self, event, universe, extendTo):
+        if event.GetAssetTask(self.Asset).Type == TaskType.FLYALONG:
+            return False
         return super(comm, self).CanExtend(event, universe, extendTo)
 
     def POWERSUB_PowerProfile_COMMSUB(self, event):
