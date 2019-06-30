@@ -94,8 +94,20 @@ class eomSSTN(EOMS):
         instance.faceCentroids = instance.geometry[":",MatrixIndex(7,9)]
         instance.faceNormals = instance.geometry[":",MatrixIndex(10,12)]
         instance.faceAreas = instance.geometry.GetColumn(13)
-        # Residual dipole property
+        # Constants
         instance.ResDipole = Matrix[System.Double](node.Attributes["residualdipole"].Value)
+        instance.invImat = Matrix[System.Double].Eye(3)
+        instance.invImat[1,1] = 1.0/instance.Imat[1,1]
+        instance.invImat[2,2] = 1.0/instance.Imat[2,2]
+        instance.invImat[3,3] = 1.0/instance.Imat[3,3]
+        instance.invIws = Matrix[System.Double].Eye(3)
+        instance.invIws[1,1] = 1.0/instance.IsWheels[1,1]
+        instance.invIws[2,2] = 1.0/instance.IsWheels[2,2]
+        instance.invIws[3,3] = 1.0/instance.IsWheels[3,3]
+        instance.mu = 398600.4418
+        instance.rE = 6378.137
+        instance.J2000 = 2451545.0
+        instance.Y2000 = 2000.0
         return instance
     
     def PythonAccessor(self, t, y, param, environment):
@@ -164,80 +176,69 @@ class eomSSTN(EOMS):
         dy[8,1] = epsbecidot[1]
         dy[9,1] = epsbecidot[2]
         dy[10,1] = epsbecidot[3]
-        T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent) 
+        T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent)
         Imat = self.Imat
-        omegaDot = Matrix[System.Double].Inverse(Imat)*(T_dist-Matrix[System.Double].Cross(wbeci,Imat*wbeci)) # Correct formula for body rate integration? Or need wheel momentum? -AJ        
+        omegaDot = self.invImat*(T_dist-Matrix[System.Double].Cross(wbeci,Imat*wbeci))
         dy[11,1] = omegaDot[1]
         dy[12,1] = omegaDot[2]
         dy[13,1] = omegaDot[3]
         IsWheels = self.IsWheels
-        omegaWDot = Matrix[System.Double].Inverse(IsWheels)*(-T_control-Matrix[System.Double].Cross(wbeci,IsWheels*wwb)) # Fairly confident, ask Mehiel anyways - AJ
+        omegaWDot = self.invIws*(-T_control-Matrix[System.Double].Cross(wbeci,IsWheels*wwb))
         dy[14,1] = omegaWDot[1]
         dy[15,1] = omegaWDot[2]
         dy[16,1] = omegaWDot[3]
         return dy
     
     def CalcForces(self,r_eci,v_eci,qb_eci):
-        a_grav = self.CalcGravityForce(r_eci)
-        #a_drag = self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
-        a_drag = Matrix[float](3,1,0.0)
-        a_total = a_grav + a_drag
+        a_total = a_grav = self.CalcGravityForce(r_eci)
+        a_total += self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
         return a_total
 
     def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole,jdCurrent):
-        #T_drag = self.CalcDragMoment(r_eci,v_eci,qb_eci)
-        T_drag = Matrix[float](3,1,0.0)
-        T_mag = self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
-        #T_gravgrad = self.CalcGravGradMoment(r_eci,qb_eci)
-        T_gravgrad = Matrix[float](3,1,0.0)
-        T_total = T_drag + T_mag + T_gravgrad + T_control
+        T_total = T_control
+        T_total += self.CalcDragMoment(r_eci,v_eci,qb_eci)
+        T_total += self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
+        T_total += self.CalcGravGradMoment(r_eci,qb_eci)
         return T_total
 
     def CalcGravityForce(self,r):
         # Calc 2-body, J2, J3, J4, and J5 acceleration
-        mu = 398600.4418
         r3 = Matrix[System.Double].Norm(r)**3
         agrav = Matrix[System.Double](3,1)
-        agrav[1] = -mu*r[1]/r3
-        agrav[2] = -mu*r[2]/r3
-        agrav[3] = -mu*r[3]/r3
+        agrav[1] = -self.mu*r[1]/r3
+        agrav[2] = -self.mu*r[2]/r3
+        agrav[3] = -self.mu*r[3]/r3
         agrav += self.CalcJ2Force(r)
-        #agrav += self.CalcJ3Force(r)
-        #agrav += self.CalcJ4Force(r)
-        #agrav += self.CalcJ5Force(r)
+        agrav += self.CalcJ3Force(r)
+        agrav += self.CalcJ4Force(r)
+        agrav += self.CalcJ5Force(r)
         return agrav
 
     def CalcJ2Force(self,r):
-        mu = 398600.4418
         J2 = 1.0826269e-3
-        rE = 6378.137
         rnorm = Matrix[System.Double].Norm(r)
         aJ2 = Matrix[System.Double](3,1)
-        aJ2[1] = -((3*J2*mu*(rE**2)*r[1])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
-        aJ2[2] = -((3*J2*mu*(rE**2)*r[2])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
-        aJ2[3] = -((3*J2*mu*(rE**2)*r[3])/(2*(rnorm**5)))*(3-((5*(r[3]**2))/(rnorm**2)))
+        aJ2[1] = -((3*J2*self.mu*(self.rE**2)*r[1])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
+        aJ2[2] = -((3*J2*self.mu*(self.rE**2)*r[2])/(2*(rnorm**5)))*(1-((5*(r[3]**2))/(rnorm**2)))
+        aJ2[3] = -((3*J2*self.mu*(self.rE**2)*r[3])/(2*(rnorm**5)))*(3-((5*(r[3]**2))/(rnorm**2)))
         return aJ2
 
     def CalcJ3Force(self,r):
-        mu = 398600.4418
         J3 = -2.533e-06
-        rE = 6378.137
         rnorm = Matrix[System.Double].Norm(r)
         aJ3 = Matrix[System.Double](3,1)
-        gamma = -(5.0*J3/2.0)*(rE/rnorm)**3
+        gamma = -(5.0*J3/2.0)*(self.rE/rnorm)**3
         alpha = -( (3*(r[3]/rnorm))-7*(r[3]/rnorm)**3 )
         beta = Matrix[System.Double](3,1,0.0)
         beta[3] = 1 - 5*(r[3]/rnorm)**2
-        aJ3 = -(gamma*mu/(rnorm**2)) * ( (alpha*r/rnorm) + 0.6*beta )
+        aJ3 = -(gamma*self.mu/(rnorm**2)) * ( (alpha*r/rnorm) + 0.6*beta )
         return aJ3
 
     def CalcJ4Force(self,r):
-        mu = 398600.4418
         J4 = -1.620e-06
-        rE = 6378.137
         rnorm = Matrix[System.Double].Norm(r)
         aJ4 = Matrix[System.Double](3,1)
-        gamma = -5*J4*(rE/rnorm)**4/8.0
+        gamma = -5*J4*(self.rE/rnorm)**4/8.0
         fourthord = 63*(r[3]/rnorm)**4 #4th order term
         xy02order = 3-42*(r[3]/rnorm)**2 #0 and 2nd order terms for x and y components
         c12 = xy02order + fourthord
@@ -245,22 +246,20 @@ class eomSSTN(EOMS):
         aJ4[1] = c12*r[1]/rnorm
         aJ4[2] = c12*r[2]/rnorm
         aJ4[3] = c3*r[3]/rnorm
-        aJ4 *= gamma*mu/(rnorm**2)
+        aJ4 *= gamma*self.mu/(rnorm**2)
         return aJ4
 
     def CalcJ5Force(self,r):
-        mu = 398600.4418
         J5 = -2.273e-07
-        rE = 6378.137
         rnorm = Matrix[System.Double].Norm(r)
         aJ5 = Matrix[System.Double](3,1)
-        gamma = -J5*(rE/rnorm)**5/8
+        gamma = -J5*(self.rE/rnorm)**5/8
         c12=3*( (35*r[3]/rnorm) -(210*(r[3]/rnorm)**3) + (231*(r[3]/rnorm)**5) )
         c3 = 15- 315*((r[3]/rnorm)**2) + 945*((r[3]/rnorm)**4) - 693*((r[3]/rnorm)**6)
         aJ5[1]= c12*r[1]/rnorm
         aJ5[2] = c12*r[2]/rnorm
         aJ5[3] = c3*r[3]/rnorm
-        aJ5 *= gamma*mu/(rnorm**2)
+        aJ5 *= gamma*self.mu/(rnorm**2)
         return aJ5
 
     def CalcDragForce(self,r_eci,v_eci,qb_eci):
@@ -282,9 +281,8 @@ class eomSSTN(EOMS):
         vRamBody = Quat.Rotate(qb_eci,vRam)
         vRamBodyNormalized = vRamBody/Matrix[float].Norm(vRamBody)
         ndotv = self.CalcRamIncDotProd(r_eci,v_eci,qb_eci,surfNormal)
-        if (ndotv >= 0.0):
-            panDragBody = Matrix[float](3,1,0.0)
-        elif (ndotv < 0.0):
+        panDragBody = Matrix[float](3,1,0.0)
+        if (ndotv < 0.0):
             panDragBody = 1000.0*Matrix[float].Norm(vRamBody)*ndotv*rho*(1000.0*vRamBody)*surfArea
         return panDragBody
 
@@ -331,16 +329,14 @@ class eomSSTN(EOMS):
         return magMoment
 
     def CalcGravGradMoment(self,r_eci,qb_eci):
-        mu = 398600.4418
         rnorm = Matrix[System.Double].Norm(r_eci)
         r5 = rnorm**5
         rb = Quat.Rotate(qb_eci,r_eci)
-        T_g = 3.0*mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/r5
+        T_g = 3.0*self.mu*Matrix[System.Double].Cross(rb,self.Imat*rb)/r5
         return T_g
 
     def CalcAtmosDens(self,r_eci):
-        rE = 6378.137
-        h = Matrix[System.Double].Norm(r_eci) - rE
+        h = Matrix[System.Double].Norm(r_eci) - self.rE
         # Based on exp. atmosphere model from Vallado Table 8-4
         rho = self.atmos.density(h)
         return rho
@@ -348,16 +344,14 @@ class eomSSTN(EOMS):
     def CalcCurrentYMDhms(self,JD):
         # calculates current utc year, month, day, hour, minute, and second and returns a list as [Y,M,D,h,m,s] per Vallado's "Inverse Julian Date" algorithm
         # Visit https://www.celestrak.com/software/vallado-sw.php for more information
-        J2000 = 2451545.0 #JD for Jan. 1 2000
-        Y2000 = 2000.0 
-        T2000 = (JD - J2000)/365.25 # Number of Julian centuries (*100) from Jan. 1, 2000
-        Y = Y2000 + math.floor(T2000)
-        lyrs = math.floor(0.25*(Y-Y2000-1))
-        days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
+        T2000 = (JD - self.J2000)/365.25 # Number of Julian centuries (*100) from Jan. 1, 2000
+        Y = self.Y2000 + math.floor(T2000)
+        lyrs = math.floor(0.25*(Y-self.Y2000-1))
+        days = (JD-self.J2000)-(365.0*(Y-self.Y2000)+lyrs)
         if days < 1.0:
             Y = Y-1
-            lyrs = math.floor(0.25*(Y-Y2000-1))
-            days = (JD-J2000)-(365.0*(Y-Y2000)+lyrs)
+            lyrs = math.floor(0.25*(Y-self.Y2000-1))
+            days = (JD-self.J2000)-(365.0*(Y-self.Y2000)+lyrs)
         dayofyr = math.floor(days)
         # determine month
         lmonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]

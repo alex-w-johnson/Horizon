@@ -38,6 +38,8 @@ namespace HSFSubsystem
 
         public override bool CanExtend(Event proposedEvent, Domain environment, double evalToTime)
         {
+            if (proposedEvent.GetAssetTask(Asset).Type == TaskType.FLYALONG)
+                return false;
             if (proposedEvent.GetEventEnd(Asset) < evalToTime)
                 proposedEvent.SetEventEnd(Asset, evalToTime);
             return true;

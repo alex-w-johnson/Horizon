@@ -21,6 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "Logging\Logging.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{63B508F7-1C69-41C7-8ED9-28E791788817}"
 	ProjectSection(SolutionItems) = preProject
+		CAN_Constellation_Model.xml = CAN_Constellation_Model.xml
 		CAN_Model_ADCS_Test.xml = CAN_Model_ADCS_Test.xml
 		CAN_Model_Comms_Test.xml = CAN_Model_Comms_Test.xml
 		CAN_Model_EOMSTest.xml = CAN_Model_EOMSTest.xml

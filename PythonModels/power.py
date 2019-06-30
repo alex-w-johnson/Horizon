@@ -97,7 +97,8 @@ class power(HSFSubsystem.Subsystem):
         return True
 
     def CanExtend(self, event, universe, extendTo):
-
+        if event.GetAssetTask(self.Asset).Type == TaskType.FLYALONG:
+            return False
         ee = event.GetEventEnd(self.Asset)
         if (ee > SimParameters.SimEndSeconds):
             return False

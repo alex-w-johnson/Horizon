@@ -99,6 +99,8 @@ class payload(HSFSubsystem.Subsystem):
          return True
 
     def CanExtend(self, event, universe, extendTo):
+        if event.GetAssetTask(self.Asset).Type == TaskType.FLYALONG:
+            return False
         return super(payload, self).CanExtend(event, universe, extendTo)
 
     def POWERSUB_PowerProfile_PAYLOADSUB(self, event):

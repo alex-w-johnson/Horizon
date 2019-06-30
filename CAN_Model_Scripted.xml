@@ -2,7 +2,7 @@
   <ASSET assetName="Asset1">
     <DynamicState
 			DynamicStateType="DYNAMIC_ECI"
-			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; -2.7105054e-20; -0.0011179537; 0.0; 0.0; 0.0]">
+			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; 0; 0; 0.0; 0.0; 0.0]">
       <EOMS
 				EOMSType="scripted"
         src="..\..\..\PythonModels\eomSSTN.py"
@@ -64,7 +64,7 @@
         antennaaxis ="[-1.0; 0.0; 0.0]">
       </Guidance>
       <Control
-        pointingbound ="0.1"
+        pointingbound ="0.01"
         beamwidth ="2"
         kpslew="[0.0065; 0.0065; 0.0065]"
         kdslew="[0.0311; 0.0311; 0.0311]"

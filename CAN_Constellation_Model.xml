@@ -1,0 +1,497 @@
+﻿<MODEL>
+  <ASSET assetName="Asset1">
+    <DynamicState
+			DynamicStateType="DYNAMIC_ECI"
+			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; 0; 0; 0.0; 0.0; 0.0]">
+      <EOMS
+				EOMSType="scripted"
+        src="..\..\..\PythonModels\eomSSTN.py"
+        className="eomSSTN"
+        mass="8.5"
+        com="[0.0; 0.0; 0.133]"
+        cop="[0.0; 0.0; -0.1042]"
+        cxareaavg="0.1584"
+        cd="2.2"
+        moi="[0.15; 0.15; 0.15]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
+        residualdipole ="[0.0; 0.0; 0.1]"
+        geometry="[0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.1000, 0.0000, 0.1500, 1, 0, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, -0.1000, 0.0000, 0.1500, -1, 0, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.1000, 0.1500, 0, 1, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, -0.1000, 0.1500, 0, -1, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.0000, 0.3000, 0, 0, 1, 0.0400; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.0000, 0.0000, 0, 0, -1, 0.0400; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.4000, 0.0000, 0.0025, 1, 0, 0, 0.0010; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.1000, 0.0025, 0, 1, 0, 0.0015; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, -0.1000, 0.0025, 0, -1, 0, 0.0015; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.0000, 0.0050, 0, 0, 1, 0.0600; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.0000, 0.0000, 0, 0, -1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.1000, 0.2500, 0.0025, 1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, -0.1000, 0.2500, 0.0025, -1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.4000, 0.0025, 0, 1, 0, 0.0010; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.2500, 0.0050, 0, 0, 1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.2500, 0.0000, 0, 0, -1, 0.0600; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.4000, 0.0000, 0.0025, -1, 0, 0, 0.0010; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.1000, 0.0025, 0, 1, 0, 0.0015; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, -0.1000, 0.0025, 0, -1, 0, 0.0015; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.0000, 0.0050, 0, 0, 1, 0.0600; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.0000, 0.0000, 0, 0, -1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.1000, -0.2500, 0.0025, 1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, -0.1000, -0.2500, 0.0025, -1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.4000, 0.0025, 0, -1, 0, 0.0010; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.2500, 0.0050, 0, 0, 1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.2500, 0.0000, 0, 0, -1, 0.0600]"
+        Name ="Asset1">
+      </EOMS>
+    </DynamicState>
+    <SUBSYSTEM
+			Type="Access"
+			subsystemName = "Access">
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Adcs"
+      src="..\..\..\PythonModels\Adcs.py"
+      className ="adcs">
+      <Wheels
+        numwheels="3"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
+        idlepowwheels="[0.5; 0.5; 0.5]"
+        maxpowwheels="[5.5; 5.5; 5.5]"
+        peaktorque="[0.004; 0.004; 0.004]"
+        maxspeed="[650.0; 650.0; 650.0]">
+      </Wheels>
+      <Magtorquers
+        nummagtorx="3"
+        axmagtorx1="[1.0; 0.0; 0.0]"
+        axmagtorx2="[0.0; 1.0; 0.0]"
+        axmagtorx3="[0.0; 0.0; 1.0]"
+        peakB="[0.2; 0.2; 0.2]"
+        maxpowmagtorx="[0.6; 0.6; 0.6]">
+      </Magtorquers>
+      <Guidance
+        antisolaraxis ="[0.0; 0.0; 1.0]"
+        slewtime ="240.0"
+        dwelltime ="120.0"
+        boreaxis ="[0.0; 0.0; 1.0]"
+        antennaaxis ="[-1.0; 0.0; 0.0]">
+      </Guidance>
+      <Control
+        pointingbound ="0.01"
+        beamwidth ="2"
+        kpslew="[0.0065; 0.0065; 0.0065]"
+        kdslew="[0.0311; 0.0311; 0.0311]"
+        kpdesat="[4.914E-5; 4.914E-5; 4.914E-5]"
+        kddesat="[0.0022; 0.0022; 0.0022]"
+        trackrate="0.003">
+      </Control>
+      <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[-0.9813; 0.137; 0.1355]"></IC>
+      <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
+      <IC type="Double" key="EarthBoreAngle" value="90"></IC>
+      <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
+      <IC type="Matrix" key="RxWheelTorque" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Bool" key="IsTracking" value="0"></IC>
+      <DEPENDENCY subsystemName="Access"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Payload"
+			src="..\..\..\PythonModels\payload.py"
+			className="payload"
+      fullFieldNumPixels="1048576"
+      subFieldNumPixels="16384"
+      fullFieldCaptureTime="100"
+      subFieldCaptureTime="100"
+      pixelDepth="2">
+      <IC type="Double" key="numPixels" value="0.0"></IC>
+      <IC type="Bool" key="PayloadOn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "MDH"
+			src="..\..\..\PythonModels\mdh.py"
+			className="mdh"
+      compressionRatio ="1.5"
+      bufferSize="8.0e+9"
+      peakDataRate ="187500">
+      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Comm"
+			src="..\..\..\PythonModels\comm.py"
+			className="comm"
+      linkBudgetPath="CANSat_Link_Budget.xls"
+      peakDataRate ="187500"
+      minElevAngle="10">
+      <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
+      <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset1"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Power"
+			src="..\..\..\PythonModels\power.py"
+			className="power"
+			batterySize="100000"
+      panelEfficiency="0.25"
+			panelArea="0.18"
+      panelDensity="0.75">
+      <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
+      <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset1"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Payload" fcnName="PowerfromPayload.asset1"></DEPENDENCY>
+      <DEPENDENCY subsystemName="MDH" fcnName="PowerfromMDH.asset1"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Comm" fcnName="PowerfromComm.asset1"></DEPENDENCY>
+    </SUBSYSTEM>
+    <CONSTRAINT
+          value="0.25"
+          subsystemName="Power"
+          type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DepthofDischarge"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+          value="0.85"
+          subsystemName="MDH"
+          type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="135.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="SolarBoreElongation"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="EarthBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="RamDirectionBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+  </ASSET>
+  <ASSET assetName="Asset2">
+    <DynamicState
+			DynamicStateType="DYNAMIC_ECI"
+			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; 0; 0; 0.0; 0.0; 0.0]">
+      <EOMS
+				EOMSType="scripted"
+        src="..\..\..\PythonModels\eomSSTN.py"
+        className="eomSSTN"
+        mass="8.5"
+        com="[0.0; 0.0; 0.133]"
+        cop="[0.0; 0.0; -0.1042]"
+        cxareaavg="0.1584"
+        cd="2.2"
+        moi="[0.15; 0.15; 0.15]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
+        residualdipole ="[0.0; 0.0; 0.1]"
+        geometry="[0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.1000, 0.0000, 0.1500, 1, 0, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, -0.1000, 0.0000, 0.1500, -1, 0, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.1000, 0.1500, 0, 1, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, -0.1000, 0.1500, 0, -1, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.0000, 0.3000, 0, 0, 1, 0.0400; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.0000, 0.0000, 0, 0, -1, 0.0400; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.4000, 0.0000, 0.0025, 1, 0, 0, 0.0010; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.1000, 0.0025, 0, 1, 0, 0.0015; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, -0.1000, 0.0025, 0, -1, 0, 0.0015; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.0000, 0.0050, 0, 0, 1, 0.0600; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.0000, 0.0000, 0, 0, -1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.1000, 0.2500, 0.0025, 1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, -0.1000, 0.2500, 0.0025, -1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.4000, 0.0025, 0, 1, 0, 0.0010; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.2500, 0.0050, 0, 0, 1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.2500, 0.0000, 0, 0, -1, 0.0600; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.4000, 0.0000, 0.0025, -1, 0, 0, 0.0010; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.1000, 0.0025, 0, 1, 0, 0.0015; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, -0.1000, 0.0025, 0, -1, 0, 0.0015; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.0000, 0.0050, 0, 0, 1, 0.0600; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.0000, 0.0000, 0, 0, -1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.1000, -0.2500, 0.0025, 1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, -0.1000, -0.2500, 0.0025, -1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.4000, 0.0025, 0, -1, 0, 0.0010; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.2500, 0.0050, 0, 0, 1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.2500, 0.0000, 0, 0, -1, 0.0600]"
+        Name ="Asset2">
+      </EOMS>
+    </DynamicState>
+    <SUBSYSTEM
+			Type="Access"
+			subsystemName = "Access">
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Adcs"
+      src="..\..\..\PythonModels\Adcs.py"
+      className ="adcs">
+      <Wheels
+        numwheels="3"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
+        idlepowwheels="[0.5; 0.5; 0.5]"
+        maxpowwheels="[5.5; 5.5; 5.5]"
+        peaktorque="[0.004; 0.004; 0.004]"
+        maxspeed="[650.0; 650.0; 650.0]">
+      </Wheels>
+      <Magtorquers
+        nummagtorx="3"
+        axmagtorx1="[1.0; 0.0; 0.0]"
+        axmagtorx2="[0.0; 1.0; 0.0]"
+        axmagtorx3="[0.0; 0.0; 1.0]"
+        peakB="[0.2; 0.2; 0.2]"
+        maxpowmagtorx="[0.6; 0.6; 0.6]">
+      </Magtorquers>
+      <Guidance
+        antisolaraxis ="[0.0; 0.0; 1.0]"
+        slewtime ="240.0"
+        dwelltime ="120.0"
+        boreaxis ="[0.0; 0.0; 1.0]"
+        antennaaxis ="[-1.0; 0.0; 0.0]">
+      </Guidance>
+      <Control
+        pointingbound ="0.01"
+        beamwidth ="2"
+        kpslew="[0.0065; 0.0065; 0.0065]"
+        kdslew="[0.0311; 0.0311; 0.0311]"
+        kpdesat="[4.914E-5; 4.914E-5; 4.914E-5]"
+        kddesat="[0.0022; 0.0022; 0.0022]"
+        trackrate="0.003">
+      </Control>
+      <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[-0.9813; 0.137; 0.1355]"></IC>
+      <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
+      <IC type="Double" key="EarthBoreAngle" value="90"></IC>
+      <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
+      <IC type="Matrix" key="RxWheelTorque" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Bool" key="IsTracking" value="0"></IC>
+      <DEPENDENCY subsystemName="Access"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Payload"
+			src="..\..\..\PythonModels\payload.py"
+			className="payload"
+      fullFieldNumPixels="1048576"
+      subFieldNumPixels="16384"
+      fullFieldCaptureTime="100"
+      subFieldCaptureTime="100"
+      pixelDepth="2">
+      <IC type="Double" key="numPixels" value="0.0"></IC>
+      <IC type="Bool" key="PayloadOn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "MDH"
+			src="..\..\..\PythonModels\mdh.py"
+			className="mdh"
+      compressionRatio ="1.5"
+      bufferSize="8.0e+9"
+      peakDataRate ="187500">
+      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset2"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Comm"
+			src="..\..\..\PythonModels\comm.py"
+			className="comm"
+      linkBudgetPath="CANSat_Link_Budget.xls"
+      peakDataRate ="187500"
+      minElevAngle="10">
+      <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
+      <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset2"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Power"
+			src="..\..\..\PythonModels\power.py"
+			className="power"
+			batterySize="100000"
+      panelEfficiency="0.25"
+			panelArea="0.18"
+      panelDensity="0.75">
+      <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
+      <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset2"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Payload" fcnName="PowerfromPayload.asset2"></DEPENDENCY>
+      <DEPENDENCY subsystemName="MDH" fcnName="PowerfromMDH.asset2"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Comm" fcnName="PowerfromComm.asset2"></DEPENDENCY>
+    </SUBSYSTEM>
+    <CONSTRAINT
+          value="0.25"
+          subsystemName="Power"
+          type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DepthofDischarge"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+          value="0.85"
+          subsystemName="MDH"
+          type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="135.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="SolarBoreElongation"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="EarthBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="RamDirectionBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+  </ASSET>
+  <ASSET assetName="Asset3">
+    <DynamicState
+			DynamicStateType="DYNAMIC_ECI"
+			ICs="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; 0; 0; 0.0; 0.0; 0.0]">
+      <EOMS
+				EOMSType="scripted"
+        src="..\..\..\PythonModels\eomSSTN.py"
+        className="eomSSTN"
+        mass="8.5"
+        com="[0.0; 0.0; 0.133]"
+        cop="[0.0; 0.0; -0.1042]"
+        cxareaavg="0.1584"
+        cd="2.2"
+        moi="[0.15; 0.15; 0.15]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
+        residualdipole ="[0.0; 0.0; 0.1]"
+        geometry="[0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.1000, 0.0000, 0.1500, 1, 0, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, -0.1000, 0.0000, 0.1500, -1, 0, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.1000, 0.1500, 0, 1, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, -0.1000, 0.1500, 0, -1, 0, 0.0600; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.0000, 0.3000, 0, 0, 1, 0.0400; 0.2000, 0.2000, 0.3000, 0.0000, 0.0000, 0.1500, 0.0000, 0.0000, 0.0000, 0, 0, -1, 0.0400; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.4000, 0.0000, 0.0025, 1, 0, 0, 0.0010; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.1000, 0.0025, 0, 1, 0, 0.0015; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, -0.1000, 0.0025, 0, -1, 0, 0.0015; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.0000, 0.0050, 0, 0, 1, 0.0600; 0.3000, 0.2000, 0.0050, 0.2500, 0.0000, 0.0025, 0.2500, 0.0000, 0.0000, 0, 0, -1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.1000, 0.2500, 0.0025, 1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, -0.1000, 0.2500, 0.0025, -1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.4000, 0.0025, 0, 1, 0, 0.0010; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.2500, 0.0050, 0, 0, 1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, 0.2500, 0.0025, 0.0000, 0.2500, 0.0000, 0, 0, -1, 0.0600; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.4000, 0.0000, 0.0025, -1, 0, 0, 0.0010; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.1000, 0.0025, 0, 1, 0, 0.0015; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, -0.1000, 0.0025, 0, -1, 0, 0.0015; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.0000, 0.0050, 0, 0, 1, 0.0600; 0.3000, 0.2000, 0.0050, -0.2500, 0.0000, 0.0025, -0.2500, 0.0000, 0.0000, 0, 0, -1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.1000, -0.2500, 0.0025, 1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, -0.1000, -0.2500, 0.0025, -1, 0, 0, 0.0015; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.4000, 0.0025, 0, -1, 0, 0.0010; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.2500, 0.0050, 0, 0, 1, 0.0600; 0.2000, 0.3000, 0.0050, 0.0000, -0.2500, 0.0025, 0.0000, -0.2500, 0.0000, 0, 0, -1, 0.0600]"
+        Name ="Asset3">
+      </EOMS>
+    </DynamicState>
+    <SUBSYSTEM
+			Type="Access"
+			subsystemName = "Access">
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Adcs"
+      src="..\..\..\PythonModels\Adcs.py"
+      className ="adcs">
+      <Wheels
+        numwheels="3"
+        wheelsmass="[0.13; 0.13; 0.13]"
+        iswheels="[3E-5; 3E-5; 3E-5]"
+        itwheels="[1.5E-5; 1.5E-5; 1.5E-5]"
+        wheelorigin="[0.1; 0.0; 0.1]"
+        poswheel1="[-0.405; 0.4; -0.21]"
+        poswheel2="[-0.21; 0.095; -0.29]"
+        poswheel3="[-0.21; 0.79; -.405]"
+        idlepowwheels="[0.5; 0.5; 0.5]"
+        maxpowwheels="[5.5; 5.5; 5.5]"
+        peaktorque="[0.004; 0.004; 0.004]"
+        maxspeed="[650.0; 650.0; 650.0]">
+      </Wheels>
+      <Magtorquers
+        nummagtorx="3"
+        axmagtorx1="[1.0; 0.0; 0.0]"
+        axmagtorx2="[0.0; 1.0; 0.0]"
+        axmagtorx3="[0.0; 0.0; 1.0]"
+        peakB="[0.2; 0.2; 0.2]"
+        maxpowmagtorx="[0.6; 0.6; 0.6]">
+      </Magtorquers>
+      <Guidance
+        antisolaraxis ="[0.0; 0.0; 1.0]"
+        slewtime ="240.0"
+        dwelltime ="120.0"
+        boreaxis ="[0.0; 0.0; 1.0]"
+        antennaaxis ="[-1.0; 0.0; 0.0]">
+      </Guidance>
+      <Control
+        pointingbound ="0.01"
+        beamwidth ="2"
+        kpslew="[0.0065; 0.0065; 0.0065]"
+        kdslew="[0.0311; 0.0311; 0.0311]"
+        kpdesat="[4.914E-5; 4.914E-5; 4.914E-5]"
+        kddesat="[0.0022; 0.0022; 0.0022]"
+        trackrate="0.003">
+      </Control>
+      <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[-0.9813; 0.137; 0.1355]"></IC>
+      <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
+      <IC type="Double" key="EarthBoreAngle" value="90"></IC>
+      <IC type="Double" key="RamDirectionBoreAngle" value="90"></IC>
+      <IC type="Matrix" key="RxWheelTorque" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Matrix" key="MagtorqMDipole" value="[0.0; 0.0; 0.0]"></IC>
+      <IC type="Bool" key="IsTracking" value="0"></IC>
+      <DEPENDENCY subsystemName="Access"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Payload"
+			src="..\..\..\PythonModels\payload.py"
+			className="payload"
+      fullFieldNumPixels="1048576"
+      subFieldNumPixels="16384"
+      fullFieldCaptureTime="100"
+      subFieldCaptureTime="100"
+      pixelDepth="2">
+      <IC type="Double" key="numPixels" value="0.0"></IC>
+      <IC type="Bool" key="PayloadOn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "MDH"
+			src="..\..\..\PythonModels\mdh.py"
+			className="mdh"
+      compressionRatio ="1.5"
+      bufferSize="8.0e+9"
+      peakDataRate ="187500">
+      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset3"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Comm"
+			src="..\..\..\PythonModels\comm.py"
+			className="comm"
+      linkBudgetPath="CANSat_Link_Budget.xls"
+      peakDataRate ="187500"
+      minElevAngle="10">
+      <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
+      <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset3"></DEPENDENCY>
+    </SUBSYSTEM>
+    <SUBSYSTEM
+			Type="scripted"
+			subsystemName = "Power"
+			src="..\..\..\PythonModels\power.py"
+			className="power"
+			batterySize="100000"
+      panelEfficiency="0.25"
+			panelArea="0.18"
+      panelDensity="0.75">
+      <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
+      <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
+      <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset3"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Payload" fcnName="PowerfromPayload.asset3"></DEPENDENCY>
+      <DEPENDENCY subsystemName="MDH" fcnName="PowerfromMDH.asset3"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Comm" fcnName="PowerfromComm.asset3"></DEPENDENCY>
+    </SUBSYSTEM>
+    <CONSTRAINT
+          value="0.25"
+          subsystemName="Power"
+          type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DepthofDischarge"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+          value="0.85"
+          subsystemName="MDH"
+          type="FAIL_IF_HIGHER">
+      <STATEVAR type = "Double" key="DataBufferFillRatio"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="135.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="SolarBoreElongation"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="EarthBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+    <CONSTRAINT
+      value="75.0"
+      subsystemName="ADCS"
+      type="FAIL_IF_LOWER">
+      <STATEVAR type ="Double" key="RamDirectionBoreAngle"></STATEVAR>
+    </CONSTRAINT>
+  </ASSET>
+</MODEL>

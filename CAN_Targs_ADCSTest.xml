@@ -10,4 +10,26 @@
 			ICs = "[-1.469507729932651E08; 2.052524454762490E07; 8.898546976340212E06]">
     </DynamicState>
   </TARGET>
+  <TARGET
+		TargetName = "imagetarget1"
+		TargetType = "LocationTarget"
+		TaskType = "IMAGING"
+		MaxTimes = "50"
+		Value = "100000">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[-2.26E+15; 9E+14; 0.0]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
+		TargetName = "desaturate1"
+		TargetType = "Desaturate"
+		TaskType = "DESATURATE"
+		MaxTimes = "1000000000"
+		Value = "1">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[-1.469507729932651E08; 2.052524454762490E07; 8.898546976340212E06]">
+    </DynamicState>
+  </TARGET>
 </TARGETDECK>
