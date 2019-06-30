@@ -202,6 +202,10 @@ class adcs(HSFSubsystem.Subsystem):
         # Calculate event time start
         time = es
 
+        # reset previous quaternions for zero-crossing logic
+        self.qlam0_prev = None
+        self.qcom0_prev = None
+
         assetOrbState = Matrix[float](6,1)
         assetOrbState[1] = assetPosEs[1]
         assetOrbState[2] = assetPosEs[2]
@@ -629,6 +633,8 @@ class adcs(HSFSubsystem.Subsystem):
                 qComLam = Quat.Conjugate(qLam0) * qCom0
                 qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,slewQuatTime,qLam0)
                 qBodCom = Quat.Conjugate(qComLam) * qBodLam
+                self.qlam0_prev = qLam0
+                self.qcom0_prev = qCom0
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
@@ -678,6 +684,7 @@ class adcs(HSFSubsystem.Subsystem):
                             ee = event.GetEventEnd(asset)
                         qCom0 = self.CalcCommsCommandFrame(assetOrbState,targetPosMat)
                         qLam0 = self.CalcLVLHECIState(assetOrbState)
+                        self.qlam0_prev = qLam0
                         qComLam = Quat.Conjugate(qLam0) * qCom0
                         qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime,qLam0)
                         qBodCom = Quat.Conjugate(qComLam) * qBodLam
@@ -745,7 +752,7 @@ class adcs(HSFSubsystem.Subsystem):
         C_com0.SetColumn(3,z_com0)
         q_com0 = Quat.Mat2Quat(C_com0)
         if (self.qcom0_prev == None):
-            return q_com0
+            q_com0 = q_com0
         if Quat.Dot(q_com0, self.qcom0_prev) < 0.0:
             q_com0 = -1.0 * q_com0
         self.qcom0_prev = q_com0
@@ -844,6 +851,10 @@ class adcs(HSFSubsystem.Subsystem):
         C_com0.SetColumn(2,y_com0)
         C_com0.SetColumn(3,z_com0)
         q_com0 = Quat.Mat2Quat(C_com0)
+        if (self.qcom0_prev == None):
+            q_com0 = q_com0
+        if Quat.Dot(q_com0, self.qcom0_prev) < 0.0:
+            q_com0 = -1.0 * q_com0
         return q_com0
 
     def CalcDesatCommandDipole(self, bBody, T_command):

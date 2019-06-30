@@ -1,9 +1,20 @@
 ﻿<TARGETDECK>
   <TARGET
+		TargetName = "groundstation1"
+		TargetType = "FacilityTarget"
+		TaskType = "COMM"
+		MaxTimes = "1000"
+		Value = "1000">
+    <DynamicState
+			DynamicStateType = "STATIC_LLA"
+			ICs = "[0.0; -90.0000; 0.0]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
 		TargetName = "control"
 		TargetType = "FlyingAlong"
 		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
+		MaxTimes = "10"
 		Value = "10">
     <DynamicState
 			DynamicStateType = "STATIC_ECI"

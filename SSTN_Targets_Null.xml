@@ -14,7 +14,7 @@
 		TargetName = "imagetarget1"
 		TargetType = "LocationTarget"
 		TaskType = "IMAGING"
-		MaxTimes = "16"
+		MaxTimes = "50"
 		Value = "1000000">
 		<DynamicState
 			DynamicStateType = "STATIC_ECI"
