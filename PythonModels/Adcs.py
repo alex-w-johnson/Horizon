@@ -292,14 +292,19 @@ class adcs(HSFSubsystem.Subsystem):
                 trackRateError = Vector.Norm(trackingRate)
                 #print trackRateError
                 if (pointError <= self.pointingbound) and (trackRateError <= self.trackRate):
-                    print("Imaging")
+                    #print("Imaging")
+                    # reset previous quaternions for zero-crossing logic
+                    self.qlam0_prev = None
+                    self.qcom0_prev = None
                     event.SetTaskStart(asset,time + timeSlew)
                     ts = event.GetTaskStart(asset)
                     event.SetTaskEnd(asset,ts + self.dwelltime)
                     te = event.GetTaskEnd(asset)
-                    event.SetEventEnd(asset,te)
+                    event.SetEventEnd(asset,es + eventdt)
                     ee = event.GetEventEnd(asset)
                     while(time < te):
+                        if time >= 3960:
+                            pass
                         tNorm = (time - es) / ts
                         #print("Normalized Maneuver Time: " + tNorm.ToString())
                         assetPosTime = assetDynState.PositionECI(time)
@@ -322,11 +327,16 @@ class adcs(HSFSubsystem.Subsystem):
                             qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat,qLam0)
                             #qComLam = Quat.Slerp(tNorm,qBodLam,qComLam)
                             qComLamHold = qComLam
-                            qCom0Hold = qLam0 * qComLamHold
+                            qCom0Hold = qLam0 * qComLamHold        
+                            self.qcom0_prev = qCom0Hold
                         elif time >= ts and time < te:
                             qCom0 = qCom0Hold
-                            self.qcom0_prev = qCom0
                             qComLam = Quat.Conjugate(qLam0) * qCom0
+                            self.qcom0_prev = qCom0
+                        elif time >= te and time <= ee:
+                            qCom0 = self.CalcNadirCommandFrame(assetOrbState,qLam0)
+                            qComLam = Quat.Conjugate(qLam0) * qCom0
+                            self.qcom0_prev = qCom0
                         qBodCom = Quat.Conjugate(qComLam) * qBodLam
                         qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                         propError = self.PropErrorCalc(self.kpvec,qErr)
@@ -482,15 +492,15 @@ class adcs(HSFSubsystem.Subsystem):
                     lvlhRate = Matrix[float].Transpose(lvlhRate)
                     deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
                     T_control = -propError - deriError
-                    print("Control " + T_control.ToString())
+                    #print("Control " + T_control.ToString())
                     r_eci = Matrix[float](3,1)
                     for i in range(1,4):
                         r_eci[i,1] = assetPosTime[i]
                     mDipoleCommand = self.CalcDesatCommandDipole(self.CalcBodyMagField(r_eci,SimParameters.SimStartJD,assetQuatTime),T_control)
                     Tdipole = self.CalcMagMoment(r_eci,SimParameters.SimStartJD,mDipoleCommand,assetQuatTime)
-                    print("Dipole Torque: " + Tdipole.ToString())
+                    #print("Dipole Torque: " + Tdipole.ToString())
                     T_braking = self.CalcDesatCommandWheelTorque(Tdipole,assetWheelRatesTime)
-                    print("Braking: " + T_braking.ToString())
+                    #print("Braking: " + T_braking.ToString())
                     assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_braking)
                     assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, mDipoleCommand)
                     borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
@@ -553,15 +563,15 @@ class adcs(HSFSubsystem.Subsystem):
                     lvlhRate = Matrix[float].Transpose(lvlhRate)
                     deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
                     T_control = -propError - deriError
-                    print("Control " + T_control.ToString())
+                    #print("Control " + T_control.ToString())
                     r_eci = Matrix[float](3,1)
                     for i in range(1,4):
                         r_eci[i,1] = assetPosTime[i]
                     mDipoleCommand = self.CalcDesatCommandDipole(self.CalcBodyMagField(r_eci,SimParameters.SimStartJD,assetQuatTime),T_control)
                     Tdipole = self.CalcMagMoment(r_eci,SimParameters.SimStartJD,mDipoleCommand,assetQuatTime)
-                    print("Dipole Torque: " + Tdipole.ToString())
+                    #print("Dipole Torque: " + Tdipole.ToString())
                     T_braking = self.CalcDesatCommandWheelTorque(Tdipole,assetWheelRatesTime)
-                    print("Braking: " + T_braking.ToString())
+                    #print("Braking: " + T_braking.ToString())
                     assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_braking)
                     assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, mDipoleCommand)
                     borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
@@ -652,7 +662,7 @@ class adcs(HSFSubsystem.Subsystem):
                 #print(pointError)
                 #print(self.beamwidth)
                 if (pointError <= self.beamwidth):
-                    print("Downlinking")
+                    #print("Downlinking")
                     event.SetTaskStart(asset,time + timeSlew)
                     ts = event.GetTaskStart(asset)
                     event.SetTaskEnd(asset,ts + 60.0)
@@ -752,10 +762,9 @@ class adcs(HSFSubsystem.Subsystem):
         C_com0.SetColumn(3,z_com0)
         q_com0 = Quat.Mat2Quat(C_com0)
         if (self.qcom0_prev == None):
-            q_com0 = q_com0
+            self.qcom0_prev = q_com0
         if Quat.Dot(q_com0, self.qcom0_prev) < 0.0:
             q_com0 = -1.0 * q_com0
-        self.qcom0_prev = q_com0
         # Determine Command Quaternion w.r.t.  LVLH Frame
         q_Command = Quat.Conjugate(q_lam0) * q_com0
         return q_Command
@@ -826,7 +835,7 @@ class adcs(HSFSubsystem.Subsystem):
         #print(C_com0.ToString())
         q_com0 = Quat.Mat2Quat(C_com0)
         if (self.qcom0_prev == None):
-            return q_com0
+            self.qcom0_prev = q_com0
         if Quat.Dot(q_com0, self.qcom0_prev) < 0.0:
             q_com0 = -1.0 * q_com0
         #print(q_com0)
@@ -852,7 +861,7 @@ class adcs(HSFSubsystem.Subsystem):
         C_com0.SetColumn(3,z_com0)
         q_com0 = Quat.Mat2Quat(C_com0)
         if (self.qcom0_prev == None):
-            q_com0 = q_com0
+            self.qcom0_prev = q_com0
         if Quat.Dot(q_com0, self.qcom0_prev) < 0.0:
             q_com0 = -1.0 * q_com0
         return q_com0

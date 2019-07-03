@@ -86,7 +86,7 @@ namespace Horizon
             }
 
             // Mehiel's way
-            string stateDataFilePath = @"C:\HorizonLog\Scratch";// + string.Format("output-{0:yyyy-MM-dd-hh-mm-ss}", DateTime.Now);
+            string stateDataFilePath = @"C:\HorizonLog\Scratch\";// + string.Format("output_{0:yyyy_MM_dd_hh_mm_ss}", DateTime.Now);
             SystemSchedule.WriteSchedule(program.schedules[0], stateDataFilePath);
 
             var csv = new StringBuilder();
@@ -104,7 +104,7 @@ namespace Horizon
             // Set Defaults
             simulationInputFilePath = @"..\..\..\SimulationInput_CAN.XML";
             targetDeckFilePath = @"..\..\..\CAN_Targs_ADCSTest.xml";
-            modelInputFilePath = @"..\..\..\CAN_Constellation_Model.xml";
+            modelInputFilePath = @"..\..\..\CAN_Model_Scripted.xml";
             bool simulationSet = false, targetSet = false, modelSet = false;
 
             // Get the input filenames

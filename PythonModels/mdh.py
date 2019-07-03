@@ -73,7 +73,9 @@ class mdh(HSFSubsystem.Subsystem):
              ts = event.GetTaskStart(self.Asset)
              te = event.GetTaskEnd(self.Asset)
              data = self._bufferSize * self._newState.GetLastValue(self.Dkeys[0]).Value
-             if( data / 2 > 50):
+             if data == 0.0:
+                 return False
+             if( data / 2 > self._bufferSize/2):
                  dataqueout = data/2
              else:
                  dataqueout = data
