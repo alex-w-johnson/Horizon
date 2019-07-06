@@ -191,14 +191,14 @@ class eomSSTN(EOMS):
     
     def CalcForces(self,r_eci,v_eci,qb_eci):
         a_total = a_grav = self.CalcGravityForce(r_eci)
-        #a_total += self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
+        a_total += self.CalcDragForce(r_eci,v_eci,qb_eci)/self.Mass/1000.0 # convert from m/s^2 to km/s^2
         return a_total
 
     def CalcMoments(self,r_eci,v_eci,qb_eci,T_control,M_dipole,jdCurrent):
         T_total = T_control
-        #T_total += self.CalcDragMoment(r_eci,v_eci,qb_eci)
-        #T_total += self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
-        #T_total += self.CalcGravGradMoment(r_eci,qb_eci)
+        T_total += self.CalcDragMoment(r_eci,v_eci,qb_eci)
+        T_total += self.CalcMagMoment(r_eci,jdCurrent,M_dipole,qb_eci)
+        T_total += self.CalcGravGradMoment(r_eci,qb_eci)
         return T_total
 
     def CalcGravityForce(self,r):
@@ -208,10 +208,10 @@ class eomSSTN(EOMS):
         agrav[1] = -self.mu*r[1]/r3
         agrav[2] = -self.mu*r[2]/r3
         agrav[3] = -self.mu*r[3]/r3
-        #agrav += self.CalcJ2Force(r)
-        #agrav += self.CalcJ3Force(r)
-        #agrav += self.CalcJ4Force(r)
-        #agrav += self.CalcJ5Force(r)
+        agrav += self.CalcJ2Force(r)
+        agrav += self.CalcJ3Force(r)
+        agrav += self.CalcJ4Force(r)
+        agrav += self.CalcJ5Force(r)
         return agrav
 
     def CalcJ2Force(self,r):

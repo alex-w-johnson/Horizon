@@ -10,7 +10,7 @@ clr.AddReferenceByName('HSFUniverse')
 clr.AddReferenceByName('UserModel')
 clr.AddReferenceByName('MissionElements')
 clr.AddReferenceByName('HSFSystem')
-
+clr.AddReference("Microsoft.Office.Interop.Excel")
 import System.Xml
 import HSFSystem
 import HSFSubsystem
@@ -18,6 +18,7 @@ import MissionElements
 import Utilities
 import HSFUniverse
 import UserModel
+import Microsoft.Office.Interop.Excel as Excel
 from HSFSystem import *
 from System.Xml import XmlNode
 from Utilities import *
@@ -37,6 +38,28 @@ class mdh(HSFSubsystem.Subsystem):
             instance._peakDataRate = float(node.Attributes['peakDataRate'].Value.ToString())
         if (node.Attributes['bufferSize'] != None):
             instance._bufferSize = float(node.Attributes['bufferSize'].Value.ToString())
+        instance.LinkBudgetFile = str(node.Attributes["linkBudgetPath"].Value)
+        currDirectory = System.AppDomain.CurrentDomain.BaseDirectory
+        if "Debug" in currDirectory:
+            pathToRemove = "Horizon\\bin\\Debug\\"
+        if "Release" in currDirectory:
+            pathToRemove = "Horizon\\bin\\Release\\"
+        if currDirectory.endswith(pathToRemove):
+            LinkBudgetPath = currDirectory.replace(pathToRemove,instance.LinkBudgetFile)
+        excel = Excel.ApplicationClass()
+        excel.Visible = False
+        workbook = excel.Workbooks.Open(LinkBudgetPath,False)
+        datasheet = workbook.Worksheets(14) # TODO: make this select the overview sheet in the AMSAT budget workbook
+        dataRateCell = datasheet.Range["L5"]
+        dataRateVal = dataRateCell.Value2/8.0 # Given in sheet in bps, convert to B/s
+        workbook.Close()
+        if dataRateVal:
+            instance.maxDataRate = dataRateVal
+        elif node.Attributes["peakDataRate"].Value:
+            instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
+        else:
+            instance.maxDataRate = 1200.0 #9600 bps
+        instance.compRatio = float(node.Attributes['compressionRatio'].Value.ToString())
         instance.DATABUFFERRATIO_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'databufferfillratio')
         instance.addKey(instance.DATABUFFERRATIO_KEY)
         return instance
@@ -60,7 +83,7 @@ class mdh(HSFSubsystem.Subsystem):
             te = event.GetTaskEnd(self.Asset)
             oldbufferratio = self._newState.GetLastValue(self.Dkeys[0]).Value
             newdataratein = HSFProfile[System.Double]()
-            newdataratein = self.DependencyCollector(event) / self._bufferSize
+            newdataratein = self.DependencyCollector(event) / self._bufferSize / self.
             exceeded = False
             newdataratio = HSFProfile[System.Double]()
             newdataratio = newdataratein.upperLimitIntegrateToProf(ts, te, 5, 1, exceeded, 0, oldbufferratio)

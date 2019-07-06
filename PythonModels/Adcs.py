@@ -265,11 +265,13 @@ class adcs(HSFSubsystem.Subsystem):
                 assetOrbState[6] = slewVelTime[3]
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
                 tNormSlew = timeSlew / self.slewtime
-                qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat,qLam0)
+                qCom0 = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
+                qComLam = Quat.Conjugate(qLam0)*qCom0
                 qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,slewQuatTime,qLam0)
                 qComLam = Quat.Slerp(tNormSlew,qBodLam,qComLam)
                 qBodCom = Quat.Conjugate(qComLam) * qBodLam
                 self.qlam0_prev = qLam0
+                self.qcom0_prev = qCom0
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
@@ -302,8 +304,8 @@ class adcs(HSFSubsystem.Subsystem):
                     te = event.GetTaskEnd(asset)
                     event.SetEventEnd(asset,es + eventdt)
                     ee = event.GetEventEnd(asset)
-                    while(time < te):
-                        if time >= 3960:
+                    while(time < ee):
+                        if time >= 4600:
                             pass
                         tNorm = (time - es) / ts
                         #print("Normalized Maneuver Time: " + tNorm.ToString())
@@ -324,7 +326,11 @@ class adcs(HSFSubsystem.Subsystem):
                         self.qlam0_prev = qLam0
                         qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime,qLam0)
                         if time < ts:
-                            qComLam = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat,qLam0)
+                            qCom0 = self.CalcRollConstrainedQCommand(assetOrbState,targetPosMat)
+                            if Quat.Dot(assetQuatTime,qCom0) < 0.0:
+                                qCom0 = -1.0 * qCom0
+                                self.qcom0_prev = qCom0
+                            qComLam = Quat.Conjugate(qLam0) * qCom0
                             #qComLam = Quat.Slerp(tNorm,qBodLam,qComLam)
                             qComLamHold = qComLam
                             qCom0Hold = qLam0 * qComLamHold        
@@ -403,6 +409,9 @@ class adcs(HSFSubsystem.Subsystem):
                 assetOrbState[6] = assetVelTime[3]
                 qLam0 = self.CalcLVLHECIState(assetOrbState)
                 qCom0 = self.CalcNadirCommandFrame(assetOrbState,qLam0)
+                if Quat.Dot(assetQuatTime,qCom0) < 0.0:
+                    qCom0 = -1.0 * qCom0
+                    self.qcom0_prev = qCom0
                 qComLam = Quat.Conjugate(qLam0) * qCom0
                 qBodLam = self.CalcBodyAttitudeLVLH(assetOrbState,assetQuatTime,qLam0)
                 qBodCom = Quat.Conjugate(qComLam) * qBodLam
@@ -738,7 +747,7 @@ class adcs(HSFSubsystem.Subsystem):
     def DependencyCollector(self, currentEvent):
         return super(adcs, self).DependencyCollector(currentEvent)
 
-    def CalcRollConstrainedQCommand(self, state, r_ot,q_lam0):
+    def CalcRollConstrainedQCommand(self, state, r_ot):
         # Get state information from dynamic state
         r_oa = state[MatrixIndex(1,3),1]
         v_oa = state[MatrixIndex(4,6),1]
@@ -766,7 +775,7 @@ class adcs(HSFSubsystem.Subsystem):
         if Quat.Dot(q_com0, self.qcom0_prev) < 0.0:
             q_com0 = -1.0 * q_com0
         # Determine Command Quaternion w.r.t.  LVLH Frame
-        q_Command = Quat.Conjugate(q_lam0) * q_com0
+        q_Command = q_com0
         return q_Command
 
     # Calculates orientation of body frame with respect to lvlh frame
