@@ -28,21 +28,5 @@ class eval(HSFScheduler.TargetValueEvaluator):
         for eit in sched.AllStates.Events:
             for assetTask in eit.Tasks:
                 task = assetTask.Value
-                sum += task.Target.Value
-                if(task.Type == TaskType.FLYALONG):
-                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
-                    foo = self.Dependencies.GetDependencyFunc(callKey)
-                    sum+= System.Double(foo(eit))
-                elif(task.Type == TaskType.DESATURATE):
-                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
-                    foo = self.Dependencies.GetDependencyFunc(callKey)
-                    sum+= System.Double(foo(eit))
-                elif(task.Type == TaskType.IMAGING):
-                    callKey = "EvalfromADCS" + "." + assetTask.Key.Name
-                    foo = self.Dependencies.GetDependencyFunc(callKey)
-                    sum += System.Double(foo(eit))
-                #if(task.Type == TaskType.COMM):
-                    #callKey = "EvalfromMDH" + "." + assetTask.Key.Name
-                    #foo = self.Dependencies.GetDependencyFunc(callKey)
-                    #sum += System.Double(foo(eit))        
+                sum += task.Target.Value      
         return sum
