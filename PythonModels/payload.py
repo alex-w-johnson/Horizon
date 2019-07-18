@@ -43,7 +43,9 @@ class payload(HSFSubsystem.Subsystem):
         instance._fullFieldNumPixels = 1050000
         instance._subFieldCaptureTime = 90
         instance._fullFieldCaptureTime = 100
-        instance._pixelDepth = 1
+        instance._pixelDepth = 2
+        instance._powerOn = 5.0
+        instance._powerOff = 1.0
         if (node.Attributes['subFieldNumPixels'] != None):
             instance._subFieldNumPixels = float(node.Attributes['subFieldNumPixels'].Value.ToString())
         if (node.Attributes['fullFieldNumPixels'] != None):
@@ -54,7 +56,10 @@ class payload(HSFSubsystem.Subsystem):
             instance._fullFieldCaptureTime = float(node.Attributes['fullFieldCaptureTime'].Value.ToString())
         if (node.Attributes['pixelDepth'] != None):
             instance._pixelDepth = float(node.Attributes['pixelDepth'].Value.ToString())
-
+        if (node.Attributes['powerOn'] != None):
+            instance._powerOn = float(node.Attributes['powerOn'].Value.ToString())
+        if (node.Attributes['powerOff'] != None):
+            instance._powerOff = float(node.Attributes['powerOff'].Value.ToString())
         return instance
 
     def GetDependencyDictionary(self):
@@ -86,13 +91,9 @@ class payload(HSFSubsystem.Subsystem):
                  return False
              te = ts + timetocapture
              event.SetTaskEnd(self.Asset, te)
-
-             position = self.Asset.AssetDynamicState
              timage = ts + timetocapture / 2
-
              self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage, self._pixelDepth*pixels))
              self._newState.AddValue(self.PIXELS_KEY, KeyValuePair[System.Double, System.Double](timage + 1, 0.0))
-
              self._newState.AddValue(self.PAYLOADON_KEY, KeyValuePair[System.Double, System.Boolean](ts, True))
              self._newState.AddValue(self.PAYLOADON_KEY, KeyValuePair[System.Double, System.Boolean](te, False))
              return True
@@ -105,10 +106,10 @@ class payload(HSFSubsystem.Subsystem):
 
     def POWERSUB_PowerProfile_PAYLOADSUB(self, event):
         prof1 = HSFProfile[System.Double]()
-        prof1[event.GetEventStart(self.Asset)] = 2 # per camera datasheet at http://www.3d-plus.com/data/doc/products/references/shortform_space_camera_2018.pdf
+        prof1[event.GetEventStart(self.Asset)] = self._powerOff # per camera datasheet at http://www.3d-plus.com/data/doc/products/references/shortform_space_camera_2018.pdf
         if (event.State.GetValueAtTime(self.PAYLOADON_KEY, event.GetTaskStart(self.Asset)).Value):
-            prof1[event.GetTaskStart(self.Asset)] = 4
-            prof1[event.GetTaskEnd(self.Asset)] = 2	
+            prof1[event.GetTaskStart(self.Asset)] = self._powerOn
+            prof1[event.GetTaskEnd(self.Asset)] = self._powerOff	
         return prof1
 
     def MDHSUB_NewDataProfile_PAYLOADSUB(self, event):

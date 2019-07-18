@@ -58,6 +58,8 @@ class comm(HSFSubsystem.Subsystem):
         else:
             instance.maxDataRate = 1200.0 #9600 bps
         instance.minElevAngle = float(node.Attributes["minElevAngle"].Value)
+        instance.antennaPower = float(node.Attributes["antennaPower"].Value)
+        instance.trxPower = float(node.Attributes['trxPower'].Value)
         instance.DATARATE_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'datarate(B/s)')
         instance.addKey(instance.DATARATE_KEY)
         return instance
@@ -86,7 +88,7 @@ class comm(HSFSubsystem.Subsystem):
             rhoDotTargPos = Vector.Dot(rho,targPos)
             elevAngle = System.Math.Acos(rhoDotTargPos/Vector.Norm(rho)/Vector.Norm(targPos)) - (System.Math.PI / 2.0)
             elevAngle = elevAngle * 180.0 / System.Math.PI
-            print(elevAngle)
+            #print(elevAngle)
             if elevAngle < self.minElevAngle:
                 return False
             if (newProf.Empty() == False):
@@ -100,12 +102,12 @@ class comm(HSFSubsystem.Subsystem):
 
     def POWERSUB_PowerProfile_COMMSUB(self, event):
         prof1 = HSFProfile[System.Double]()
-        prof1[event.GetEventStart(self.Asset)] = 5.0
-        prof1[event.GetTaskStart(self.Asset)] = 5.0
+        prof1[event.GetEventStart(self.Asset)] = self.trxPower
+        prof1[event.GetTaskStart(self.Asset)] = self.trxPower
         if self._task.Type == TaskType.COMM:
-            prof1[event.GetTaskStart(self.Asset)] = 10.0
-        prof1[event.GetTaskEnd(self.Asset)] = 5.0
-        prof1[event.GetEventEnd(self.Asset)] = 5.0
+            prof1[event.GetTaskStart(self.Asset)] = self.trxPower + self.antennaPower
+        prof1[event.GetTaskEnd(self.Asset)] = self.trxPower
+        prof1[event.GetEventEnd(self.Asset)] = self.trxPower
         return prof1
 
     def DependencyCollector(self, currentEvent):

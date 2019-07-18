@@ -215,8 +215,6 @@ class adcs(HSFSubsystem.Subsystem):
         
         # Calculate event time start
         time = es
-        if time >= 1200.0:
-            pass
 
         # reset previous quaternions for zero-crossing logic
         self.qlam0_prev = None
@@ -289,7 +287,6 @@ class adcs(HSFSubsystem.Subsystem):
                 self.qlam0_prev = qLam0
                 self.qcom0_prev = qCom0
                 qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
-                #print("Slew q error: "+qErr.ToString())
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 deriError = self.DeriErrorCalc(self.kdvec,slewRatesTime)
                 T_control = -1.0 * propError - deriError
@@ -367,7 +364,6 @@ class adcs(HSFSubsystem.Subsystem):
                             self.qcom0_prev = qCom0
                         qBodCom = Quat.Conjugate(qComLam) * qBodLam
                         qErr = Matrix[float].Transpose(Matrix[float](qBodCom._eps.ToString()))
-                        #print("q Error: "+ qErr.ToString())
                         propError = self.PropErrorCalc(self.kpvec,qErr)
                         r = Vector.Norm(Vector(assetPosTime.ToString()))
                         deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
@@ -410,7 +406,6 @@ class adcs(HSFSubsystem.Subsystem):
             # Check Wheel Speeds
             for wheelIdx in range(1,self.numWheels + 1):
                 if assetWheelRates[wheelIdx] > self.maxspeedwheels[wheelIdx]:
-                    print("Wheel speeds exceeded")
                     return False
             event.SetTaskStart(asset,es)
             event.SetTaskEnd(asset,es + eventdt)
@@ -426,9 +421,7 @@ class adcs(HSFSubsystem.Subsystem):
                 assetWheelRatesTime = assetDynState.WheelRates(time)
                 for wheelIdx in range(1,self.numWheels + 1):
                     if assetWheelRatesTime[wheelIdx] > self.maxspeedwheels[wheelIdx]:
-                        print("Wheel speeds exceeded")
-                        return False
-                    
+                        return False                   
                 assetOrbState = Matrix[float](6,1)
                 assetOrbState[1] = assetPosTime[1]
                 assetOrbState[2] = assetPosTime[2]

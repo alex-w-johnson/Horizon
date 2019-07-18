@@ -40,11 +40,12 @@ class power(HSFSubsystem.Subsystem):
         instance.addKey(instance.POWIN_KEY)
         instance.sun = Sun()
         # default values if variables not defined in xml file
-        instance._batterySize = 1000000
+        instance._batterySize = 100000
         instance._panelEfficiency = 0.25
         instance._panelArea = 0.18
         instance._panelDensity = 0.75
-
+        instance._thermalAvgPower = 10.0
+        instance._epsAvgPower = 1.0
         # values read from the xml file		
         if (node.Attributes['batterySize'] != None):
             instance._batterySize = float(node.Attributes['batterySize'].Value)
@@ -54,7 +55,10 @@ class power(HSFSubsystem.Subsystem):
             instance._panelArea = float(node.Attributes['panelArea'].Value)
         if (node.Attributes['panelDensity'] != None):
             instance._panelDensity = float(node.Attributes['panelDensity'].Value)
-
+        if (node.Attributes['thermalSysAvgPower'] != None):
+            instance._thermalAvgPower = float(node.Attributes['thermalSysAvgPower'].Value)
+        if (node.Attributes['epsAvgPower'] != None):
+            instance._epsAvgPower = float(node.Attributes['epsAvgPower'].Value)
         return instance
 
     def GetDependencyDictionary(self):
@@ -68,7 +72,7 @@ class power(HSFSubsystem.Subsystem):
         es = event.GetEventStart(self.Asset)
         te = event.GetTaskEnd(self.Asset)
         ee = event.GetEventEnd(self.Asset)
-        powerSubPowerOut = 10
+        powerSubPowerOut = self._epsAvgPower + self._thermalAvgPower
 
         if (ee > SimParameters.SimEndSeconds):
             #Logger.Report("Simulation ended")
