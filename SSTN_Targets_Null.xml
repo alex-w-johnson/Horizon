@@ -1,15 +1,15 @@
 <TARGETDECK>
-	<TARGET
+  <TARGET
 		TargetName = "groundstation1"
 		TargetType = "FacilityTarget"
 		TaskType = "COMM"
-		MaxTimes = "10"
-		Value = "1000">
-		<DynamicState
+		MaxTimes = "1000000000"
+		Value = "100">
+    <DynamicState
 			DynamicStateType = "STATIC_LLA"
 			ICs = "[35.302296; -120.665158; 75]">
-		</DynamicState>
-	</TARGET>
+    </DynamicState>
+  </TARGET>
 	<TARGET
 		TargetName = "imagetarget1"
 		TargetType = "LocationTarget"

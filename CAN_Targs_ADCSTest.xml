@@ -7,7 +7,7 @@
 		Value = "1000">
     <DynamicState
 			DynamicStateType = "STATIC_LLA"
-			ICs = "[0.0; -90.0000; 0.0]">
+			ICs = "[35.302296; -120.665158; 75]">
     </DynamicState>
   </TARGET>
   <TARGET
@@ -29,7 +29,7 @@
 		Value = "1000000000">
     <DynamicState
 			DynamicStateType = "STATIC_ECI"
-			ICs = "[-2.26E+15; 9E+14; 0.0]">
+			ICs = "[-3.37E14; 1.37E13; 1.04E13]">
     </DynamicState>
   </TARGET>
   <TARGET

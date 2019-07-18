@@ -105,9 +105,11 @@
 			subsystemName = "MDH"
 			src="..\..\..\PythonModels\mdh.py"
 			className="mdh"
+      linkBudgetPath="CANSat_Link_Budget.xls"
       compressionRatio ="1.5"
       bufferSize="8.0e+9"
-      peakDataRate ="208750">
+      peakDataRate ="208750"
+      obcAvgPower="5.0">
       <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
     </SUBSYSTEM>
@@ -129,12 +131,12 @@
 			subsystemName = "Power"
 			src="..\..\..\PythonModels\power.py"
 			className="power"
-			batterySize="100000"
+			batterySize="360000"
       panelEfficiency="0.25"
 			panelArea="0.18"
       panelDensity="0.75"
       thermalSysAvgPower="12.0"
-      obcAvgPower="5.0">
+      epsAvgPower="0.5">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset1"></DEPENDENCY>

@@ -33,7 +33,10 @@
 			Type="scripted"
 			subsystemName = "Adcs"
       src="..\..\..\PythonModels\Adcs.py"
-      className ="adcs">
+      className ="adcs"
+      powerIMU="1.5"
+      powerStarTracker="1"
+      powerGPS="0.5">
       <Wheels
         numwheels="3"
         wheelsmass="[0.13; 0.13; 0.13]"
@@ -90,7 +93,9 @@
       subFieldNumPixels="16384"
       fullFieldCaptureTime="100"
       subFieldCaptureTime="100"
-      pixelDepth="2">
+      pixelDepth="2"
+      powerOn="4.0"
+      powerOff="2.0">
       <IC type="Double" key="numPixels" value="0.0"></IC>
       <IC type="Bool" key="PayloadOn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
@@ -100,9 +105,11 @@
 			subsystemName = "MDH"
 			src="..\..\..\PythonModels\mdh.py"
 			className="mdh"
+      linkBudgetPath="CANSat_Link_Budget.xls"
       compressionRatio ="1.5"
       bufferSize="8.0e+9"
-      peakDataRate ="187500">
+      peakDataRate ="208750"
+      obcAvgPower="5.0">
       <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
     </SUBSYSTEM>
@@ -112,8 +119,10 @@
 			src="..\..\..\PythonModels\comm.py"
 			className="comm"
       linkBudgetPath="CANSat_Link_Budget.xls"
-      peakDataRate ="187500"
-      minElevAngle="10">
+      peakDataRate ="208750"
+      minElevAngle="10"
+      antennaPower="10.0"
+      trxPower="5.0">
       <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
       <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset1"></DEPENDENCY>
     </SUBSYSTEM>
@@ -122,10 +131,12 @@
 			subsystemName = "Power"
 			src="..\..\..\PythonModels\power.py"
 			className="power"
-			batterySize="100000"
+			batterySize="360000"
       panelEfficiency="0.25"
 			panelArea="0.18"
-      panelDensity="0.75">
+      panelDensity="0.75"
+      thermalSysAvgPower="12.0"
+      epsAvgPower="0.5">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset1"></DEPENDENCY>
@@ -198,7 +209,10 @@
 			Type="scripted"
 			subsystemName = "Adcs"
       src="..\..\..\PythonModels\Adcs.py"
-      className ="adcs">
+      className ="adcs"
+      powerIMU="1.5"
+      powerStarTracker="1"
+      powerGPS="0.5">
       <Wheels
         numwheels="3"
         wheelsmass="[0.13; 0.13; 0.13]"
@@ -255,7 +269,9 @@
       subFieldNumPixels="16384"
       fullFieldCaptureTime="100"
       subFieldCaptureTime="100"
-      pixelDepth="2">
+      pixelDepth="2"
+      powerOn="4.0"
+      powerOff="2.0">
       <IC type="Double" key="numPixels" value="0.0"></IC>
       <IC type="Bool" key="PayloadOn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
@@ -265,9 +281,11 @@
 			subsystemName = "MDH"
 			src="..\..\..\PythonModels\mdh.py"
 			className="mdh"
+      linkBudgetPath="CANSat_Link_Budget.xls"
       compressionRatio ="1.5"
       bufferSize="8.0e+9"
-      peakDataRate ="187500">
+      peakDataRate ="208750"
+      obcAvgPower="5.0">
       <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset2"></DEPENDENCY>
     </SUBSYSTEM>
@@ -277,8 +295,10 @@
 			src="..\..\..\PythonModels\comm.py"
 			className="comm"
       linkBudgetPath="CANSat_Link_Budget.xls"
-      peakDataRate ="187500"
-      minElevAngle="10">
+      peakDataRate ="208750"
+      minElevAngle="10"
+      antennaPower="10.0"
+      trxPower="5.0">
       <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
       <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset2"></DEPENDENCY>
     </SUBSYSTEM>
@@ -287,10 +307,12 @@
 			subsystemName = "Power"
 			src="..\..\..\PythonModels\power.py"
 			className="power"
-			batterySize="100000"
+			batterySize="360000"
       panelEfficiency="0.25"
 			panelArea="0.18"
-      panelDensity="0.75">
+      panelDensity="0.75"
+      thermalSysAvgPower="12.0"
+      epsAvgPower="0.5">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset2"></DEPENDENCY>
@@ -363,7 +385,10 @@
 			Type="scripted"
 			subsystemName = "Adcs"
       src="..\..\..\PythonModels\Adcs.py"
-      className ="adcs">
+      className ="adcs"
+      powerIMU="1.5"
+      powerStarTracker="1"
+      powerGPS="0.5">
       <Wheels
         numwheels="3"
         wheelsmass="[0.13; 0.13; 0.13]"
@@ -420,7 +445,9 @@
       subFieldNumPixels="16384"
       fullFieldCaptureTime="100"
       subFieldCaptureTime="100"
-      pixelDepth="2">
+      pixelDepth="2"
+      powerOn="4.0"
+      powerOff="2.0">
       <IC type="Double" key="numPixels" value="0.0"></IC>
       <IC type="Bool" key="PayloadOn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs"></DEPENDENCY>
@@ -430,9 +457,11 @@
 			subsystemName = "MDH"
 			src="..\..\..\PythonModels\mdh.py"
 			className="mdh"
+      linkBudgetPath="CANSat_Link_Budget.xls"
       compressionRatio ="1.5"
       bufferSize="8.0e+9"
-      peakDataRate ="187500">
+      peakDataRate ="208750"
+      obcAvgPower="5.0">
       <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset3"></DEPENDENCY>
     </SUBSYSTEM>
@@ -442,8 +471,10 @@
 			src="..\..\..\PythonModels\comm.py"
 			className="comm"
       linkBudgetPath="CANSat_Link_Budget.xls"
-      peakDataRate ="187500"
-      minElevAngle="10">
+      peakDataRate ="208750"
+      minElevAngle="10"
+      antennaPower="10.0"
+      trxPower="5.0">
       <IC type="Double" key="DataRate(B/s)" value="0.0"></IC>
       <DEPENDENCY subsystemName="MDH" fcnName="CommfromMDH.asset3"></DEPENDENCY>
     </SUBSYSTEM>
@@ -452,10 +483,12 @@
 			subsystemName = "Power"
 			src="..\..\..\PythonModels\power.py"
 			className="power"
-			batterySize="100000"
+			batterySize="360000"
       panelEfficiency="0.25"
 			panelArea="0.18"
-      panelDensity="0.75">
+      panelDensity="0.75"
+      thermalSysAvgPower="12.0"
+      epsAvgPower="0.5">
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset3"></DEPENDENCY>

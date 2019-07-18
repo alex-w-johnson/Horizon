@@ -86,14 +86,15 @@ namespace Horizon
             }
 
             // Mehiel's way
-            string stateDataFilePath = @"C:\HorizonLog\Scratch\";// + string.Format("output_{0:yyyy_MM_dd_hh_mm_ss}", DateTime.Now);
+            string stateDataFilePath = @"C:\HorizonLog\Scratch\" + string.Format("output_{0:yyyy_MM_dd_hh_mm_ss}", DateTime.Now);
             SystemSchedule.WriteSchedule(program.schedules[0], stateDataFilePath);
 
             var csv = new StringBuilder();
             csv.Clear();
             foreach (var asset in program.simSystem.Assets)
             {
-                File.WriteAllText(@"..\..\..\" + asset.Name + "_dynamicStateData.csv", asset.AssetDynamicState.ToString());
+                //File.WriteAllText(@"..\..\..\" + asset.Name + "_dynamicStateData.csv", asset.AssetDynamicState.ToString());
+                File.WriteAllText(stateDataFilePath + @"\" + asset.Name + "_dynamicStateData.csv", asset.AssetDynamicState.ToString());
             }
 
             //Console.ReadKey();
@@ -103,8 +104,8 @@ namespace Horizon
         {
             // Set Defaults
             simulationInputFilePath = @"..\..\..\SimulationInput_CAN.XML";
-            targetDeckFilePath = @"..\..\..\CAN_Targs_ADCSTest.xml";
-            modelInputFilePath = @"..\..\..\CAN_Model_Scripted.xml";
+            targetDeckFilePath = @"..\..\..\CAN_Targets.xml";
+            modelInputFilePath = @"..\..\..\CAN_Constellation_Model.xml";
             bool simulationSet = false, targetSet = false, modelSet = false;
 
             // Get the input filenames
