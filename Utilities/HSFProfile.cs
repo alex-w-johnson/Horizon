@@ -468,7 +468,7 @@ namespace Utilities
             }
             catch (ArgumentException)
             {
-                //log.Warn("An element with Key/Value pair already exists in Profile - overwriting value.");
+                log.Warn("An element with Key/Value pair already exists in Profile - overwriting value.");
                 data[timeIn] = valIn;
             }
         }
@@ -485,7 +485,7 @@ namespace Utilities
             }
             catch (ArgumentException)
             {
-                //log.Warn("An element with Key/Value pair already exists in Profile - overwriting value.");
+                log.Warn("An element with Key/Value pair already exists in Profile - overwriting value.");
                 data[pointIn.Key] = pointIn.Value;
             }
         }
