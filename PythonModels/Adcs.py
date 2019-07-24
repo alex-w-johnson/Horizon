@@ -399,11 +399,7 @@ class adcs(HSFSubsystem.Subsystem):
                 assetWheelRatesTime = assetDynState.WheelRates(time)
                 for wheelIdx in range(1,self.numWheels + 1):
                     if assetWheelRatesTime[wheelIdx] > self.maxspeedwheels[wheelIdx]:
-<<<<<<< HEAD
-                        return False                   
-=======
                         return False
->>>>>>> parent of 22f639e... Added canExtend(), k_i term, DC motor torque curve model for torque envelope, power values
                 assetOrbState = Matrix[float](6,1)
                 assetOrbState[1] = assetPosTime[1]
                 assetOrbState[2] = assetPosTime[2]
