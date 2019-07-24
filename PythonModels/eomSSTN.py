@@ -151,6 +151,7 @@ class eomSSTN(EOMS):
         wwb[3] = wwzb
         etaI = qb0*Matrix[System.Double].Eye(3)
         epsbecidot = 0.5*Matrix[System.Double].CrossMatrix(epsbeci)*wbeci + 0.5*etaI*wbeci
+
         # Current Julian Date
         jdCurrent = UserModel.SimParameters.SimStartJD + t/86400.0
         # ADCS control inputs
@@ -176,11 +177,8 @@ class eomSSTN(EOMS):
         dy[9,1] = epsbecidot[2]
         dy[10,1] = epsbecidot[3]
         T_dist = self.CalcMoments(Reci,Veci,qbeci,T_control,M_dipole,jdCurrent)
-        #print('T_app:' + T_dist.ToString())
-        #print(T_dist)
         Imat = self.Imat
         omegaDot = self.invImat*(T_dist-Matrix[System.Double].Cross(wbeci,Imat*wbeci))
-        #print('dOmega' + omegaDot.ToString())
         dy[11,1] = omegaDot[1]
         dy[12,1] = omegaDot[2]
         dy[13,1] = omegaDot[3]

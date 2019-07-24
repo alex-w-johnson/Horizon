@@ -54,13 +54,12 @@ class mdh(HSFSubsystem.Subsystem):
         dataRateVal = dataRateCell.Value2/8.0 # Given in sheet in bps, convert to B/s
         workbook.Close()
         if dataRateVal:
-            instance._peakDataRate = dataRateVal
+            instance.maxDataRate = dataRateVal
         elif node.Attributes["peakDataRate"].Value:
-            instance._peakDataRate = float(node.Attributes["peakDataRate"].Value)
+            instance.maxDataRate = float(node.Attributes["peakDataRate"].Value)
         else:
-            instance._peakDataRate
+            instance.maxDataRate = 1200.0 #9600 bps
         instance.compRatio = float(node.Attributes['compressionRatio'].Value.ToString())
-        instance.obcAvgPower = float(node.Attributes['obcAvgPower'].Value.ToString())
         instance.DATABUFFERRATIO_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'databufferfillratio')
         instance.addKey(instance.DATABUFFERRATIO_KEY)
         return instance
@@ -84,7 +83,7 @@ class mdh(HSFSubsystem.Subsystem):
             te = event.GetTaskEnd(self.Asset)
             oldbufferratio = self._newState.GetLastValue(self.Dkeys[0]).Value
             newdataratein = HSFProfile[System.Double]()
-            newdataratein = self.DependencyCollector(event) / self._bufferSize / self.compRatio
+            newdataratein = self.DependencyCollector(event) / self._bufferSize / self.
             exceeded = False
             newdataratio = HSFProfile[System.Double]()
             newdataratio = newdataratein.upperLimitIntegrateToProf(ts, te, 5, 1, exceeded, 0, oldbufferratio)
@@ -117,7 +116,7 @@ class mdh(HSFSubsystem.Subsystem):
 
     def POWERSUB_PowerProfile_MDHSUB(self, event):
         prof1 = HSFProfile[System.Double]()
-        prof1[event.GetEventStart(self.Asset)] = self.obcAvgPower
+        prof1[event.GetEventStart(self.Asset)] = 15
         return prof1
 
     def COMMSUB_DataRateProfile_MDHSUB(self, event):
