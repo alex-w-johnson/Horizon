@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Utilities.CollectionExtentions">
+    <Position X="2.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAEAAAAAAAAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>CollectionExtentions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.Complex&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="2.75" Y="2.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEACAAAQABAAAgAE8AWAWgAgAQBAAIAAIEEEASAABzA=</HashCode>
+      <FileName>Complex.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Utilities.DeepCopy">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DeepCopy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.EOMS">
+    <Position X="0.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EOMS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.GeometryUtilities">
+    <Position X="5.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAABAAAIAAAAIAAAAABAAAgAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>GeometryUtilities.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.HSFProfile&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="4" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAIAQAAQAlBAAQAE+AcACCQAAAIAAZgAAAESAAEAAiQ=</HashCode>
+      <FileName>HSFProfile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Utilities.Integrator">
+    <Position X="0.5" Y="3.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAUAAA=</HashCode>
+      <FileName>Integrator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.IntegratorOptions">
+    <Position X="0.5" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAEAAAAAEAQAIAAAAAAAA=</HashCode>
+      <FileName>IntegratorOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.IntegratorParameters">
+    <Position X="0.5" Y="8" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAoAAAAAIAAAAAACAAEAAAEAAAAAAAAAACAAABAAAAA=</HashCode>
+      <FileName>IntegratorParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.Matrix&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEQDQBAEDFCIghAM+AcAECBkiAgAAJAMAACAAQhAAjA=</HashCode>
+      <FileName>Matrix.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Utilities.MatrixEnum&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAACAIAAAAAAAAAAAIAAAACAAAAA=</HashCode>
+      <FileName>Matrix.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Utilities.MatrixSize">
+    <Position X="10.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Matrix.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.MatrixIndex">
+    <Position X="10.75" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAACAAAAABAAAAAAQEAIAAAAAAAAAA=</HashCode>
+      <FileName>MatrixIndex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.Quat">
+    <Position X="4.5" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAABIAAAAAAAAEIQAAAAAAGAAAAAAAAAAAACAAgAA=</HashCode>
+      <FileName>Quat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.StateSpaceEOMS" Collapsed="true">
+    <Position X="0.5" Y="2.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StateSpaceEOMS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.StateVarKey&lt;T&gt;">
+    <Position X="0.5" Y="11.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAACAgAAAIABAIAAgACAAAAAIiA=</HashCode>
+      <FileName>StateVarKey.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Utilities.Vector" BaseTypeListCollapsed="true">
+    <Position X="7" Y="13.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAABAABBAAAgAE+AUAECBgCgAAAIAEAACACQAAAjA=</HashCode>
+      <FileName>Vector.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Utilities.VectorEnum" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAACAIAAAAAAAAAAAIAAAACAAAAA=</HashCode>
+      <FileName>Vector.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Utilities.VectorSize">
+    <Position X="9.75" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Vector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Utilities.IHSFProfile" Collapsed="true">
+    <Position X="5.5" Y="3.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IHSFProfile.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

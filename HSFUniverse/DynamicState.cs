@@ -110,22 +110,6 @@ namespace HSFUniverse
             _stateData.Add(simTime, dynamicState);
         }
 
-        /// <summary>
-        /// Removes dynamic state data until time simTime.
-        /// </summary>
-        /// <param name="simTime"></param>
-        /// <returns></returns>
-        public void RemoveStatesUntil(double simTime) // Run this by The Real Sim Shady himself
-        {
-            int currStateIndex = _stateData.IndexOfKey(simTime);
-            double timeToResetFrom = _stateData.Last().Key;
-            int idxToResetFrom = _stateData.IndexOfKey(timeToResetFrom);
-            for(int resetIdx = idxToResetFrom; resetIdx > currStateIndex; resetIdx--)
-            {
-                _stateData.Remove(_stateData.Keys[resetIdx]);
-            }
-        }
-
         public Vector DynamicStateECI(double simTime) //Should we be interpolating?
         {
             return this[simTime]; 

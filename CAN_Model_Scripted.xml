@@ -49,7 +49,7 @@
         idlepowwheels="[0.5; 0.5; 0.5]"
         maxpowwheels="[5.5; 5.5; 5.5]"
         peaktorque="[0.004; 0.004; 0.004]"
-        maxspeed="[650.0; 650.0; 650.0]">
+        maxspeed="[500.0; 500.0; 500.0]">
       </Wheels>
       <Magtorquers
         nummagtorx="3"
@@ -57,7 +57,7 @@
         axmagtorx2="[0.0; 1.0; 0.0]"
         axmagtorx3="[0.0; 0.0; 1.0]"
         peakB="[0.2; 0.2; 0.2]"
-        maxpowmagtorx="[0.6; 0.6; 0.6]">
+        maxpowmagtorx="[1.2;1.2;1.2]">
       </Magtorquers>
       <Guidance
         antisolaraxis ="[0.0; 0.0; 1.0]"
@@ -110,7 +110,7 @@
       bufferSize="8.0e+9"
       peakDataRate ="208750"
       obcAvgPower="5.0">
-      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
+      <IC type="Double" key="DataBufferFillRatio" value="0.8"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM

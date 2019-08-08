@@ -106,7 +106,7 @@ class mdh(HSFSubsystem.Subsystem):
              if (data - dataqueout < 0):
                  dataqueout = data
              if (dataqueout > 0):
-                 self._newState.AddValue(self.DATABUFFERRATIO_KEY, KeyValuePair[System.Double, System.Double](te, (data - dataqueout) / self._bufferSize))
+                 self._newState.AddValue(self.DATABUFFERRATIO_KEY, KeyValuePair[System.Double, System.Double](te, (dataqueout - self._peakDataRate * (te-ts)) / self._bufferSize))
              return True
         return True
 

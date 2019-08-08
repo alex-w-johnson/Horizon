@@ -35,10 +35,10 @@
       <FileName>DynamicEOMS.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="HSFUniverse.DynamicState" Collapsed="true">
-    <Position X="12" Y="0.5" Width="1.5" />
+  <Class Name="HSFUniverse.DynamicState">
+    <Position X="5.5" Y="3" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>BCIkAAAAAEAwAIAMDAQACAQAAQAAABAAEQAIACAAAAg=</HashCode>
+      <HashCode>BCIkAAAAAEAwAIAMDAQACAQAAQAAABAAAQAIACAAAAg=</HashCode>
       <FileName>DynamicState.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -77,7 +77,7 @@
       <FileName>ScriptedUniverse.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="HSFUniverse.SpaceEnvironment" Collapsed="true">
+  <Class Name="HSFUniverse.SpaceEnvironment">
     <Position X="2.75" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAICAAAAAAAAAAAAAAAAAAAAEAAAAAAAQ=</HashCode>
@@ -98,8 +98,8 @@
       <FileName>StandardModels.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="HSFUniverse.Sun" Collapsed="true">
-    <Position X="12" Y="1.5" Width="1.5" />
+  <Class Name="HSFUniverse.Sun">
+    <Position X="15.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAgAAARAAAAAAIAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>Sun.cs</FileName>
@@ -119,22 +119,22 @@
       <FileName>WMM.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Enum Name="HSFUniverse.DynamicStateType" Collapsed="true">
-    <Position X="10.25" Y="3.75" Width="1.5" />
+  <Enum Name="HSFUniverse.DynamicStateType">
+    <Position X="8.25" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAABAAAAAAAAICAAAAAAAAAQAAAAAIQAAAAAAAAA=</HashCode>
       <FileName>DynamicState.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="HSFUniverse.PropagationType" Collapsed="true">
-    <Position X="12" Y="3.75" Width="1.5" />
+  <Enum Name="HSFUniverse.PropagationType">
+    <Position X="8.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAQAAIAAAAAAAAAAAAAAAAAAAAAAAAAAEAIAAAAAA=</HashCode>
       <FileName>DynamicState.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="HSFUniverse.ShadowState" Collapsed="true">
-    <Position X="13.75" Y="3.75" Width="1.5" />
+  <Enum Name="HSFUniverse.ShadowState">
+    <Position X="15.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAIAAAAAIAAAAAA=</HashCode>
       <FileName>Sun.cs</FileName>

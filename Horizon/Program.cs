@@ -104,8 +104,8 @@ namespace Horizon
         {
             // Set Defaults
             simulationInputFilePath = @"..\..\..\SimulationInput_CAN.XML";
-            targetDeckFilePath = @"..\..\..\CAN_Targets.xml";
-            modelInputFilePath = @"..\..\..\CAN_Constellation_Model.xml";
+            targetDeckFilePath = @"..\..\..\CAN_Targs_CommsTest.xml";
+            modelInputFilePath = @"..\..\..\CAN_Model_Scripted.XML";
             bool simulationSet = false, targetSet = false, modelSet = false;
 
             // Get the input filenames

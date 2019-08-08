@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="HSFSubsystem.AccessSub" Collapsed="true">
+    <Position X="1.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>AccessSub.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.ADCS" Collapsed="true">
+    <Position X="8" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAQAAAAAAAAAAIAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>ADCS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.Comm" Collapsed="true">
+    <Position X="12.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAABAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Comm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.EOSensor" Collapsed="true">
+    <Position X="17" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAgBAAAAKAAAAAAAACAAIIBAAAAAAIggAAQA=</HashCode>
+      <FileName>EOSensor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.Power" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAoAABAEAEQAAAAAAIAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Power.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.ScriptedSubsystem" Collapsed="true">
+    <Position X="10.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQgAAAAwAAAAAAAAAAAAAJAAAAAAAAABAAAAAAgAAAA=</HashCode>
+      <FileName>ScriptedSubsystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.SSDR" Collapsed="true">
+    <Position X="14.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIQAAAAAAAAAAEACAAEAACAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>SSDR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSubsystem.Subsystem" Collapsed="true">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQgAAAggAAAgAgARBAAAAJSAAAAAEAABAAAgUEgEAIA=</HashCode>
+      <FileName>Subsystem.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HSFSubsystem.SubsystemFactory">
+    <Position X="19.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SubsystemFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSystem.Constraint">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAQAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Constraint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSystem.ConstraintFactory">
+    <Position X="19.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ConstraintFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSystem.Dependency">
+    <Position X="21.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIEAAAAAAAAAABAAAAAAAAAAAAAAQAAQAAAAAAAAgA=</HashCode>
+      <FileName>Dependency.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSystem.IMU" Collapsed="true">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAgAAsCAAABEQQKYAAAEIEAAACABAAAAAAAIHAgCIAE=</HashCode>
+      <FileName>IMU.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSystem.SingleConstraint&lt;T&gt;">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="HSFSystem.SingleConstraint&lt;T&gt;.ConstraintType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SingleConstraint.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAAAQCAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>SingleConstraint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFSystem.SystemClass">
+    <Position X="23.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABCAAAAAAAAAAAAAAAAAAAAABAAAAAgAAQAgCA=</HashCode>
+      <FileName>SystemClass.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="HSFSystem.ISubsystem">
+    <Position X="9" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>ISubsystem.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

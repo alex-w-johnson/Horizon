@@ -119,6 +119,7 @@
       <Link>Horizon2.licenseheader</Link>
     </None>
     <None Include="app.config" />
+    <None Include="HSFSchedulerClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

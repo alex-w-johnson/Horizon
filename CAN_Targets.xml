@@ -1,5 +1,16 @@
 ﻿<TARGETDECK>
   <TARGET
+   TargetName = "control"
+   TargetType = "FlyingAlong"
+   TaskType = "FLYALONG"
+   MaxTimes = "1000000000"
+   Value = "10">
+    <DynamicState
+			DynamicStateType = "STATIC_ECI"
+			ICs = "[-1.469507729932651E08; 2.052524454762490E07; 8.898546976340212E06]">
+    </DynamicState>
+  </TARGET>
+  <TARGET
 		TargetName = "imagetarget1"
 		TargetType = "LocationTarget"
 		TaskType = "IMAGING"
@@ -8,28 +19,6 @@
     <DynamicState
 			DynamicStateType = "STATIC_ECI"
 			ICs = "[-3.37E14; 1.37E13; 1.04E13]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "desaturate1"
-		TargetType = "Desaturate"
-		TaskType = "DESATURATE"
-		MaxTimes = "1000000000"
-		Value = "1">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[-1.469507729932651E08; 2.052524454762490E07; 8.898546976340212E06]">
-    </DynamicState>
-  </TARGET>
-  <TARGET
-		TargetName = "control"
-		TargetType = "FlyingAlong"
-		TaskType = "FLYALONG"
-		MaxTimes = "1000000000"
-		Value = "10">
-    <DynamicState
-			DynamicStateType = "STATIC_ECI"
-			ICs = "[-1.469507729932651E08; 2.052524454762490E07; 8.898546976340212E06]">
     </DynamicState>
   </TARGET>
 </TARGETDECK>

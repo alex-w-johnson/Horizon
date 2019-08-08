@@ -74,7 +74,7 @@ class adcs(HSFSubsystem.Subsystem):
         instance.axmagtorx2 = Matrix[float](node.ChildNodes[1].Attributes["axmagtorx2"].Value)
         instance.axmagtorx3 = Matrix[float](node.ChildNodes[1].Attributes["axmagtorx3"].Value)
         instance.peakbmagtorx = Matrix[float](node.ChildNodes[1].Attributes["peakB"].Value)
-        instance.peakpowermagtorx = Matrix[float](node.ChildNodes[1].Attributes["maxpowmagtorx"].Value)
+        instance.maxpowermagtorx = Matrix[float](node.ChildNodes[1].Attributes["maxpowmagtorx"].Value)
         instance.antisolaraxis = Matrix[float](node.ChildNodes[2].Attributes["antisolaraxis"].Value)
         instance.slewtime = float(node.ChildNodes[2].Attributes["slewtime"].Value)
         instance.dwelltime = float(node.ChildNodes[2].Attributes["dwelltime"].Value)
@@ -357,7 +357,7 @@ class adcs(HSFSubsystem.Subsystem):
                             qCom0 = qCom0Hold
                             qComLam = Quat.Conjugate(qLam0) * qCom0
                             self.qcom0_prev = qCom0
-                        elif time >= te and time <= ee:
+                        elif time >= te and time < ee:
                             isKiError = False
                             qCom0 = self.CalcNadirCommandFrame(assetOrbState,qLam0)
                             qComLam = Quat.Conjugate(qLam0) * qCom0
@@ -411,7 +411,7 @@ class adcs(HSFSubsystem.Subsystem):
             event.SetTaskEnd(asset,es + eventdt)
             event.SetEventEnd(asset,es + eventdt)
             ee = event.GetEventEnd(asset)
-            while time <= ee:
+            while time < ee:
                 assetPosTime = assetDynState.PositionECI(time)
                 assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
                 assetVelTime = assetDynState.VelocityECI(time)
@@ -456,10 +456,7 @@ class adcs(HSFSubsystem.Subsystem):
                 borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
                 borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
                 solPosNormVec = self.sun.getEarSunVec(time) / Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
-                #print("solPosNormVec: " + solPosNormVec.ToString()+ "
-                #boreAxis: "+ borePointing.ToString())
                 solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
-                #print(Matrix[float].Dot(borePointing,solPosNormVec).ToString())
                 nadirVec = -1.0 * Matrix[float](assetPosTime.ToString()) / Matrix[float].Norm(assetPosTime)
                 nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
                 ramVec = assetVelTime / Vector.Norm(assetVelTime)
@@ -472,8 +469,6 @@ class adcs(HSFSubsystem.Subsystem):
                 self._newState.AddValue(self.ISTRACKING_KEY,HSFProfile[bool](time, False))
                 self._newState.AddValue(self.WHEELTORQUE_KEY,HSFProfile[Matrix[float]](time,T_control))
                 self._newState.AddValue(self.MAGTORQDIPOLE_KEY,HSFProfile[Matrix[float]](time,Matrix[float]("[0.0; 0.0; 0.0]")))
-                #print("Sim Time: "+str(time)+"seconds | Current Time:
-                #"+System.DateTime.Now.ToString())
                 time+=dt
             return True
         elif (taskType == TaskType.DESATURATE):
@@ -484,7 +479,7 @@ class adcs(HSFSubsystem.Subsystem):
             isDesated = True
             self.isDesaturating = False
             for idx in range(1,self.numWheels + 1):
-                isDesated = (isDesated and (assetWheelRates[idx] < self.maxspeedwheels[idx]))
+                isDesated = (isDesated and (assetWheelRates[idx] < 0.2*self.maxspeedwheels[idx]))
             if (not isDesated):
                 self.isDesaturating = True
                 event.SetTaskStart(asset,es)
@@ -499,9 +494,6 @@ class adcs(HSFSubsystem.Subsystem):
                     assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
                     assetRatesTime = Matrix[float].Transpose(assetDynState.EulerRates(time))
                     assetWheelRatesTime = assetDynState.WheelRates(time)
-                    for wheelIdx in range(1,self.numWheels + 1):
-                        if assetWheelRatesTime[wheelIdx] > self.maxspeedwheels[wheelIdx]:
-                            return False
                     assetOrbState = Matrix[float](6,1)
                     assetOrbState[1] = assetPosTime[1]
                     assetOrbState[2] = assetPosTime[2]
@@ -520,16 +512,13 @@ class adcs(HSFSubsystem.Subsystem):
                     qErr = Matrix[float].Transpose(qErr)
                     propError = self.PropErrorCalc(self.kpvec,qErr)
                     rTime = Matrix[float].Norm(assetPosTime)
-                    lvlhRate = Vector.Cross(Vector(assetPosTime.ToString()),assetVelTime) / (rTime * rTime)
-                    lvlhRate = Quat.Rotate(assetQuatTime,lvlhRate)
-                    lvlhRate = Matrix[float](lvlhRate.ToString())
-                    lvlhRate = Matrix[float].Transpose(lvlhRate)
-                    deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime)
+                    lvlhRate = Matrix[float](3,1)
+                    lvlhRate[2] = -Vector.Norm(assetVelTime)/Matrix[float].Norm(assetPosTime)
+                    lvlhRateInBody = Quat.Rotate(qBodLam,lvlhRate)
+                    deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime-lvlhRateInBody)
                     T_control = -propError - deriError
                     #print("Control " + T_control.ToString())
-                    r_eci = Matrix[float](3,1)
-                    for i in range(1,4):
-                        r_eci[i,1] = assetPosTime[i]
+                    r_eci = assetOrbState[MatrixIndex(1,3),MatrixIndex(1)]
                     mDipoleCommand = self.CalcDesatCommandDipole(self.CalcBodyMagField(r_eci,SimParameters.SimStartJD,assetQuatTime),T_control)
                     Tdipole = self.CalcMagMoment(r_eci,SimParameters.SimStartJD,mDipoleCommand,assetQuatTime)
                     #print("Dipole Torque: " + Tdipole.ToString())
@@ -544,12 +533,12 @@ class adcs(HSFSubsystem.Subsystem):
                     borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
                     solPosNormVec = self.sun.getEarSunVec(time) / Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
                     solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
-                    nadirVec = -1.0 * Matrix[float](assetPosTime.ToString()) / Vector.Norm(assetPosTime)
+                    nadirVec = -1.0 * Matrix[float](assetPosTime.ToString()) / Matrix[float].Norm(assetPosTime)
                     nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
                     ramVec = assetVelTime / Vector.Norm(assetVelTime)
                     ramVec = Matrix[float](ramVec.ToString())
                     ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
-                    self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](targetPos,e,borePointing))
+                    self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](time,borePointing))
                     self._newState.AddValue(self.SOLARELONG_KEY,HSFProfile[float](time,solElongAng))
                     self._newState.AddValue(self.EARTHELONG_KEY,HSFProfile[float](time,nadirBoreAng))
                     self._newState.AddValue(self.RAMANGLE_KEY,HSFProfile[float](time,ramAng))
@@ -645,7 +634,7 @@ class adcs(HSFSubsystem.Subsystem):
                     return False
 
             # Set up scheduling evaluation for comms task
-            event.SetTaskEnd(asset,time + self.slewtime + 60.0)
+            event.SetTaskEnd(asset,time + self.slewtime + eventdt)
             te = event.GetTaskEnd(asset)
             event.SetEventEnd(asset,te)
             ee = event.GetEventEnd(asset)
@@ -705,10 +694,10 @@ class adcs(HSFSubsystem.Subsystem):
                     #print("Downlinking")
                     event.SetTaskStart(asset,time + timeSlew)
                     ts = event.GetTaskStart(asset)
-                    event.SetTaskEnd(asset,ts + 60.0)
+                    event.SetTaskEnd(asset,ts + eventdt)
                     te = event.GetTaskEnd(asset)
                     if ts == te:
-                        event.SetTaskEnd(asset,ts + 60.0)
+                        event.SetTaskEnd(asset,ts + eventdt)
                     event.SetEventEnd(asset,te)
                     ee = event.GetEventEnd(asset)
                     while(time < te):

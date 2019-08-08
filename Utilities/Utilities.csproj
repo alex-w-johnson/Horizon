@@ -104,6 +104,7 @@
       <Link>Horizon2.licenseheader</Link>
     </None>
     <None Include="app.config" />
+    <None Include="UtilitiesClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

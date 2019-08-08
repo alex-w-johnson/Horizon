@@ -88,7 +88,7 @@ class comm(HSFSubsystem.Subsystem):
             rhoDotTargPos = Vector.Dot(rho,targPos)
             elevAngle = System.Math.Acos(rhoDotTargPos/Vector.Norm(rho)/Vector.Norm(targPos)) - (System.Math.PI / 2.0)
             elevAngle = elevAngle * 180.0 / System.Math.PI
-            #print(elevAngle)
+            print(elevAngle)
             if elevAngle < self.minElevAngle:
                 return False
             if (newProf.Empty() == False):

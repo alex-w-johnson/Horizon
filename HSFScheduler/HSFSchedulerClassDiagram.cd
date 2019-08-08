@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="HSFScheduler.Access">
+    <Position X="5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABQAAAAAAAEAggAAAAAAAAAAAAAAFAgAAACAAA=</HashCode>
+      <FileName>Access.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.Checker">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAEAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Checker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.Evaluator">
+    <Position X="1.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Evaluator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.EvaluatorFactory">
+    <Position X="7.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EvaluatorFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.Scheduler">
+    <Position X="0.5" Y="5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAABAAIEAASAAAAAAACAAACAAAAAECAAQAAAAABAA=</HashCode>
+      <FileName>Scheduler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.ScriptedEvaluator">
+    <Position X="0.5" Y="2.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAACAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ScriptedEvaluator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.StateHistory">
+    <Position X="3.75" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAACAAAAAAAAAAIAAAIAACgAAAAAAAAAAAAAARAA=</HashCode>
+      <FileName>StateHistory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.SystemSchedule">
+    <Position X="6.75" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgQAAAAAABEACAAAAAAAACAAAAACJAAAE=</HashCode>
+      <FileName>SystemSchedule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HSFScheduler.TargetValueEvaluator">
+    <Position X="2.5" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TargetValueEvaluator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
