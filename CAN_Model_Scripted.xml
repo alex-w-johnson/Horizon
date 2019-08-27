@@ -75,6 +75,7 @@
         kddesat="[0.0022; 0.0022; 0.0022]"
         trackrate="0.003">
       </Control>
+      <IC type="Matrix" key="DynState" value="[946.53201; 6777.837; 0; 0.97622974; -0.1363315; 7.5870761; 0.56678126; 0.49790907; 0.43320732; -0.49312978; 0; 0; 0; 0.0; 0.0; 0.0]"></IC>
       <IC type="Matrix" key="Bore_Pointing_Vector(XYZ)" value="[-0.9813; 0.137; 0.1355]"></IC>
       <IC type="Double" key="SolarBoreElongation" value="175.6438"></IC>
       <IC type="Double" key="EarthBoreAngle" value="90"></IC>
@@ -110,7 +111,7 @@
       bufferSize="8.0e+9"
       peakDataRate ="208750"
       obcAvgPower="5.0">
-      <IC type="Double" key="DataBufferFillRatio" value="0.8"></IC>
+      <IC type="Double" key="DataBufferFillRatio" value="0.0"></IC>
       <DEPENDENCY subsystemName="Payload" fcnName="MDHfromPayload.asset1"></DEPENDENCY>
     </SUBSYSTEM>
     <SUBSYSTEM
@@ -140,6 +141,7 @@
       <IC type="Double" key="DepthofDischarge" value="0.0"></IC>
       <IC type="Double" key="SolarPanelPowerIn" value="0.0"></IC>
       <DEPENDENCY subsystemName="Adcs" fcnName="PowerfromADCS.asset1"></DEPENDENCY>
+      <DEPENDENCY subsystemName="Adcs" fcnName="PowerDynStatefromADCS.asset1"></DEPENDENCY>
       <DEPENDENCY subsystemName="Payload" fcnName="PowerfromPayload.asset1"></DEPENDENCY>
       <DEPENDENCY subsystemName="MDH" fcnName="PowerfromMDH.asset1"></DEPENDENCY>
       <DEPENDENCY subsystemName="Comm" fcnName="PowerfromComm.asset1"></DEPENDENCY>

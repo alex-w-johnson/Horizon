@@ -64,7 +64,7 @@ class mdh(HSFSubsystem.Subsystem):
         instance.DATABUFFERRATIO_KEY = Utilities.StateVarKey[System.Double](instance.Asset.Name + '.' + 'databufferfillratio')
         instance.addKey(instance.DATABUFFERRATIO_KEY)
         return instance
-		
+
     def GetDependencyDictionary(self):
         dep = Dictionary[str, Delegate]()
         depFunc1 = Func[Event,  Utilities.HSFProfile[System.Double]](self.POWERSUB_PowerProfile_MDHSUB)

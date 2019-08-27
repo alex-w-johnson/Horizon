@@ -69,6 +69,9 @@ class power(HSFSubsystem.Subsystem):
         return Func[Event,  Utilities.HSFProfile[System.Double]](self.DependencyCollector)
 
     def CanPerform(self, event, universe):
+        quatDepFuncKey = "PowerDynStatefromADCS." + self.Asset.Name
+        quatDepFunc = self.SubsystemDependencyFunctions[quatDepFuncKey]
+        dynInvokeResult = quatDepFunc.DynamicInvoke(event)
         es = event.GetEventStart(self.Asset)
         te = event.GetTaskEnd(self.Asset)
         ee = event.GetEventEnd(self.Asset)
@@ -86,7 +89,7 @@ class power(HSFSubsystem.Subsystem):
 
         # collect power profile in
         position = self.Asset.AssetDynamicState
-        powerIn = self.CalcSolarPanelPowerProfile(es, te, self._newState, position, universe)
+        powerIn = self.CalcSolarPanelPowerProfile(es, te, self._newState, position, universe, dynInvokeResult)
 
         # calculate dod rate
         dodrateofchange = HSFProfile[System.Double]()
@@ -101,6 +104,9 @@ class power(HSFSubsystem.Subsystem):
         return True
 
     def CanExtend(self, event, universe, extendTo):
+        quatDepFuncKey = "PowerDynStatefromADCS." + self.Asset.Name
+        quatDepFunc = self.SubsystemDependencyFunctions[quatDepFuncKey]
+        dynInvokeResult = quatDepFunc.DynamicInvoke(event)
         if event.GetAssetTask(self.Asset).Type == TaskType.FLYALONG:
             return False
         ee = event.GetEventEnd(self.Asset)
@@ -120,7 +126,7 @@ class power(HSFSubsystem.Subsystem):
         powerOut = self.DependencyCollector(event)
         # collect power profile in
         position = self.Asset.AssetDynamicState
-        powerIn = self.CalcSolarPanelPowerProfile(te, ee, event.State, position, universe)
+        powerIn = self.CalcSolarPanelPowerProfile(te, ee, event.State, position, universe, dynInvokeResult)
         # calculated dod rate
         dodrateofchange = ((powerOut - powerIn) / self._batterySize)
 
@@ -145,7 +151,7 @@ class power(HSFSubsystem.Subsystem):
         else:
             return self.CalcPowerInCosineArea(attitude,area,efficiency,time)
 
-    def CalcSolarPanelPowerProfile(self, start, end, state, position, universe):
+    '''def CalcSolarPanelPowerProfile(self, start, end, state, position, universe):
         # create solar panel profile for this event
         freq = 1
         lastShadow = universe.Sun.castShadowOnPos(position, start)
@@ -158,17 +164,50 @@ class power(HSFSubsystem.Subsystem):
             lastShadow = shadow
             time += freq
         state.AddValue(self.POWIN_KEY, solarPanelSolarProfile)
+        return solarPanelSolarProfile'''
+
+    def CalcSolarPanelPowerProfile(self, start, end, state, position, universe, attitude):
+        # create solar panel profile for this event
+        freq = 1
+        lastShadow = universe.Sun.castShadowOnPos(position, start)
+        solarPanelSolarProfile = Utilities.HSFProfile[System.Double](start, self.GetSolarPanelPower(lastShadow,attitude,self._panelArea,self._panelEfficiency,start))
+        time = start
+        while time <= end:
+            shadow = universe.Sun.castShadowOnPos(position, time)
+            solarPanelSolarProfile[time] = self.GetSolarPanelPower(shadow,attitude,self._panelArea,self._panelEfficiency,time)
+            lastShadow = shadow
+            time += freq
+        state.AddValue(self.POWIN_KEY, solarPanelSolarProfile)
         return solarPanelSolarProfile
 
     def DependencyCollector(self, currentEvent):
-        return super(power, self).DependencyCollector(currentEvent)
+        outProf = HSFProfile[float]()
+        for dep in self.SubsystemDependencyFunctions:
+            if not (dep.Key == "DepCollector" or dep.Key == ("PowerDynStatefromADCS."+self.Asset.Name)):
+                temp = dep.Value.DynamicInvoke(currentEvent)
+                outProf = outProf + temp
+        return outProf
+
+    '''def CalcPowerInCosineArea(self,attitude,area,efficiency,time):
+        panelAxis = Matrix[System.Double](3,1)
+        panelAxis[1] = 0.0
+        panelAxis[2] = 0.0
+        panelAxis[3] = -1.0
+        attitudeAtTime = attitude.Quaternions(time)
+        attitude = Quat(attitudeAtTime[1],attitudeAtTime[2],attitudeAtTime[3],attitudeAtTime[4])
+        panAxisECI = Quat.Rotate(Quat.Conjugate(attitude),panelAxis)
+        r_solar = self.sun.getEarSunVec(time)
+        r_solarNorm = Vector.Norm(Vector(r_solar.ToString()))
+        dotProd = Matrix[System.Double].Dot(r_solar/r_solarNorm,panAxisECI)
+        return 1367.0*area*efficiency*dotProd*self._panelDensity'''
 
     def CalcPowerInCosineArea(self,attitude,area,efficiency,time):
         panelAxis = Matrix[System.Double](3,1)
         panelAxis[1] = 0.0
         panelAxis[2] = 0.0
         panelAxis[3] = -1.0
-        attitudeAtTime = attitude.Quaternions(time)
+        dynStateTime = attitude[time]
+        attitudeAtTime = dynStateTime[MatrixIndex(7,10),1]
         attitude = Quat(attitudeAtTime[1],attitudeAtTime[2],attitudeAtTime[3],attitudeAtTime[4])
         panAxisECI = Quat.Rotate(Quat.Conjugate(attitude),panelAxis)
         r_solar = self.sun.getEarSunVec(time)

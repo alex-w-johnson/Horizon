@@ -113,7 +113,7 @@
       <Link>Horizon2.licenseheader</Link>
     </None>
     <None Include="app.config" />
-    <None Include="ClassDiagram1.cd" />
+    <None Include="HSFUniverseClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

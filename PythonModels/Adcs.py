@@ -48,6 +48,7 @@ class adcs(HSFSubsystem.Subsystem):
         instance.MAGTORQDIPOLE_KEY = StateVarKey[Matrix[float]](instance.Asset.Name + '.' + 'magtorqmdipole')
         instance.isDesaturating = False
         instance.ISTRACKING_KEY = StateVarKey[bool](instance.Asset.Name + '.' + 'istracking')
+        instance.DYNSTATE_KEY = StateVarKey[Matrix[float]](instance.Asset.Name + '.' + 'dynstate')
         instance.addKey(instance.POINTVEC_KEY)
         instance.addKey(instance.SOLARELONG_KEY)
         instance.addKey(instance.EARTHELONG_KEY)
@@ -55,6 +56,7 @@ class adcs(HSFSubsystem.Subsystem):
         instance.addKey(instance.WHEELTORQUE_KEY)
         instance.addKey(instance.MAGTORQDIPOLE_KEY)
         instance.addKey(instance.ISTRACKING_KEY)
+        instance.addKey(instance.DYNSTATE_KEY)
         instance.Asset.AssetDynamicState.IntegratorParameters.Add(instance.WHEELTORQUE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
         instance.Asset.AssetDynamicState.IntegratorParameters.Add(instance.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
         instance.numwheels = int(node.ChildNodes[0].Attributes["numwheels"].Value)
@@ -96,9 +98,10 @@ class adcs(HSFSubsystem.Subsystem):
         instance.constPower = instance.powerimu + instance.powerStarTracker + instance.powerGPS
         # Calculate initial lvlh quaternion
         assetOrbState0 = Matrix[float](6,1)
-        assetInitDynState = asset.AssetDynamicState.InitialConditions()
-        assetPos0 = assetInitDynState[MatrixIndex(1,3)]
-        assetVel0 = assetInitDynState[MatrixIndex(4,6)]
+        #assetInitDynState = asset.AssetDynamicState.InitialConditions()
+        assetInitDynState = Matrix[float].Transpose(Matrix[float](asset.AssetDynamicState.InitialConditions().ToString()))
+        assetPos0 = assetInitDynState[MatrixIndex(1,3),MatrixIndex(1,1)]
+        assetVel0 = assetInitDynState[MatrixIndex(4,6),MatrixIndex(1,1)]
         assetOrbState0[1] = assetPos0[1]
         assetOrbState0[2] = assetPos0[2]
         assetOrbState0[3] = assetPos0[3]
@@ -117,6 +120,10 @@ class adcs(HSFSubsystem.Subsystem):
         dep.Add("PowerfromADCS" + "." + self.Asset.Name, depFunc1)
         depFunc2 = Func[Event, float](self.EVAL_tasktype_ADCSSUB)
         dep.Add("EvalfromADCS" + "." + self.Asset.Name, depFunc2)
+        '''depFunc3 = Func[Event, HSFProfile[Matrix[float]]](self.COMMSUB_DynamicState_ADCSSUB)
+        dep.Add("CommDynStatefromADCS" + "." + self.Asset.Name, depFunc3)'''
+        depFunc4 = Func[Event, HSFProfile[Matrix[float]]](self.POWERSUB_DynamicState_ADCSSUB)
+        dep.Add("PowerDynStatefromADCS" + "." + self.Asset.Name, depFunc4)
         return dep
 
     def GetDependencyCollector(self):
@@ -125,16 +132,12 @@ class adcs(HSFSubsystem.Subsystem):
     def POWERSUB_PowerProfile_ADCSSUB(self, event):
         prof1 = HSFProfile[float]()
         if (event.GetAssetTask(self.Asset).Type == TaskType.IMAGING or event.GetAssetTask(self.Asset).Type == TaskType.COMM):
-            #print Matrix[float].CumSum(self.idlepowerwheels,2)
-            #print Matrix[float].CumSum(self.maxpowerwheels,2)
             prof1[event.GetEventStart(self.Asset)] = self.constPower + float(Matrix[float].CumSum(self.idlepowerwheels,2))
             prof1[event.GetTaskStart(self.Asset)] = self.constPower + float(Matrix[float].CumSum(self.maxpowerwheels,2))
             prof1[event.GetTaskEnd(self.Asset)] = self.constPower + float(Matrix[float].CumSum(self.idlepowerwheels,2))
         elif (event.GetAssetTask(self.Asset).Type == TaskType.DESATURATE):
-            #print Matrix[float].CumSum(self.maxpowermagtorx,2)
             prof1[event.GetEventStart(self.Asset)] = self.constPower + float(Matrix[float].CumSum(self.idlepowerwheels,2)) + float(Matrix[float].CumSum(self.maxpowermagtorx,2))
         else:
-            #print Matrix[float].CumSum(self.idlepowerwheels,2)
             prof1[event.GetEventStart(self.Asset)] = self.constPower + float(Matrix[float].CumSum(self.idlepowerwheels,2))
         return prof1
 
@@ -148,6 +151,14 @@ class adcs(HSFSubsystem.Subsystem):
             return 1.0
         else:
             return 0.0
+
+    def COMMSUB_DynamicState_ADCSSUB(self,event):
+        prof1 = event.State.GetProfile(self.DYNSTATE_KEY)
+        return prof1
+
+    def POWERSUB_DynamicState_ADCSSUB(self,event):
+        prof1 = event.State.GetProfile(self.DYNSTATE_KEY)
+        return prof1
 
     def CanPerform(self, event, universe):
         # TODO: Evaluate whether a task can be completed during an Access
@@ -201,18 +212,25 @@ class adcs(HSFSubsystem.Subsystem):
         targetDynState = target.DynamicState
 
         # Load asset dynamic state
-        assetDynState = asset.AssetDynamicState
-        assetVelEs = assetDynState.VelocityECI(es)
-        assetQuatEs = assetDynState.Quaternions(es)
-        assetQuatEs = Quat(assetQuatEs[1],assetQuatEs[2],assetQuatEs[3],assetQuatEs[4])
-        assetRatesEs = assetDynState.EulerRates(es)
-        assetRatesEs = Matrix[float].Transpose(assetRatesEs)
-        assetWheelRates = assetDynState.WheelRates(es)
+        #assetDynState = asset.AssetDynamicState
+        assetDynState = self._newState.GetFullProfile(self.DYNSTATE_KEY)
+        #assetVelEs = assetDynState.VelocityECI(es)
+        #assetQuatEs = assetDynState.Quaternions(es)
+        #assetQuatEs = Quat(assetQuatEs[1],assetQuatEs[2],assetQuatEs[3],assetQuatEs[4])
+        #assetRatesEs = assetDynState.EulerRates(es)
+        #assetRatesEs = Matrix[float].Transpose(assetRatesEs)
+        #assetWheelRates = assetDynState.WheelRates(es)
+        assetDynStateEs = assetDynState[es]
+        assetVelEs = assetDynStateEs[MatrixIndex(4,6),1]
+        assetQuatEs = assetDynStateEs[MatrixIndex(7,10),1]
+        assetRatesEs = assetDynStateEs[MatrixIndex(11,13),1]
+        assetWheelRates = assetDynStateEs[MatrixIndex(14,16),1]
 
         # Calculate dynamic states at task start time
-        assetPosEs = assetDynState.PositionECI(es)
+        #assetPosEs = assetDynState.PositionECI(es)
         targetPosEs = targetDynState.PositionECI(es)
-        
+        assetPosEs = assetDynStateEs[MatrixIndex(1,3),1]
+
         # Calculate event time start
         time = es
 
@@ -220,13 +238,15 @@ class adcs(HSFSubsystem.Subsystem):
         self.qlam0_prev = None
         self.qcom0_prev = None
 
-        assetOrbState = Matrix[float](6,1)
+        '''assetOrbState = Matrix[float](6,1)
         assetOrbState[1] = assetPosEs[1]
         assetOrbState[2] = assetPosEs[2]
         assetOrbState[3] = assetPosEs[3]
         assetOrbState[4] = assetVelEs[1]
         assetOrbState[5] = assetVelEs[2]
-        assetOrbState[6] = assetVelEs[3]
+        assetOrbState[6] = assetVelEs[3]'''
+        assetOrbState = assetPosEs
+        assetOrbState.Vertcat(assetVelEs)
 
         if (taskType == TaskType.IMAGING):
             # Implement roll-constrained slew maneuver here THEN HOLD INERTIAL POINTING AFTER TASK START
@@ -246,14 +266,16 @@ class adcs(HSFSubsystem.Subsystem):
                     return False
             
             # Check slew time capability
+            event.SetTaskStart(asset,es)
+            ts = event.GetTaskStart(asset)
             event.SetTaskEnd(asset,time + self.slewtime + self.dwelltime)
             te = event.GetTaskEnd(asset)
             event.SetEventEnd(asset,te)
             ee = event.GetEventEnd(asset)
             targetPosMat = Matrix[float].Transpose(Matrix[float](targetPosEs.ToString()))
-            dsType = assetDynState.Type
-            dsEoms = assetDynState.Eoms
-            dsIc = assetDynState.DynamicStateECI(time)
+            dsType = asset.AssetDynamicState.Type
+            dsEoms = asset.AssetDynamicState.Eoms
+            dsIc = Vector(assetDynStateEs.ToString())
             slewDynState = DynamicState(asset.Name,dsType, dsEoms, dsIc)
             slewDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
             slewDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
@@ -299,16 +321,9 @@ class adcs(HSFSubsystem.Subsystem):
                 slewBoreAxis = Quat.Rotate(Quat.Conjugate(slewQuatTime), self.boreaxis)
                 r_AT = targetPosMat - slewPosTime
                 pointError = 180.0 * System.Math.Acos(Matrix[float].Dot(slewBoreAxis,r_AT) / (Vector.Norm(Vector(r_AT.ToString())) * Vector.Norm(Vector(slewBoreAxis.ToString())))) / System.Math.PI
-                if pointError > 45.0:
-                    pass
-                #print pointError
-                trackingRate = Vector(2)
-                trackingRate[1] = slewRatesTime[1]
-                trackingRate[2] = slewRatesTime[2]
-                trackRateError = Vector.Norm(trackingRate)
-                #print trackRateError
+                trackingRate = slewRatesTime[MatrixIndex(1,2),1]
+                trackRateError = Matrix[float].Norm(trackingRate)
                 if (pointError <= self.pointingbound) and (trackRateError <= self.trackRate):
-                    #print("Imaging")
                     # reset previous quaternions for zero-crossing logic
                     self.qlam0_prev = None
                     self.qcom0_prev = None
@@ -322,16 +337,23 @@ class adcs(HSFSubsystem.Subsystem):
                         return False
                     if (te > SimParameters.SimEndSeconds):
                         return False
+                    eventDynState = DynamicState(asset.Name, dsType, dsEoms, dsIc)
                     while(time < ee):
-                        tNorm = (time - es) / ts
                         #print("Normalized Maneuver Time: " + tNorm.ToString())
-                        assetPosTime = assetDynState.PositionECI(time)
+                        assetDynStateTime = assetDynState[time]
+                        '''assetPosTime = assetDynState.PositionECI(time)
                         assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
                         assetVelTime = assetDynState.VelocityECI(time)
                         assetQuatTime = assetDynState.Quaternions(time)
                         assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
                         assetRatesTime = Matrix[float].Transpose(assetDynState.EulerRates(time))
-                        assetWheelRatesTime = assetDynState.WheelRates(time)
+                        assetWheelRatesTime = assetDynState.WheelRates(time)'''
+                        assetPosTime = assetDynStateTime[MatrixIndex(1,3),1]
+                        assetVelTime = assetDynStateTime[MatrixIndex(4,6),1]
+                        assetQuatTime = assetDynStateTime[MatrixIndex(7,10),1]
+                        assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
+                        assetRatesTime = assetDynStateTime[MatrixIndex(11,13),1]
+                        assetWheelRatesTime = assetDynStateTime[MatrixIndex(14,16),1]
                         assetOrbState = Matrix[float](6,1)
                         assetOrbState[1] = assetPosTime[1]
                         assetOrbState[2] = assetPosTime[2]
@@ -374,8 +396,12 @@ class adcs(HSFSubsystem.Subsystem):
                         for i in range(1,self.numwheels + 1):
                             if abs(T_control[i]) > self.peaktorqwheels[i]*(1.0-abs(assetWheelRatesTime[i])/self.maxspeedwheels[i]):
                                 T_control[i] = math.copysign(self.peaktorqwheels[i]*(1.0-abs(assetWheelRatesTime[i])/self.maxspeedwheels[i]),T_control[i])
-                        assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
-                        assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
+                        #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
+                        #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float]("[0.0; 0.0; 0.0]"))
+                        eventDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
+                        eventDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float](3,1,0.0))
+                        eventDynStateFuture = eventDynState.DynamicStateECI(time-es+dt)
+                        assetDynState[time+dt] = Matrix[float].Transpose(Matrix[float](eventDynStateFuture.ToString()))
                         # Update ADCS states
                         borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
                         borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
@@ -383,8 +409,7 @@ class adcs(HSFSubsystem.Subsystem):
                         solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
                         nadirVec = -1.0 * assetPosTime / Vector.Norm(Vector(assetPosTime.ToString()))
                         nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
-                        ramVec = assetVelTime / Vector.Norm(assetVelTime)
-                        ramVec = Matrix[float].Transpose(Matrix[float](ramVec.ToString()))
+                        ramVec = assetVelTime / Matrix[float].Norm(assetVelTime)
                         ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                         self._newState.AddValue(self.POINTVEC_KEY, HSFProfile[Matrix[float]](time,borePointing))
                         self._newState.AddValue(self.SOLARELONG_KEY, HSFProfile[float](time,solElongAng))
@@ -411,14 +436,25 @@ class adcs(HSFSubsystem.Subsystem):
             event.SetTaskEnd(asset,es + eventdt)
             event.SetEventEnd(asset,es + eventdt)
             ee = event.GetEventEnd(asset)
+            dsType = asset.AssetDynamicState.Type
+            dsEoms = asset.AssetDynamicState.Eoms
+            dsIc = Vector(assetDynStateEs.ToString())
+            eventDynState = DynamicState(asset.Name, dsType, dsEoms, dsIc)
             while time < ee:
-                assetPosTime = assetDynState.PositionECI(time)
+                '''assetPosTime = assetDynState.PositionECI(time)
                 assetPosTime = Matrix[float].Transpose(Matrix[float](assetPosTime.ToString()))
                 assetVelTime = assetDynState.VelocityECI(time)
                 assetQuatTime = assetDynState.Quaternions(time)
                 assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
                 assetRatesTime = Matrix[float].Transpose(assetDynState.EulerRates(time))
-                assetWheelRatesTime = assetDynState.WheelRates(time)
+                assetWheelRatesTime = assetDynState.WheelRates(time)'''
+                assetDynStateTime = assetDynState[time]
+                assetPosTime = assetDynStateTime[MatrixIndex(1,3),1]
+                assetVelTime = assetDynStateTime[MatrixIndex(4,6),1]
+                assetQuatTime = assetDynStateTime[MatrixIndex(7,10),1]
+                assetQuatTime = Quat(assetQuatTime[1], assetQuatTime[2], assetQuatTime[3], assetQuatTime[4])
+                assetRatesTime = assetDynStateTime[MatrixIndex(11,13),1]
+                assetWheelRatesTime = assetDynStateTime[MatrixIndex(14,16),1]
                 for wheelIdx in range(1,self.numWheels + 1):
                     if assetWheelRatesTime[wheelIdx] > self.maxspeedwheels[wheelIdx]:
                         return False                   
@@ -444,23 +480,26 @@ class adcs(HSFSubsystem.Subsystem):
                 propError = self.PropErrorCalc(self.kpvec,qErr)
                 rTime = Matrix[float].Norm(assetPosTime)
                 lvlhRate = Matrix[float](3,1)
-                lvlhRate[2] = -Vector.Norm(assetVelTime)/Matrix[float].Norm(assetPosTime)
+                lvlhRate[2] = -Matrix[float].Norm(assetVelTime)/Matrix[float].Norm(assetPosTime)
                 lvlhRateInBody = Quat.Rotate(qBodLam,lvlhRate)
                 deriError = self.DeriErrorCalc(self.kdvec,assetRatesTime-lvlhRateInBody)
                 T_control = -propError - deriError
                 for i in range(1,self.numwheels + 1):
                     if abs(T_control[i]) > self.peaktorqwheels[i]*(1.0-abs(assetWheelRatesTime[i])/self.maxspeedwheels[i]):
                         T_control[i] = math.copysign(self.peaktorqwheels[i]*(1.0-abs(assetWheelRatesTime[i])/self.maxspeedwheels[i]),T_control[i])
-                assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
-                assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))
+                #assetDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY, T_control)
+                #assetDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY, Matrix[float]("[0.0; 0.0; 0.0]"))
+                eventDynState.IntegratorParameters.Add(self.WHEELTORQUE_KEY,T_control)
+                eventDynState.IntegratorParameters.Add(self.MAGTORQDIPOLE_KEY,Matrix[float](3,1,0.0))
+                eventDynStateFuture = eventDynState.DynamicStateECI(time-es+dt)
+                assetDynState[time+dt] = Matrix[float].Transpose(Matrix[float](eventDynStateFuture.ToString()))
                 borePointing = Quat.Rotate(Quat.Conjugate(assetQuatTime),self.boreaxis)
                 borePointing = borePointing / Vector.Norm(Vector(borePointing.ToString()))
                 solPosNormVec = self.sun.getEarSunVec(time) / Vector.Norm(Vector(self.sun.getEarSunVec(time).ToString()))
                 solElongAng = System.Math.Acos(Matrix[float].Dot(borePointing,solPosNormVec)) * 180.0 / System.Math.PI
                 nadirVec = -1.0 * Matrix[float](assetPosTime.ToString()) / Matrix[float].Norm(assetPosTime)
                 nadirBoreAng = System.Math.Acos(Matrix[float].Dot(borePointing,nadirVec)) * 180.0 / System.Math.PI
-                ramVec = assetVelTime / Vector.Norm(assetVelTime)
-                ramVec = Matrix[float](ramVec.ToString())
+                ramVec = assetVelTime / Matrix[float].Norm(assetVelTime)
                 ramAng = System.Math.Acos(Matrix[float].Dot(borePointing,ramVec)) * 180.0 / System.Math.PI
                 self._newState.AddValue(self.POINTVEC_KEY,HSFProfile[Matrix[float]](time,borePointing))
                 self._newState.AddValue(self.SOLARELONG_KEY,HSFProfile[float](time,solElongAng))
